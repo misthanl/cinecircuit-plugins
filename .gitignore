@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+.env
+.env.*
+!.env.example
+dist/
+*.db
+*.db-*
+*.log
+*.tar.gz
+# Machine-specific NAS deployment helper; not part of plugin distribution.
+deploy_installed.py
+migrate.py
+update_installed_package.py
+verify_release.py
+tests/test_migration.py
