@@ -128,6 +128,15 @@ def test_cookiecloud_schedule_is_a_fixed_period_selector() -> None:
     ]
 
 
+def test_cookiecloud_settings_and_schedule_share_one_page() -> None:
+    schema = CookieCloudPlugin.manifest.config_schema
+
+    assert schema["description"] == "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。"
+    assert [section["key"] for section in schema["sections"]] == ["connection"]
+    assert {field["section"] for field in schema["fields"]} == {"connection"}
+    assert next(field for field in schema["fields"] if field["key"] == "user_key")["secret"] is True
+
+
 def test_cookie_header_uses_only_supported_domain_and_most_specific_cookie() -> None:
     cookies = [
         {"name": "sid", "value": "parent", "domain": ".example.com", "path": "/"},

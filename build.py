@@ -14,13 +14,13 @@ sys.path.insert(0, str(ROOT.parent / "cinecircuit"))
 
 
 def build_frontends() -> None:
-    """Compile TypeScript sources without changing the runtime package contract."""
-    executable = ROOT / "node_modules" / ".bin" / ("tsc.cmd" if sys.platform == "win32" else "tsc")
-    if not executable.is_file():
-        raise RuntimeError("TypeScript compiler missing; run `pnpm install` before building plugins")
-    shutil.rmtree(FRONTEND_BUILD_ROOT, ignore_errors=True)
+    """Compile TypeScript and Vue SFC sources into one browser ESM file per plugin."""
+    executable = shutil.which("node")
+    script = ROOT / "scripts/build-frontends.mjs"
+    if not executable or not script.is_file():
+        raise RuntimeError("Frontend builder missing; run `pnpm install` before building plugins")
     subprocess.run(
-        [str(executable), "-p", str(ROOT / "tsconfig.build.json")],
+        [executable, str(script)],
         cwd=ROOT,
         check=True,
     )
@@ -59,6 +59,8 @@ def build():
                 if not path.is_file() or "__pycache__" in path.parts:
                     continue
                 if path.name.startswith("test_") or path.name.endswith((".test.mjs", ".pyc")) or path.name == "legacy_http_reference.py":
+                    continue
+                if path.suffix == ".vue":
                     continue
                 if path.name == "frontend.ts":
                     compiled = FRONTEND_BUILD_ROOT / path.relative_to(ROOT).with_suffix(".js")

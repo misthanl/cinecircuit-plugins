@@ -2,13 +2,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
-import { install } from "../../.build/cinecircuit_plugins/auto_signin/frontend.js";
-
 const require = createRequire(resolve("package.json"));
 const { JSDOM } = require("jsdom");
 const dom = new JSDOM("<!doctype html><html><body></body></html>");
 for (const key of ["window", "document", "Element", "HTMLElement", "SVGElement", "Node"]) globalThis[key] = dom.window[key];
 const vue = require("vue");
+globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = vue;
+const { install } = await import("../../.build/cinecircuit_plugins/auto_signin/frontend.js");
 const { mount, flushPromises } = require("@vue/test-utils");
 
 test("Auto Signin loads sites, saves selections and registers its page", async () => {

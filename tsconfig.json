@@ -9,5 +9,5 @@
     "strict": true,
     "target": "ES2022"
   },
-  "include": ["cinecircuit_plugins/*/frontend.ts"]
+  "include": ["env.d.ts", "cinecircuit_plugins/*/frontend.ts", "cinecircuit_plugins/**/*.vue"]
 }

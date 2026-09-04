@@ -20,7 +20,7 @@ class SiteTrafficPlugin(PluginBase):
         entrypoint="plugin:SiteTrafficPlugin",
         id="brush-flow",
         name="站点刷流",
-        version="1.0.1",
+        version="1.0.0",
         description="按站点、下载器、选种规则和删种规则执行自动刷流，并记录任务统计。",
         icon="mdi-water-sync",
         permissions=(

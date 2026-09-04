@@ -4,7 +4,9 @@
 
 ## 构建和安装
 
-先运行 `pnpm install` 安装锁定的 TypeScript 工具链，再使用宿主开发环境的 Python 运行 `build.py`，生成 `dist/*.zip` 和带 SHA-256 的 `dist/packages.json`。插件前端开发源码使用 `frontend.ts`，构建时编译为浏览器 ESM `frontend.js`；ZIP 只包含编译后的 JS，不包含 TypeScript 源码、类型声明或 source map。构建时会检查每个独立 ZIP 的入口、相对导入与清单一致性。
+先运行 `pnpm install` 安装锁定的 TypeScript、Vite 与 Vue SFC 工具链，再使用宿主开发环境的 Python 运行 `build.py`，生成 `dist/*.zip` 和带 SHA-256 的 `dist/packages.json`。插件可在 `frontend.ts` 中引入 `.vue` 单文件组件；构建器会把每个插件独立编译为单个浏览器 ESM `frontend.js`，将 scoped CSS 内联，并把 Vue 导入连接到宿主共享运行时。ZIP 不会包含 Vue、TypeScript、`.vue` 源码、额外 CSS、类型声明或 source map。构建时会检查每个独立 ZIP 的入口、相对导入与清单一致性。
+
+所有带界面的正式插件都以 Vue SFC 实现页面或编辑器；`frontend.ts` 只负责扩展注册、SDK 请求桥接和宿主组件注入。无前端入口的纯后台插件不需要创建空的 Vue 页面。
 
 ## GitHub 插件库发布
 

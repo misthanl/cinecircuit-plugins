@@ -22,7 +22,7 @@ class SubtitleWorkspacePlugin(PluginBase):
         entrypoint="plugin:SubtitleWorkspacePlugin",
         id="subtitle-manager",
         name="字幕管理助手",
-        version="1.0.1",
+        version="1.0.0",
         description="在线搜索、手动上传、自动匹配、规范改名与字幕管理工作台。",
         icon="mdi-subtitles-outline",
         permissions=(

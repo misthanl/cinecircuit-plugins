@@ -25,7 +25,7 @@ class MaoyanWatchlistPlugin(PluginBase):
         entrypoint="plugin:MaoyanWatchlistPlugin",
         id="maoyan-rank",
         name="猫眼榜单追踪",
-        version="1.0.1",
+        version="1.0.0",
         description="监控猫眼电影票房与剧集、网剧、综艺、网络电影热度榜并自动添加订阅。",
         icon="mdi-cat",
         permissions=(PluginPermission.MEDIA_DISCOVER, PluginPermission.SUBSCRIPTION_CREATE),

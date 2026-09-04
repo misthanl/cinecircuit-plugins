@@ -1,37 +1,22 @@
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { resolve } from "node:path";
 import { test } from "node:test";
-import { install } from "../../.build/cinecircuit_plugins/brush_flow/frontend.js";
 
-function harness(request) {
-  const mounted = [];
+const require = createRequire(resolve("package.json"));
+const { JSDOM } = require("jsdom");
+const dom = new JSDOM("<!doctype html><html><body></body></html>");
+for (const key of ["window", "document", "Element", "HTMLElement", "SVGElement", "Node"]) globalThis[key] = dom.window[key];
+const vue = require("vue");
+globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = vue;
+const { install } = await import("../../.build/cinecircuit_plugins/brush_flow/frontend.js");
+const { mount, flushPromises } = require("@vue/test-utils");
+
+function setup(request) {
   let registration;
-  const vue = {
-    defineComponent: (definition) => definition,
-    h(type, props, children) {
-      if (arguments.length === 2 && (Array.isArray(props) || typeof props !== "object" || "type" in props)) {
-        return { type, props: {}, children: props };
-      }
-      return { type, props: props || {}, children };
-    },
-    onMounted: (callback) => { mounted.push(callback); },
-    ref: (value) => ({ value }),
-  };
-  install({ vue, request, registerPage: (value) => { registration = value; } });
+  install({ vue, request, registerPage: value => { registration = value; } });
   assert.equal(registration.pluginId, "brush-flow");
-  const render = registration.component.setup();
-  return { mounted, render };
-}
-
-function descendants(node) {
-  if (!node || typeof node !== "object") return [];
-  const children = Array.isArray(node.children)
-    ? node.children.flatMap(descendants)
-    : descendants(node.children);
-  return [node, ...children];
-}
-
-function button(root, label) {
-  return descendants(root).find((node) => node.type === "button" && node.children === label);
+  return mount(registration.component);
 }
 
 test("brush flow preserves inventory, preview and save requests", async () => {
@@ -51,19 +36,20 @@ test("brush flow preserves inventory, preview and save requests", async () => {
     if (path.endsWith("/api/preview")) return { count: 1, items: [{ title: "候选资源" }] };
     return {};
   };
-  const view = harness(request);
-  await view.mounted[0]();
-  let tree = view.render();
-  assert.match(JSON.stringify(tree), /站点一/);
+  const wrapper = setup(request);
+  await flushPromises();
+  assert.match(wrapper.text(), /站点一/);
 
-  await button(tree, "预览选种").props.onClick();
-  tree = view.render();
-  assert.match(JSON.stringify(tree), /候选资源/);
+  await wrapper.findAll("button").find(button => button.text() === "预览选种").trigger("click");
+  await flushPromises();
+  assert.match(wrapper.text(), /候选资源/);
   assert.equal(calls.at(-1).path, "/plugins/brush-flow/api/preview");
   assert.equal(JSON.parse(calls.at(-1).init.body).task_id, "task-1");
 
-  await button(tree, "保存全部").props.onClick();
+  await wrapper.findAll("button").find(button => button.text() === "保存全部").trigger("click");
+  await flushPromises();
   assert.equal(calls.at(-1).path, "/plugins/brush-flow");
   assert.equal(calls.at(-1).init.method, "PATCH");
   assert.deepEqual(JSON.parse(calls.at(-1).init.body).config.tasks, [task]);
+  wrapper.unmount();
 });

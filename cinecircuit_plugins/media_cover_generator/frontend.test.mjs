@@ -1,36 +1,22 @@
 import assert from "node:assert/strict";
+import { createRequire } from "node:module";
+import { resolve } from "node:path";
 import { test } from "node:test";
-import { install } from "../../.build/cinecircuit_plugins/media_cover_generator/frontend.js";
 
-function harness(request) {
-  const mounted = [];
+const require = createRequire(resolve("package.json"));
+const { JSDOM } = require("jsdom");
+const dom = new JSDOM("<!doctype html><html><body></body></html>");
+for (const key of ["window", "document", "Element", "HTMLElement", "SVGElement", "Node"]) globalThis[key] = dom.window[key];
+const vue = require("vue");
+globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = vue;
+const { install } = await import("../../.build/cinecircuit_plugins/media_cover_generator/frontend.js");
+const { mount, flushPromises } = require("@vue/test-utils");
+
+function setup(request) {
   let registration;
-  const vue = {
-    defineComponent: (definition) => definition,
-    h(type, props, children) {
-      const isVNode = props !== null && typeof props === "object"
-        && "type" in props && ("props" in props || "children" in props);
-      if (arguments.length === 2 && (Array.isArray(props) || typeof props !== "object" || isVNode)) {
-        return { type, props: {}, children: props };
-      }
-      return { type, props: props || {}, children };
-    },
-    onMounted: (callback) => { mounted.push(callback); },
-    ref: (value) => ({ value }),
-  };
-  install({ vue, request, registerPage: (value) => { registration = value; } });
+  install({ vue, request, registerPage: value => { registration = value; } });
   assert.equal(registration.pluginId, "emby-cover-generator");
-  const render = registration.component.setup();
-  return { mounted, render };
-}
-
-function descendants(node) {
-  if (Array.isArray(node)) return node.flatMap(descendants);
-  if (!node || typeof node !== "object") return [];
-  const children = Array.isArray(node.children)
-    ? node.children.flatMap(descendants)
-    : descendants(node.children);
-  return [node, ...children];
+  return mount(registration.component);
 }
 
 test("cover generator preserves server selection, library toggles and run sequence", async () => {
@@ -44,24 +30,17 @@ test("cover generator preserves server selection, library toggles and run sequen
     if (path.includes("/api/libraries?")) return { items: [{ id: "library-1", name: "电影", collection_type: "movies" }] };
     return {};
   };
-  const view = harness(request);
-  await view.mounted[0]();
-  let tree = view.render();
-  const serverSelect = descendants(tree).find((node) => node.type === "select");
-  await serverSelect.props.onChange({ target: { value: "server-1" } });
+  const wrapper = setup(request);
+  await flushPromises();
+  await wrapper.get("select").setValue("server-1");
+  await flushPromises();
   assert.equal(calls.at(-1).path, "/plugins/emby-cover-generator/api/libraries?server_id=server-1");
 
-  tree = view.render();
-  const libraryCheckbox = descendants(tree).find((node) => node.type === "input" && node.props.type === "checkbox");
-  assert.ok(libraryCheckbox, JSON.stringify(descendants(tree).filter((node) => node.type === "input" || node.type === "select")));
-  libraryCheckbox.props.onChange();
-  const generateButton = descendants(view.render()).find(
-    (node) => node.type === "button" && node.props.class !== "alt" && !Array.isArray(node.props.class),
-  );
-  assert.ok(generateButton, JSON.stringify(descendants(view.render()).filter((node) => node.type === "button")));
-  await generateButton.props.onClick();
+  await wrapper.get('input[type="checkbox"]').setValue(true);
+  await wrapper.findAll("button").find(button => button.text() === "保存并生成").trigger("click");
+  await flushPromises();
 
-  const saveCall = calls.find((call) => call.path === "/plugins/emby-cover-generator");
+  const saveCall = calls.find(call => call.path === "/plugins/emby-cover-generator");
   assert.equal(saveCall.init.method, "PATCH");
   const saved = JSON.parse(saveCall.init.body).config;
   assert.deepEqual(saved.selected_servers, ["server-1"]);
@@ -69,4 +48,5 @@ test("cover generator preserves server selection, library toggles and run sequen
   assert.equal(saved.dry_run, false);
   assert.equal(calls.at(-1).path, "/plugins/emby-cover-generator/run");
   assert.equal(calls.at(-1).init.method, "POST");
+  wrapper.unmount();
 });

@@ -22,7 +22,7 @@ class CookieCloudPlugin(PluginBase):
         entrypoint="plugin:CookieCloudPlugin",
         id="cookiecloud",
         name="CookieCloud 站点同步",
-        version="1.0.1",
+        version="1.0.0",
         description="接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。",
         icon="mdi-cloud-sync-outline",
         api_version=2,
@@ -37,17 +37,12 @@ class CookieCloudPlugin(PluginBase):
         schedule_seconds=24 * 60 * 60,
         frontend_module="frontend.js",
         config_schema={
-            "description": "KEY 和密码保存后可查看；点击小眼睛显示或隐藏密码",
+            "description": "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。",
             "sections": [
                 {
                     "key": "connection",
                     "title": "CookieCloud 设置",
-                    "description": "浏览器扩展服务地址填写 http://127.0.0.1:8000/plugin-public/cookiecloud。",
-                },
-                {
-                    "key": "schedule",
-                    "title": "检查计划",
-                    "description": "上传只保存快照，站点检查始终由插件定时或手动触发。",
+                    "description": "浏览器扩展服务地址填写 http://127.0.0.1:8000/plugin-public/cookiecloud；上传只保存快照，站点检查由插件定时或手动触发。",
                 },
             ],
             "fields": [
@@ -63,6 +58,8 @@ class CookieCloudPlugin(PluginBase):
                     "input_type": "text",
                     "label": "用户 KEY",
                     "default": "",
+                    "secret": True,
+                    "encrypted": False,
                     "placeholder": "与浏览器 CookieCloud 扩展保持一致",
                     "icon": "mdi-key-outline",
                     "section": "connection",
@@ -82,16 +79,14 @@ class CookieCloudPlugin(PluginBase):
                     "input_type": "switch",
                     "label": "保存后立即运行一次",
                     "default": False,
-                    "description": "保存后加入一次手动检查任务，随后自动关闭此开关。",
-                    "section": "schedule",
+                    "section": "connection",
                 },
                 {
                     "key": "notification_enabled",
                     "input_type": "switch",
                     "label": "发送通知",
                     "default": False,
-                    "description": "开启后发送每次站点同步的执行结果。",
-                    "section": "schedule",
+                    "section": "connection",
                 },
                 {
                     "key": "cron",
@@ -99,7 +94,7 @@ class CookieCloudPlugin(PluginBase):
                     "label": "定时检查周期",
                     "default": "",
                     "icon": "mdi-calendar-clock",
-                    "section": "schedule",
+                    "section": "connection",
                     "options": [
                         {"value": "0 */6 * * *", "label": "每 6 小时"},
                         {"value": "0 */12 * * *", "label": "每 12 小时"},
@@ -107,7 +102,6 @@ class CookieCloudPlugin(PluginBase):
                         {"value": "0 0 * * 1", "label": "每周"},
                         {"value": "0 0 1 * *", "label": "每月"},
                     ],
-                    "description": "每周在周一 00:00、每月在 1 日 00:00 执行。",
                 },
             ],
         },

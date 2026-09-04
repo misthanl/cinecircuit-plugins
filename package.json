@@ -3,17 +3,22 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "engines": { "node": ">=22.18.0" },
+  "engines": {
+    "node": ">=22.18.0"
+  },
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json",
-    "build:frontend": "tsc -p tsconfig.build.json",
-    "test:frontend": "tsc -p tsconfig.build.json && node --test cinecircuit_plugins/*/frontend.test.mjs"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "build:frontend": "node scripts/build-frontends.mjs",
+    "test:frontend": "node scripts/build-frontends.mjs && node --test cinecircuit_plugins/*/frontend.test.mjs"
   },
   "devDependencies": {
     "@cinecircuit/plugin-sdk": "file:./sdk",
+    "@vitejs/plugin-vue": "6.0.8",
     "@vue/test-utils": "2.4.11",
     "jsdom": "30.0.1",
     "typescript": "5.9.3",
-    "vue": "3.5.26"
+    "vite": "7.3.6",
+    "vue": "3.5.26",
+    "vue-tsc": "3.3.11"
   }
 }

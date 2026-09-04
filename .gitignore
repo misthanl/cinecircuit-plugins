@@ -10,6 +10,8 @@ __pycache__/
 dist/
 .build/
 node_modules/
+packages/archive/
+packages/*-1.0.[1-9]*.zip
 *.db
 *.db-*
 *.log
