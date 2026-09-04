@@ -81,10 +81,13 @@ def test_statistics_reads_all_gateway_pages():
     assert len(result["items"]) == 5
 
 
-def test_statistics_frontend_is_served_from_the_plugin_directory():
+def test_statistics_frontend_is_served_from_the_plugin_directory(tmp_path):
     from app.api.routes_extension_catalogs import _frontend_module_path
 
-    path = _frontend_module_path({"id": "maoyan-rank", "source": "zip", "enabled": True, "trusted": True, "install_path": str(__import__("pathlib").Path(__file__).parent), "manifest": MaoyanWatchlistPlugin.manifest.to_dict()})
+    built_root = tmp_path / "maoyan_rank"
+    built_root.mkdir()
+    (built_root / "frontend.js").write_text("export function install() {}", encoding="utf-8")
+    path = _frontend_module_path({"id": "maoyan-rank", "source": "zip", "enabled": True, "trusted": True, "install_path": str(built_root), "manifest": MaoyanWatchlistPlugin.manifest.to_dict()})
     assert path is not None
     assert path.parent.name == "maoyan_rank"
     assert path.name == "frontend.js"

@@ -93,7 +93,8 @@ def test_each_builtin_plugin_owns_an_isolated_directory() -> None:
         frontend_module = registry.builtin_manifest(plugin_id).frontend_module
         if frontend_module:
             assert frontend_module == "frontend.js"
-            assert (root / frontend_module).is_file()
+            assert (root / "frontend.ts").is_file()
+            assert not (root / frontend_module).exists()
 
 
 def test_notification_capable_builtin_plugins_are_explicit_opt_in() -> None:

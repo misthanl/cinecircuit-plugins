@@ -22,7 +22,7 @@ class CookieCloudPlugin(PluginBase):
         entrypoint="plugin:CookieCloudPlugin",
         id="cookiecloud",
         name="CookieCloud 站点同步",
-        version="1.0.0",
+        version="1.0.1",
         description="接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。",
         icon="mdi-cloud-sync-outline",
         api_version=2,

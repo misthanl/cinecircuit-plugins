@@ -2,19 +2,51 @@
 import hashlib
 import json
 import shutil
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 
 ROOT = Path(__file__).resolve().parent
+FRONTEND_BUILD_ROOT = ROOT / ".build"
 sys.path.insert(0, str(ROOT.parent / "cinecircuit"))
-from cinecircuit_plugins.catalog import factories
-from app.modules.plugins.registry import PluginRegistry
-from app.modules.plugins.package_manager import PluginCatalogClient
+
+
+def build_frontends() -> None:
+    """Compile TypeScript sources without changing the runtime package contract."""
+    executable = ROOT / "node_modules" / ".bin" / ("tsc.cmd" if sys.platform == "win32" else "tsc")
+    if not executable.is_file():
+        raise RuntimeError("TypeScript compiler missing; run `pnpm install` before building plugins")
+    shutil.rmtree(FRONTEND_BUILD_ROOT, ignore_errors=True)
+    subprocess.run(
+        [str(executable), "-p", str(ROOT / "tsconfig.build.json")],
+        cwd=ROOT,
+        check=True,
+    )
+
+
+def preserve_published_version(package: Path) -> None:
+    """Keep an existing version byte-stable and reject changed same-version contents."""
+    published = ROOT / "packages" / package.name
+    if not published.is_file():
+        return
+    with ZipFile(package) as candidate, ZipFile(published) as existing:
+        candidate_names = sorted(candidate.namelist())
+        existing_names = sorted(existing.namelist())
+        unchanged = candidate_names == existing_names and all(
+            candidate.read(name) == existing.read(name) for name in candidate_names
+        )
+    if not unchanged:
+        raise RuntimeError(f"Published package version changed without a version bump: {package.name}")
+    shutil.copyfile(published, package)
 
 
 def build():
+    from app.modules.plugins.registry import PluginRegistry
+    from cinecircuit_plugins.catalog import factories
+
+    build_frontends()
     output = ROOT / "dist"
     output.mkdir(exist_ok=True)
     entries = []
@@ -28,6 +60,12 @@ def build():
                     continue
                 if path.name.startswith("test_") or path.name.endswith((".test.mjs", ".pyc")) or path.name == "legacy_http_reference.py":
                     continue
+                if path.name == "frontend.ts":
+                    compiled = FRONTEND_BUILD_ROOT / path.relative_to(ROOT).with_suffix(".js")
+                    if not compiled.is_file():
+                        raise RuntimeError(f"Compiled frontend missing: {compiled}")
+                    archive.write(compiled, "frontend.js")
+                    continue
                 archive.write(path, path.relative_to(directory).as_posix())
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -37,6 +75,7 @@ def build():
             registry.validate_package(root, factory.manifest)
             loaded = registry.load({"id": manifest["id"], "source": "zip", "install_path": str(root), "entrypoint": manifest["entrypoint"], "manifest": manifest})
             assert loaded.manifest.to_dict() == manifest
+        preserve_published_version(package)
         entries.append({"manifest": manifest, "package": package.name, "sha256": hashlib.sha256(package.read_bytes()).hexdigest()})
         print(f"built={package.name} bytes={package.stat().st_size}")
     (output / "packages.json").write_text(json.dumps({"plugins": entries}, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -45,6 +84,8 @@ def build():
 
 def publish_catalog(entries, output):
     """Publish portable relative GitHub URLs alongside the independent ZIPs."""
+    from app.modules.plugins.package_manager import PluginCatalogClient
+
     published = ROOT / "packages"
     published.mkdir(exist_ok=True)
     online = []

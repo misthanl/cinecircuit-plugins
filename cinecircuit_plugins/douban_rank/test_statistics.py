@@ -63,7 +63,7 @@ def test_invalid_ratings_are_not_presented_as_scores(value):
     assert _rating(value) is None
 
 
-def test_plugin_api_handles_empty_history_and_frontend_stays_in_plugin():
+def test_plugin_api_handles_empty_history_and_frontend_stays_in_plugin(tmp_path):
     from app.api.routes_extension_catalogs import _frontend_module_path
 
     context = SimpleNamespace(items=SimpleNamespace(list=lambda *args, **kwargs: []))
@@ -73,7 +73,10 @@ def test_plugin_api_handles_empty_history_and_frontend_stays_in_plugin():
     assert result["pages"] == 1
     with pytest.raises(KeyError):
         asyncio.run(plugin.handle_api(PluginApiRequest(action="statistics", method="POST"), context))
-    path = _frontend_module_path({"id": "douban-hot", "source": "zip", "enabled": True, "trusted": True, "install_path": str(__import__("pathlib").Path(__file__).parent), "manifest": DoubanWatchlistPlugin.manifest.to_dict()})
+    built_root = tmp_path / "douban_rank"
+    built_root.mkdir()
+    (built_root / "frontend.js").write_text("export function install() {}", encoding="utf-8")
+    path = _frontend_module_path({"id": "douban-hot", "source": "zip", "enabled": True, "trusted": True, "install_path": str(built_root), "manifest": DoubanWatchlistPlugin.manifest.to_dict()})
     assert path is not None
     assert path.parent.name == "douban_rank"
     assert _frontend_module_path({"id": "douban-hot", "source": "builtin", "enabled": False, "trusted": True}) is None

@@ -4,7 +4,7 @@
       "manifest": {
         "id": "auto-signin",
         "name": "站点签到助手",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "自动模拟登录并签到所选 PT 站点，保留每日结果、失败原因和重试筛选。",
         "icon": "mdi-calendar-check-outline",
         "api_version": 1,
@@ -135,14 +135,14 @@
           "order": 72
         }
       },
-      "package_url": "packages/auto-signin-1.0.0.zip",
-      "sha256": "a8a64577e3b06c40a92504a2e08471a126bc425c23946221629e32b6f306ff52"
+      "package_url": "packages/auto-signin-1.0.1.zip",
+      "sha256": "4e34ccb4d91d1ae9cf6c1cae6bb7d90fa5a46d5be11f30d2daa0db810f6c9d79"
     },
     {
       "manifest": {
         "id": "brush-flow",
         "name": "站点刷流",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "按站点、下载器、选种规则和删种规则执行自动刷流，并记录任务统计。",
         "icon": "mdi-water-sync",
         "api_version": 1,
@@ -259,8 +259,8 @@
           "order": 74
         }
       },
-      "package_url": "packages/brush-flow-1.0.0.zip",
-      "sha256": "dd7c1526a47b701d92e0ab9c782dbc81a0c42c4a3c968a83dc216a73c08f3bec"
+      "package_url": "packages/brush-flow-1.0.1.zip",
+      "sha256": "1600a37a678f405c366ad280abaf4fd822569c9ba558e64f986a1c22ac7cce7c"
     },
     {
       "manifest": {
@@ -409,7 +409,7 @@
       "manifest": {
         "id": "cookiecloud",
         "name": "CookieCloud 站点同步",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。",
         "icon": "mdi-cloud-sync-outline",
         "api_version": 2,
@@ -523,14 +523,14 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.0.zip",
-      "sha256": "04a2415433e0f8f15276702574f492bb360ace9bb796e7b9ce7c62651e94ac9b"
+      "package_url": "packages/cookiecloud-1.0.1.zip",
+      "sha256": "9ae86f5cbd2424740df9eb6586ae6b343c7f2af2c514862cecd53860b10b5139"
     },
     {
       "manifest": {
         "id": "douban-hot",
         "name": "豆瓣榜单追踪",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "监控豆瓣热门榜单和自定义 RSS 榜单，按评分过滤后自动添加订阅。",
         "icon": "mdi-movie-star-outline",
         "api_version": 1,
@@ -676,14 +676,14 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/douban-hot-1.0.0.zip",
-      "sha256": "02790d56f431cb3752dd7cdab3dad21b89f2705b0bda0325e8de95cece2225de"
+      "package_url": "packages/douban-hot-1.0.1.zip",
+      "sha256": "d4931c956d561b0d0b61e34ceeea53d7e4e40a79766b31c2af2947746522650b"
     },
     {
       "manifest": {
         "id": "maoyan-rank",
         "name": "猫眼榜单追踪",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "监控猫眼电影票房与剧集、网剧、综艺、网络电影热度榜并自动添加订阅。",
         "icon": "mdi-cat",
         "api_version": 1,
@@ -1018,14 +1018,14 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.0.zip",
-      "sha256": "d5bf8ef4f7dadfd1b65525c96fc5c820cde2665ca0663efe062d13a11527af37"
+      "package_url": "packages/maoyan-rank-1.0.1.zip",
+      "sha256": "78d1179fc099a256e7f492cb3e5af85e82f38b80d755814040cd76da08438c72"
     },
     {
       "manifest": {
         "id": "emby-cover-generator",
         "name": "媒体库视觉封面",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "为媒体服务器媒体库生成静态或动态风格封面，支持媒体库选择、标题、字体、分辨率和历史清理。",
         "icon": "mdi-image-multiple-outline",
         "api_version": 1,
@@ -1548,14 +1548,14 @@
           "order": 80
         }
       },
-      "package_url": "packages/emby-cover-generator-1.0.0.zip",
-      "sha256": "5a10442b23898844902d0bc91330598253aaeb19ff223686c1ba56060c19043e"
+      "package_url": "packages/emby-cover-generator-1.0.1.zip",
+      "sha256": "e6aa81b4e28ed736019165111394734adfc40b04a0cb06609d74acce642520d7"
     },
     {
       "manifest": {
         "id": "subtitle-manager",
         "name": "字幕管理助手",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "在线搜索、手动上传、自动匹配、规范改名与字幕管理工作台。",
         "icon": "mdi-subtitles-outline",
         "api_version": 1,
@@ -1913,8 +1913,8 @@
           "order": 65
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.0.zip",
-      "sha256": "481d927048f347cd92db37214637016a431fdfe4ee9896a9d487f0670cfeb6ba"
+      "package_url": "packages/subtitle-manager-1.0.1.zip",
+      "sha256": "a213b12912bf4ac234093cac7f5a9fca1d815fa72401a5f4deec61ef6f83d752"
     }
   ]
 }

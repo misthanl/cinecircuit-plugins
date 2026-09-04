@@ -1,3 +1,33 @@
+import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircuit/plugin-sdk";
+import type { PropType } from "vue";
+
+interface SubscriptionRecord {
+  id: string | number;
+  title: string;
+  poster?: string;
+  media_label: string;
+  board: string;
+  rating: number;
+  subscribed_at: string;
+}
+
+interface StatisticsResponse {
+  items: SubscriptionRecord[];
+  total: number;
+  movie_count: number;
+  tv_count: number;
+  board_count: number;
+  page: number;
+  pages: number;
+}
+
+function failureMessage(reason: unknown, fallback: string): string {
+  if (reason && typeof reason === "object" && "message" in reason) {
+    return String(reason.message || fallback);
+  }
+  return fallback;
+}
+
 const ID = "douban-hot";
 const STYLE = `
 .douban-statistics { display: grid; gap: 22px; min-width: 0; }
@@ -39,10 +69,10 @@ const STYLE = `
 @media(max-width:600px){.douban-dialog__content{padding:16px}.douban-dialog__header{padding:16px}.douban-dialog__header h2{font-size:18px}}
 `;
 
-export function install(sdk) {
+export function install(sdk: CineCircuitPluginSdk) {
   const { defineComponent, h, onMounted, ref } = sdk.vue;
   const { Button, Card, Dialog, Alert } = sdk.ui.components;
-  function posterUrl(value) {
+  function posterUrl(value: unknown) {
     const raw = String(value || "");
     if (!raw) return "";
     if (raw.startsWith("/explore/image-proxy?")) return raw;
@@ -54,23 +84,23 @@ export function install(sdk) {
       return raw;
     } catch { return ""; }
   }
-  function subscriptionTime(value) {
+  function subscriptionTime(value: unknown) {
     const text = String(value || "");
     const date = new Date(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(text) ? `${text.replace(" ", "T")}Z` : text);
     return Number.isFinite(date.getTime()) ? date.toLocaleString("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).replaceAll("/", "-") : "未知时间";
   }
   const Statistics = defineComponent({
     name: "DoubanStatistics", inheritAttrs: false,
-    props: { context: { type: Object, required: true } },
+    props: { context: { type: Object as PropType<PluginContributionContext>, required: true } },
     setup(props) {
-      const history = ref({ items: [], total: 0, movie_count: 0, tv_count: 0, board_count: 0, page: 1, pages: 1 });
-      const loading = ref(false), error = ref(""), failedPosters = ref(new Set());
+      const history = ref<StatisticsResponse>({ items: [], total: 0, movie_count: 0, tv_count: 0, board_count: 0, page: 1, pages: 1 });
+      const loading = ref(false), error = ref(""), failedPosters = ref<Set<string | number>>(new Set());
       let requestedPage = 1;
       async function load(page = requestedPage) {
         if (loading.value) return;
         requestedPage = page; loading.value = true; error.value = "";
-        try { history.value = await sdk.request(`/plugins/${ID}/api/statistics?page=${page}`); requestedPage = history.value.page; failedPosters.value = new Set(); }
-        catch (reason) { error.value = reason.message || "订阅统计加载失败"; }
+        try { history.value = await sdk.request<StatisticsResponse>(`/plugins/${ID}/api/statistics?page=${page}`); requestedPage = history.value.page; failedPosters.value = new Set(); }
+        catch (reason: unknown) { error.value = failureMessage(reason, "订阅统计加载失败"); }
         finally { loading.value = false; }
       }
       onMounted(() => load());
@@ -94,7 +124,7 @@ export function install(sdk) {
           ] : h("div", { class: "douban-dialog__message" }, [h("h3", "暂无订阅记录"), h("p", "豆瓣榜单中的作品成功加入订阅后，会显示在这里。")]),
         ]);
       }
-      return () => h(Dialog, { modelValue: true, maxWidth: 1480, width: "calc(100vw - 32px)", "onUpdate:modelValue": open => { if (!open) props.context.close(); } }, () => h(Card, { class: "douban-dialog" }, () => [
+      return () => h(Dialog, { modelValue: true, maxWidth: 1480, width: "calc(100vw - 32px)", "onUpdate:modelValue": (open: boolean) => { if (!open) props.context.close(); } }, () => h(Card, { class: "douban-dialog" }, () => [
         h("style", STYLE),
         h("header", { class: "douban-dialog__header" }, [h("h2", "豆瓣榜单订阅"), h(Button, { icon: "mdi-close", variant: "text", "aria-label": "关闭", onClick: props.context.close })]),
         h("div", { class: "douban-dialog__content" }, loading.value ? h("p", { class: "douban-dialog__message", role: "status" }, "正在读取订阅统计…") : error.value ? h(Alert, { type: "error", variant: "tonal" }, () => error.value) : overview()),

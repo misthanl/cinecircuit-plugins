@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
-import { install } from "./frontend.js";
+import { install } from "../../.build/cinecircuit_plugins/cookiecloud/frontend.js";
 
 // Test dependencies come from the working directory, never from the plugin bundle.
 const require = createRequire(resolve("package.json"));

@@ -4,7 +4,7 @@
 
 ## 构建和安装
 
-使用宿主开发环境的 Python 运行 `build.py`，生成 `dist/*.zip` 和带 SHA-256 的 `dist/packages.json`。每个 ZIP 都包含自己的 `manifest.json`、Python 入口和可选 `frontend.js`，可从插件管理页“离线安装”单独安装。构建时会检查每个独立 ZIP 的入口、相对导入与清单一致性。
+先运行 `pnpm install` 安装锁定的 TypeScript 工具链，再使用宿主开发环境的 Python 运行 `build.py`，生成 `dist/*.zip` 和带 SHA-256 的 `dist/packages.json`。插件前端开发源码使用 `frontend.ts`，构建时编译为浏览器 ESM `frontend.js`；ZIP 只包含编译后的 JS，不包含 TypeScript 源码、类型声明或 source map。构建时会检查每个独立 ZIP 的入口、相对导入与清单一致性。
 
 ## GitHub 插件库发布
 
@@ -24,4 +24,4 @@ CookieCloud 浏览器扩展服务地址填写 `http(s)://你的服务地址/plug
 
 ## 测试
 
-从宿主目录运行 `.venv/Scripts/python.exe -m pytest ../cinecircuit-plugins/tests ../cinecircuit-plugins/cinecircuit_plugins`。前端测试从宿主 `frontend` 目录运行 `node --test ../../cinecircuit-plugins/cinecircuit_plugins/*/frontend.test.mjs`。测试的显式注册仅存在于本项目测试夹具，生产宿主不自动发现或导入本项目。
+从宿主目录运行 `.venv/Scripts/python.exe -m pytest ../cinecircuit-plugins/tests ../cinecircuit-plugins/cinecircuit_plugins`。插件仓库内运行 `npm run typecheck` 检查所有前端源码，运行 `npm run test:frontend` 编译并测试生成的浏览器 ESM。测试的显式注册仅存在于本项目测试夹具，生产宿主不自动发现或导入本项目。

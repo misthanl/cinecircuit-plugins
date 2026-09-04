@@ -1,3 +1,34 @@
+import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircuit/plugin-sdk";
+import type { PropType } from "vue";
+
+interface RunRecord {
+  display_status?: string;
+  status?: string;
+}
+
+interface RunResponse {
+  items?: RunRecord[];
+}
+
+interface SecretResponse {
+  value?: string;
+}
+
+interface ConnectionConfig extends Record<string, unknown> {
+  enabled?: boolean;
+  password?: string;
+  password_configured?: boolean;
+  password_clear?: boolean;
+  user_key?: string;
+}
+
+function failureMessage(reason: unknown, fallback: string): string {
+  if (reason && typeof reason === "object" && "message" in reason) {
+    return String(reason.message || fallback);
+  }
+  return fallback;
+}
+
 const ID = "cookiecloud";
 const STYLE = `
 .cookie-overview { display: grid; gap: 18px; min-width: 0; color: var(--app-text); }
@@ -44,11 +75,11 @@ const STYLE = `
 @media(max-width:600px){.cookiecloud-config-fields{grid-template-columns:1fr}.cc-statistics-header h2{font-size:16px}}
 `;
 
-export function install(sdk) {
+export function install(sdk: CineCircuitPluginSdk) {
   const { computed, defineComponent, h, onMounted, ref, resolveComponent } = sdk.vue;
   const { Button, Card, Dialog, Chip, Alert } = sdk.ui.components;
-  const icon = (name, size = 22) => h(resolveComponent("VIcon"), { icon: name, size });
-  const localTime = (value, fallback) => {
+  const icon = (name: string | undefined, size = 22) => h(resolveComponent("VIcon"), { icon: name, size });
+  const localTime = (value: unknown, fallback: string) => {
     if (!value) return fallback;
     const text = String(value);
     const date = new Date(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(text) ? `${text.replace(" ", "T")}Z` : text);
@@ -56,9 +87,9 @@ export function install(sdk) {
   };
   const Statistics = defineComponent({
     name: "CookieCloudStatistics", inheritAttrs: false,
-    props: { context: { type: Object, required: true } },
+    props: { context: { type: Object as PropType<PluginContributionContext>, required: true } },
     setup(props) {
-      const runs = ref([]), loading = ref(false), error = ref("");
+      const runs = ref<RunRecord[]>([]), loading = ref(false), error = ref("");
       const groups = computed(() => {
         const groups = [
           { label: "成功", tone: "success", icon: "mdi-check-circle-outline", states: ["completed"] },
@@ -69,15 +100,15 @@ export function install(sdk) {
         ];
         const known = groups.flatMap(group => group.states);
         return groups.map(group => ({ ...group, count: runs.value.filter(run => {
-          const state = run.display_status || run.status;
+          const state = run.display_status || run.status || "";
           return group.states.includes(state) || (group.label === "其他" && !known.includes(state));
         }).length }));
       });
       async function load() {
         if (loading.value) return;
         loading.value = true; error.value = "";
-        try { runs.value = (await sdk.request(`/plugins/${ID}/runs?limit=100`)).items || []; }
-        catch (reason) { error.value = reason.message || "插件统计加载失败"; }
+        try { runs.value = (await sdk.request<RunResponse>(`/plugins/${ID}/runs?limit=100`)).items || []; }
+        catch (reason: unknown) { error.value = failureMessage(reason, "插件统计加载失败"); }
         finally { loading.value = false; }
       }
       onMounted(load);
@@ -96,7 +127,7 @@ export function install(sdk) {
           h("div", { class: "cookie-schedule" }, [h("span", { class: "cookie-schedule__icon" }, [icon("mdi-clock-outline")]), h("div", { class: "cookie-schedule__time" }, [h("span", "下次执行"), h("strong", installation.enabled ? localTime(installation.next_run_at, "等待调度") : "已停用")]), h(Chip, { color: installation.enabled ? "primary" : undefined, size: "small", variant: "tonal" }, () => installation.enabled ? "调度已启用" : "调度已停用")]),
         ]);
       }
-      return () => h(Dialog, { modelValue: true, maxWidth: 780, width: "calc(100vw - 32px)", "onUpdate:modelValue": open => { if (!open) props.context.close(); } }, () => h(Card, { class: "cc-statistics-dialog" }, () => [
+      return () => h(Dialog, { modelValue: true, maxWidth: 780, width: "calc(100vw - 32px)", "onUpdate:modelValue": (open: boolean) => { if (!open) props.context.close(); } }, () => h(Card, { class: "cc-statistics-dialog" }, () => [
         h("style", STYLE),
         h("header", { class: "cc-statistics-header" }, [h("span", { class: "cc-statistics-logo" }, [icon("mdi-cloud-sync-outline")]), h("div", [h("h2", "CookieCloud 站点同步 · 数据统计"), h("p", "浏览器 Cookie 同步与站点更新概览")]), h(Button, { icon: "mdi-close", variant: "text", "aria-label": "关闭", onClick: props.context.close })]),
         h("div", { class: "cc-statistics-content" }, loading.value ? h("p", { class: "cc-statistics-message", role: "status" }, "正在读取插件统计…") : error.value ? h(Alert, { type: "error", variant: "tonal" }, () => error.value) : overview()),
@@ -106,7 +137,7 @@ export function install(sdk) {
   });
   const ConnectionEditor = defineComponent({
     name: "CookieCloudConnectionEditor", inheritAttrs: false,
-    props: { modelValue: { type: Object, required: true }, disabled: Boolean }, emits: ["update:modelValue"],
+    props: { modelValue: { type: Object as PropType<ConnectionConfig>, required: true }, disabled: Boolean }, emits: ["update:modelValue"],
     setup(props, { emit }) {
       const visible = ref(false), revealed = ref(""), revealError = ref("");
       async function togglePassword() {
@@ -114,19 +145,19 @@ export function install(sdk) {
         revealError.value = "";
         try {
           if (!props.modelValue.password && props.modelValue.password_configured) {
-            revealed.value = (await sdk.request(`/plugins/${ID}/config/secret/password`)).value || "";
+            revealed.value = (await sdk.request<SecretResponse>(`/plugins/${ID}/config/secret/password`)).value || "";
           }
           visible.value = true;
         } catch { revealError.value = "密码读取失败，请重试"; }
       }
-      const update = (key, value) => emit("update:modelValue", { ...props.modelValue, [key]: value });
+      const update = (key: keyof ConnectionConfig, value: unknown) => emit("update:modelValue", { ...props.modelValue, [key]: value });
       return () => h("div", { class: "cookiecloud-config-fields" }, [
         revealError.value ? h("p", { class: "cookiecloud-config-hint", role: "alert" }, revealError.value) : null,
         h("style", STYLE),
-        h(resolveComponent("VSwitch"), { modelValue: Boolean(props.modelValue.enabled), disabled: props.disabled, label: "启用站点 Cookie 同步", color: "primary", hideDetails: true, "onUpdate:modelValue": value => update("enabled", value) }),
-        h(resolveComponent("VSwitch"), { modelValue: Boolean(props.modelValue.password_clear), disabled: props.disabled, label: "清除已保存的端对端加密密码", color: "error", hideDetails: true, "onUpdate:modelValue": value => emit("update:modelValue", { ...props.modelValue, password: value ? "" : props.modelValue.password, password_clear: Boolean(value) }) }),
-        h(resolveComponent("VTextField"), { modelValue: props.modelValue.user_key, disabled: props.disabled, label: "用户 KEY", prependInnerIcon: "mdi-key-outline", autocomplete: "off", hideDetails: true, "onUpdate:modelValue": value => update("user_key", value) }),
-        h(resolveComponent("VTextField"), { modelValue: props.modelValue.password_clear ? "" : props.modelValue.password || (visible.value ? revealed.value : ""), label: "端对端加密密码", type: visible.value ? "text" : "password", prependInnerIcon: "mdi-lock-outline", appendInnerIcon: visible.value ? "mdi-eye-off-outline" : "mdi-eye-outline", disabled: props.disabled || Boolean(props.modelValue.password_clear), autocomplete: "off", hideDetails: true, "onClick:appendInner": togglePassword, "onUpdate:modelValue": value => update("password", value) }),
+        h(resolveComponent("VSwitch"), { modelValue: Boolean(props.modelValue.enabled), disabled: props.disabled, label: "启用站点 Cookie 同步", color: "primary", hideDetails: true, "onUpdate:modelValue": (value: unknown) => update("enabled", value) }),
+        h(resolveComponent("VSwitch"), { modelValue: Boolean(props.modelValue.password_clear), disabled: props.disabled, label: "清除已保存的端对端加密密码", color: "error", hideDetails: true, "onUpdate:modelValue": (value: unknown) => emit("update:modelValue", { ...props.modelValue, password: value ? "" : props.modelValue.password, password_clear: Boolean(value) }) }),
+        h(resolveComponent("VTextField"), { modelValue: props.modelValue.user_key, disabled: props.disabled, label: "用户 KEY", prependInnerIcon: "mdi-key-outline", autocomplete: "off", hideDetails: true, "onUpdate:modelValue": (value: unknown) => update("user_key", value) }),
+        h(resolveComponent("VTextField"), { modelValue: props.modelValue.password_clear ? "" : props.modelValue.password || (visible.value ? revealed.value : ""), label: "端对端加密密码", type: visible.value ? "text" : "password", prependInnerIcon: "mdi-lock-outline", appendInnerIcon: visible.value ? "mdi-eye-off-outline" : "mdi-eye-outline", disabled: props.disabled || Boolean(props.modelValue.password_clear), autocomplete: "off", hideDetails: true, "onClick:appendInner": togglePassword, "onUpdate:modelValue": (value: unknown) => update("password", value) }),
       ]);
     },
   });

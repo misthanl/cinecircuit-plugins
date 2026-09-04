@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
-import { install } from "./frontend.js";
+import { install } from "../../.build/cinecircuit_plugins/douban_rank/frontend.js";
 const require = createRequire(resolve("package.json"));
 const { JSDOM } = require("jsdom");
 const dom = new JSDOM("<!doctype html><html><body></body></html>");
