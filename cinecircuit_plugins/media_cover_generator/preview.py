@@ -4,10 +4,11 @@ import array
 import sys
 import uuid
 from dataclasses import replace
+from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
 
-from .renderer import CoverRenderer
+from .renderer import CoverRenderer, CoverRenderOptions
 from .runtime_state import state
 
 _semaphore = asyncio.Semaphore(1)
@@ -39,10 +40,19 @@ def preview_status(identity: str) -> dict:
     return {'status':'complete',**task.result()}
 
 
+@lru_cache(maxsize=1)
+def _wedge_sample() -> bytes:
+    # Reuse bundled source photos instead of adding another large animation ZIP asset.
+    sources = [p.read_bytes() for p in sorted((Path(__file__).parent/'assets').glob('source-*.jpg'))][:3]
+    return CoverRenderer().render_animated(sources, title='电影典藏', subtitle='MOVIE COLLECTION',
+        item_count=0, options=CoverRenderOptions(style='wedge', width=1280, height=720, show_count=False),
+        image_format='webp', duration_seconds=6, frames_per_second=12)
+
+
 def read_sample(style: str, variant: str) -> dict:
-    if style in {'animated','animated_diagonal'}:
+    if style in {'animated','animated_diagonal','animated_wedge'}:
         name = 'sample-animated.webp' if style == 'animated' else 'sample-animated-diagonal.webp'
-        data = (Path(__file__).parent / 'assets' / name).read_bytes()
+        data = _wedge_sample() if style == 'animated_wedge' else (Path(__file__).parent / 'assets' / name).read_bytes()
         words = array.array('I')
         words.frombytes(data + b'\0' * (-len(data) % 4))
         if sys.byteorder != 'little':

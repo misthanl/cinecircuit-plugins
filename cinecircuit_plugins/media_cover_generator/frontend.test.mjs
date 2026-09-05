@@ -26,6 +26,15 @@ test('poster preference defaults on but preserves explicit off', async () => {
   wrapper.unmount();
 });
 
+test('animated wedge restores as a dynamic style without wall direction controls', () => {
+  const wrapper=mount(styleEditor(),{props:{modelValue:{cover_style_base:'animated_wedge'}}});
+  assert.equal(wrapper.get('.base-style-select').element.value,'animated_wedge');
+  assert.ok(wrapper.text().includes('动态斜切轮播'));
+  assert.equal(wrapper.find('.direction-select').exists(),false);
+  assert.equal(wrapper.findAll('.base-style-select option').length,3);
+  wrapper.unmount();
+});
+
 test('random sorting is first and default without overriding saved sorting', async () => {
   const wrapper=mount(styleEditor(),{props:{modelValue:{}}});
   const field=()=>wrapper.findAll('label').find(x=>x.text().startsWith('媒体排序')).get('select');
@@ -44,6 +53,34 @@ test('requested background helper text is removed without removing controls', ()
     assert.ok(field.find('input,select').exists());
     assert.equal(field.find('small').exists(),false);
   }
+  wrapper.unmount();
+});
+
+test('optional style examples appear only while their fields are focused', async () => {
+  const wrapper=mount(styleEditor(),{props:{modelValue:{cover_style_base:'diagonal'}}});
+  const field=title=>wrapper.findAll('.form-grid label').find(item=>item.text().startsWith(title));
+  const background=field('背景底色').get('input');
+  const titles=field('媒体库标题配置').get('textarea');
+  assert.equal(field('背景底色').classes().includes('label-active'),false);
+  assert.equal(field('媒体库标题配置').classes().includes('label-active'),false);
+  assert.equal(background.attributes('placeholder') || '','');
+  assert.equal(titles.attributes('placeholder') || '','');
+  await background.trigger('focus');
+  assert.equal(field('背景底色').classes().includes('label-active'),true);
+  assert.equal(background.attributes('placeholder'),'留空自动取色，如 #101828');
+  await background.trigger('blur');
+  assert.equal(field('背景底色').classes().includes('label-active'),false);
+  assert.equal(background.attributes('placeholder') || '','');
+  await titles.trigger('focus');
+  assert.equal(field('媒体库标题配置').classes().includes('label-active'),true);
+  assert.equal(titles.attributes('placeholder'),'电影=电影|MOVIES\n剧集=剧集|TV SERIES');
+  await titles.trigger('blur');
+  assert.equal(field('媒体库标题配置').classes().includes('label-active'),false);
+  assert.equal(titles.attributes('placeholder') || '','');
+  await wrapper.setProps({modelValue:{cover_style_base:'diagonal',background_color:'#101828',title_config:'电影=电影|MOVIES'}});
+  assert.equal(field('背景底色').classes().includes('label-active'),true);
+  assert.equal(field('媒体库标题配置').classes().includes('label-active'),true);
+  assert.equal(wrapper.emitted('update:modelValue'),undefined);
   wrapper.unmount();
 });
 
@@ -90,6 +127,43 @@ function styleEditor(request = async () => ({})) {
   assert.equal(editor.key, "emby-cover-generator:style");
   return editor.component;
 }
+
+function runEditor() {
+  let editor;
+  const CronField = vue.defineComponent({
+    name: 'CronFieldFixture',
+    props: ['modelValue', 'field', 'disabled'],
+    emits: ['update:modelValue'],
+    template: '<button class="cron-field-fixture" @click="$emit(\'update:modelValue\', \'0 6 * * *\')">cron</button>',
+  });
+  install({
+    vue,
+    request: async () => ({}),
+    ui: { components: { CronField } },
+    registerPage() {},
+    registerEditor: value => { if(value.key.endsWith(':run')) editor = value; },
+  });
+  assert.equal(editor.key, 'emby-cover-generator:run');
+  return { component: editor.component, CronField };
+}
+
+test('run settings use the host visual Cron selector and preserve the complete config', async () => {
+  const { component, CronField } = runEditor();
+  const modelValue = { cron: '0 5 * * *', enabled: true, delay: 60 };
+  const wrapper = mount(component, { props: { modelValue } });
+  const cron = wrapper.getComponent(CronField);
+  assert.equal(cron.props('modelValue'), '0 5 * * *');
+  assert.equal(cron.props('field').input_type, 'cron');
+  assert.equal(cron.props('field').label, '执行周期');
+
+  await cron.trigger('click');
+
+  assert.deepEqual(wrapper.emitted('update:modelValue').at(-1)[0], {
+    ...modelValue,
+    cron: '0 6 * * *',
+  });
+  wrapper.unmount();
+});
 
 test('requested defaults and all nine font names are exposed without replacing saved choices', async () => {
   const wrapper = mount(styleEditor(), {props:{modelValue:{}}});
@@ -283,7 +357,7 @@ test('type selector filters styles, restores each selection and reads saved anim
   assert.equal(wrapper.get('.cover-mode-select').element.value,'static');
   assert.equal(wrapper.findAll('.base-style-select option').length,11);
   await choose('.cover-mode-select','dynamic');
-  assert.deepEqual(wrapper.findAll('.base-style-select option').map(x=>x.attributes('value')),['animated','animated_diagonal']);
+  assert.deepEqual(wrapper.findAll('.base-style-select option').map(x=>x.attributes('value')),['animated','animated_diagonal','animated_wedge']);
   await choose('.base-style-select','animated_diagonal');
   await choose('.cover-mode-select','static');
   assert.equal(wrapper.get('.base-style-select').element.value,'multi');

@@ -42,7 +42,7 @@ class LibraryArtworkPlugin(PluginBase):
         entrypoint="plugin:LibraryArtworkPlugin",
         id="emby-cover-generator",
         name="媒体库视觉封面",
-        version="1.0.0",
+        version="1.0.1",
         description="为媒体服务器媒体库生成静态或动态风格封面，支持媒体库选择、标题、字体、分辨率和历史清理。",
         icon="mdi-image-multiple-outline",
         permissions=(
@@ -152,6 +152,7 @@ class LibraryArtworkPlugin(PluginBase):
                         {"value": "poster", "label": "海报长廊｜竖版海报排列"},
                         {"value": "animated", "label": "动态轮播｜图片渐变切换"},
                         {"value": "animated_diagonal", "label": "动态斜向海报墙｜右侧海报循环移动"},
+                        {"value": "animated_wedge", "label": "动态斜切轮播｜大图淡入淡出，背景随图变色"},
                         {"value": "diagonal", "label": "斜向画廊｜倾斜圆角海报墙"},
                         {"value": "echo", "label": "扇形叠影｜虚实渐隐卡片"},
                         {"value": "wedge", "label": "斜切大图｜留白与整幅剧照"},
@@ -594,7 +595,7 @@ class LibraryArtworkPlugin(PluginBase):
             raise ValueError('历史封面请求方式不正确')
         if request.action == "sample" and request.method == "GET":
             from .preview import read_sample
-            return read_sample(request.query.get("style", "multi"), request.query.get("variant", "1"))
+            return await asyncio.to_thread(read_sample, request.query.get("style", "multi"), request.query.get("variant", "1"))
         if request.action == "preview" and request.method == "POST":
             from .preview import render_preview, start_preview
             config = request.payload.get("config", {})
@@ -799,7 +800,7 @@ class ArtworkGenerationRun:
         if selected_libraries:
             self.config["library_ids"] = list(selected_libraries)
         style_base = str(self.config.get("cover_style_base") or "multi")
-        self.animated = style_base in {"animated", "animated_diagonal"}
+        self.animated = style_base in {"animated", "animated_diagonal", "animated_wedge"}
         style_variant = str(self.config.get("cover_style_variant") or "1")
         self.config["style"] = {
             "single": "spotlight",
@@ -812,6 +813,7 @@ class ArtworkGenerationRun:
             "poster": "filmstrip",
             "animated": "filmstrip",
             "animated_diagonal": "diagonal",
+            "animated_wedge": "wedge",
             "diagonal": "diagonal",
             "echo": "echo",
             "wedge": "wedge",

@@ -55,6 +55,7 @@ export interface CineCircuitPluginSdk {
       Card: Component;
       Chip: Component;
       Dialog: Component;
+      CronField: Component;
     };
   };
 }

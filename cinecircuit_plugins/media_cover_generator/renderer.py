@@ -166,6 +166,29 @@ class CoverRenderer:
                     frame = self._designed_layout(images,options,accent,scroll_phase=index/count,background=background,wall_tiles=tiles)
                     frame.alpha_composite(lettering)
                     yield frame
+            elif options.style == 'wedge':
+                # The slanted matte and photo dissolve together; type stays fixed.
+                lettering = Image.new('RGBA', (options.width, options.height))
+                self._draw_copy(lettering, title=title, subtitle=subtitle,
+                                item_count=item_count, options=options, accent=accent)
+                total = min(len(images), 6)
+                def key(index):
+                    photo = images[index % total]
+                    color = self._accent_color(photo, options.background_color)
+                    return self._designed_layout([photo], options, color)
+                previous = -1
+                left = right = None
+                for index in range(count):
+                    position = index * total / count
+                    segment = int(position)
+                    if segment != previous:
+                        left = right if previous == segment-1 and right is not None else key(segment)
+                        right = key(segment+1)
+                        previous = segment
+                    fraction = max(0., (position % 1 - .55) / .45)
+                    frame = Image.blend(left, right, fraction*fraction*(3-2*fraction))
+                    frame.alpha_composite(lettering)
+                    yield frame
             else:
                 # Retain at most the two neighboring key frames, not the animation.
                 film_options=replace(options,style='filmstrip')

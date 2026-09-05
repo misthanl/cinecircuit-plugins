@@ -15,7 +15,7 @@ const servers=computed(()=>[all,...Array.from(new Map(rows.value.map(x=>[x.serve
 const libraries=computed(()=>[all,...Array.from(new Map(rows.value.filter(x=>!server.value||x.server_id===server.value).map(x=>[x.server_id+'|'+x.library_id,{value:x.server_id+'|'+x.library_id,title:x.server_name+'：'+x.name}])).values())]);
 const filtered=computed(()=>rows.value.filter(x=>(!server.value||x.server_id===server.value)&&(!library.value||x.server_id+'|'+x.library_id===library.value)&&(!kind.value||(x.animated?'dynamic':'static')===kind.value)&&(!status.value||x.status===status.value)));
 const visible=computed(()=>filtered.value.slice(0,shown.value));
-const styles:Record<string,string>={diagonal:'斜向画廊',animated_diagonal:'动态海报墙',animated:'动态轮播',single:'焦点单图',poster:'海报长廊',multi:'多图拼贴',duo:'留白双海报',stack:'扇形叠卡',editorial:'杂志拼版',panorama:'胶片横窗',cinema:'极简巨幕',echo:'叠影',wedge:'斜切'};
+const styles:Record<string,string>={diagonal:'斜向画廊',animated_diagonal:'动态海报墙',animated_wedge:'动态斜切轮播',animated:'动态轮播',single:'焦点单图',poster:'海报长廊',multi:'多图拼贴',duo:'留白双海报',stack:'扇形叠卡',editorial:'杂志拼版',panorama:'胶片横窗',cinema:'极简巨幕',echo:'叠影',wedge:'斜切'};
 function endpoint(action:string){return '/plugins/emby-cover-generator/api/'+action;}
 function fail(e:unknown){error.value=e instanceof Error?e.message:String(e);}
 function menuButton(p:Record<string,unknown>){return {...p,icon:'mdi-dots-vertical',variant:'text',size:'small','aria-label':'更多操作'};}

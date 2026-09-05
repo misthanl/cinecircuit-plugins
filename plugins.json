@@ -1054,7 +1054,7 @@
       "manifest": {
         "id": "emby-cover-generator",
         "name": "媒体库视觉封面",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "为媒体服务器媒体库生成静态或动态风格封面，支持媒体库选择、标题、字体、分辨率和历史清理。",
         "icon": "mdi-image-multiple-outline",
         "api_version": 1,
@@ -1179,6 +1179,10 @@
                 {
                   "value": "animated_diagonal",
                   "label": "动态斜向海报墙｜右侧海报循环移动"
+                },
+                {
+                  "value": "animated_wedge",
+                  "label": "动态斜切轮播｜大图淡入淡出，背景随图变色"
                 },
                 {
                   "value": "diagonal",
@@ -1792,8 +1796,8 @@
           "order": 80
         }
       },
-      "package_url": "packages/emby-cover-generator-1.0.0.zip",
-      "sha256": "59b2cdf933dee70def613e039915ae07499ba135938631a48d0a873d45676f65"
+      "package_url": "packages/emby-cover-generator-1.0.1.zip",
+      "sha256": "095bad21f234833bfdbe08d1ed2de7494f3793a0248a77e2629499fc3b4b48d4"
     },
     {
       "manifest": {

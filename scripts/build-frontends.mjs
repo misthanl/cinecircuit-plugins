@@ -14,7 +14,7 @@ const runtimeExports = [
   "Fragment", "computed", "createBlock", "createCommentVNode", "createElementBlock",
   "createElementVNode", "createTextVNode", "createVNode", "defineComponent", "h",
   "normalizeClass", "normalizeStyle", "onMounted", "openBlock", "reactive", "ref",
-  "renderList", "resolveComponent", "toDisplayString", "unref", "withCtx",
+  "renderList", "resolveComponent", "resolveDynamicComponent", "toDisplayString", "unref", "withCtx",
 ];
 const execFileAsync = promisify(execFile);
 

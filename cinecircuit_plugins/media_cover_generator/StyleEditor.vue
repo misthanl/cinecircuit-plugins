@@ -22,6 +22,7 @@ defineOptions({ inheritAttrs: false });
 type Model = Record<string, unknown>;
 const props = defineProps<{ modelValue: Model; disabled?: boolean; request?: (path: string, init?: RequestInit) => Promise<unknown> }>();
 const emit = defineEmits<{ "update:modelValue": [value: Model] }>();
+const focusedField = ref("");
 
 const styles = [
   { value: "single", label: "焦点单图", note: "背景虚化，右侧突出主海报", image: sampleSingle },
@@ -29,6 +30,7 @@ const styles = [
   { value: "poster", label: "海报长廊", note: "竖版海报横向陈列，收藏感更强", image: samplePoster },
   { value: "animated", label: "动态轮播", note: "真实动态样例，图片会渐变切换", image: samplePoster },
   { value: "animated_diagonal", label: "动态斜向海报墙", note: "右侧海报循环移动，标题和背景保持固定", image: sampleDiagonal },
+  { value: "animated_wedge", label: "动态斜切轮播", note: "标题固定，大图淡入淡出，背景随图片色调变化", image: sampleWedge },
   { value: "diagonal", label: "斜向画廊", note: "左侧留白，右侧倾斜圆角海报墙", image: sampleDiagonal },
   { value: "echo", label: "扇形叠影", note: "清晰主图搭配渐隐虚化叠影", image: sampleEcho },
   { value: "wedge", label: "斜切大图", note: "磨砂留白与整幅画面斜向分隔", image: sampleWedge },
@@ -49,12 +51,12 @@ const enFonts = [["emblemaone", "EmblemaOne"], ["melete", "Melete"], ["phosphate
 const currentStyle = computed(() => String(props.modelValue.cover_style_base || "multi"));
 const hasBackground = computed(() => !['multi','cinema'].includes(currentStyle.value));
 const backgroundMode = computed(() => String(props.modelValue.background_mode || 'blurred'));
-const isAnimated = (style: string) => style === 'animated' || style === 'animated_diagonal';
+const isAnimated = (style: string) => ['animated', 'animated_diagonal', 'animated_wedge'].includes(style);
 const currentMode = computed(() => isAnimated(currentStyle.value) ? 'dynamic' : 'static');
 const availableStyles = computed(() => styles.filter(style => isAnimated(style.value) === (currentMode.value === 'dynamic')));
 const rememberedStyles = ref({
-  static: isAnimated(currentStyle.value) ? (currentStyle.value === 'animated_diagonal' ? 'diagonal' : 'poster') : currentStyle.value,
-  dynamic: isAnimated(currentStyle.value) ? currentStyle.value : (currentStyle.value === 'diagonal' ? 'animated_diagonal' : 'animated'),
+  static: isAnimated(currentStyle.value) ? (currentStyle.value === 'animated_wedge' ? 'wedge' : currentStyle.value === 'animated_diagonal' ? 'diagonal' : 'poster') : currentStyle.value,
+  dynamic: isAnimated(currentStyle.value) ? currentStyle.value : (currentStyle.value === 'wedge' ? 'animated_wedge' : currentStyle.value === 'diagonal' ? 'animated_diagonal' : 'animated'),
 });
 function changeMode(mode: string): void {
   if (props.disabled || (mode !== 'static' && mode !== 'dynamic') || mode === currentMode.value) return;
@@ -220,8 +222,8 @@ function checkedValue(event: Event): boolean { return (event.target as HTMLInput
         <label v-if="hasBackground && backgroundMode !== 'solid'"><span>横向提亮（%）</span><input type="number" min="0" max="100" :value="modelValue.background_light ?? 35" :disabled="disabled" @input="update('background_light',Number(inputValue($event)))"></label>
         <label v-if="hasBackground"><span>磨砂颗粒（0–10）</span><input type="number" min="0" max="10" :value="modelValue.background_grain ?? 3" :disabled="disabled" @input="update('background_grain',Number(inputValue($event)))"></label>
         <label><span>JPEG 质量（75–96）</span><input type="number" min="75" max="96" :value="modelValue.jpeg_quality ?? 92" :disabled="disabled" @input="update('jpeg_quality', Number(inputValue($event)))"></label>
-        <label><span>背景底色／装饰色</span><input type="text" :value="modelValue.background_color || ''" placeholder="留空自动取色，如 #101828" :disabled="disabled" @input="update('background_color', inputValue($event))"></label>
-        <label class="full"><span>媒体库标题配置 <small>可选，每行一个</small></span><textarea :value="String(modelValue.title_config || '')" :disabled="disabled" placeholder="电影=电影|MOVIES&#10;剧集=剧集|TV SERIES" @input="update('title_config', inputValue($event))" /></label>
+        <label class="deferred-label" :class="{ 'label-active': focusedField === 'background_color' || Boolean(modelValue.background_color) }"><span>背景底色／装饰色</span><input type="text" :value="modelValue.background_color || ''" :placeholder="focusedField === 'background_color' ? '留空自动取色，如 #101828' : ''" :disabled="disabled" @focus="focusedField = 'background_color'" @blur="focusedField = ''" @input="update('background_color', inputValue($event))"></label>
+        <label class="full deferred-label" :class="{ 'label-active': focusedField === 'title_config' || Boolean(modelValue.title_config) }"><span>媒体库标题配置 <small>可选，每行一个</small></span><textarea :value="String(modelValue.title_config || '')" :disabled="disabled" :placeholder="focusedField === 'title_config' ? '电影=电影|MOVIES\n剧集=剧集|TV SERIES' : ''" @focus="focusedField = 'title_config'" @blur="focusedField = ''" @input="update('title_config', inputValue($event))" /></label>
         <div class="switches full"><label><input type="checkbox" :checked="Boolean(modelValue.use_primary ?? true)" :disabled="disabled" @change="update('use_primary', checkedValue($event))"><span><b>优先使用海报图</b><small>横版剧照不足时更实用</small></span></label><label><input type="checkbox" :checked="Boolean(modelValue.show_item_count)" :disabled="disabled" @change="update('show_item_count', checkedValue($event))"><span><b>显示媒体数量角标</b><small>在左上角显示条目总数</small></span></label></div>
       </div>
     </section>
@@ -265,6 +267,8 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .form-grid label { display: grid; gap: 8px; }
 .form-grid > label { position: relative; min-width: 0; padding-top: 8px; align-content: start; }
 .form-grid > label > span { position: absolute; top: 0; left: 12px; z-index: 1; max-width: calc(100% - 32px); padding: 0 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; background: var(--control-surface, var(--app-surface, #fff)); color: var(--app-control-muted, #8894a8); font-size: 12px; font-weight: 400; line-height: 16px; pointer-events: none; }
+.form-grid > label.deferred-label > span { transition: top .15s ease, left .15s ease, padding .15s ease, font-size .15s ease, background-color .15s ease; }
+.form-grid > label.deferred-label:not(.label-active) > span { top: 26px; left: 16px; padding: 0; background: transparent; font-size: 13px; }
 .form-grid > label:focus-within > span { color: var(--app-control-border-focus, #5575e7); }
 .form-grid > label:has(:disabled) { opacity: .55; }
 .form-grid label > span small { font-weight: 400; }

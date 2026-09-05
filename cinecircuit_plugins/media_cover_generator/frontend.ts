@@ -46,6 +46,6 @@ export function install(sdk: CineCircuitPluginSdk): void {
     inheritAttrs:false,
     props:{modelValue:{type:Object as PropType<Record<string,unknown>>,required:true},disabled:Boolean},
     emits:['update:modelValue'],
-    setup(props,{emit}){return ()=>h(RunEditorView,{modelValue:props.modelValue,disabled:props.disabled,request:sdk.request,'onUpdate:modelValue':(value:Record<string,unknown>)=>emit('update:modelValue',value)});}
+    setup(props,{emit}){return ()=>h(RunEditorView,{modelValue:props.modelValue,disabled:props.disabled,request:sdk.request,cronFieldComponent:sdk.ui.components.CronField,'onUpdate:modelValue':(value:Record<string,unknown>)=>emit('update:modelValue',value)});}
   }) });
 }
