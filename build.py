@@ -62,6 +62,13 @@ def build():
                     continue
                 if path.suffix == ".vue":
                     continue
+                # These cover previews are already embedded verbatim by Vite.
+                # Keep full-size JPEGs and source photos for the preview API, but
+                # don't ship a second copy of inline thumbnails/animations.
+                if manifest['id'] == 'emby-cover-generator' and path.parent.name == 'assets' and (
+                    path.name.startswith('thumb-') or path.name == 'sample-multi.jpg'
+                ):
+                    continue
                 if path.name == "frontend.ts":
                     compiled = FRONTEND_BUILD_ROOT / path.relative_to(ROOT).with_suffix(".js")
                     if not compiled.is_file():

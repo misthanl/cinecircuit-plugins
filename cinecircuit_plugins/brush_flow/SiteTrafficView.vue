@@ -127,8 +127,8 @@ onMounted(load);
       <main class="brush-panel">
         <div v-if="selected" class="brush-form">
           <label class="brush-field full"><span>任务名称</span><input :value="selected.name" @input="inputField('name', $event)"></label>
-          <label class="brush-field"><span>PT 站点</span><select :value="selected.site_id" @change="field('site_id', ($event.target as HTMLSelectElement).value)"><option v-for="item in sites" :key="item.id" :value="item.id">{{ item.name }}</option></select></label>
-          <label class="brush-field"><span>下载器</span><select :value="selected.downloader_id" @change="field('downloader_id', ($event.target as HTMLSelectElement).value)"><option v-for="item in downloaders" :key="item.id" :value="item.id">{{ item.name }}</option></select></label>
+          <div class="brush-field"><VSelect label="PT 站点" :model-value="selected.site_id" @update:model-value="field('site_id', $event)" :items="sites.map(item => ({value:item.id,title:item.name}))" variant="outlined" density="comfortable" hide-details /></div>
+          <div class="brush-field"><VSelect label="下载器" :model-value="selected.downloader_id" @update:model-value="field('downloader_id', $event)" :items="downloaders.map(item => ({value:item.id,title:item.name}))" variant="outlined" density="comfortable" hide-details /></div>
           <label class="brush-field"><span>包含规则（正则）</span><input :value="selected.include" @input="inputField('include', $event)"></label>
           <label class="brush-field"><span>排除规则（正则）</span><input :value="selected.exclude" @input="inputField('exclude', $event)"></label>
           <label class="brush-field"><span>最小体积 GiB</span><input type="number" :value="selected.min_size" @input="inputField('min_size', $event, true)"></label>

@@ -40,6 +40,7 @@
               "input_type": "switch",
               "label": "启用自动签到",
               "default": true,
+              "description": "按下方周期自动执行；关闭后仍可在插件页面手动运行。",
               "icon": "mdi-toggle-switch-outline",
               "section": "schedule"
             },
@@ -49,6 +50,7 @@
               "label": "执行周期",
               "default": "",
               "placeholder": "5位cron表达式，留空自动",
+              "description": "留空时每天执行一次；也可以用可视化周期选择器调整。",
               "icon": "mdi-calendar-clock",
               "section": "schedule"
             },
@@ -66,6 +68,7 @@
               "input_type": "number",
               "label": "并发队列数量",
               "default": 5,
+              "description": "同时签到的站点数；网络不稳定时建议设为 2～5。",
               "icon": "mdi-format-list-numbered",
               "validation": {
                 "minimum": 1,
@@ -78,6 +81,7 @@
               "input_type": "switch",
               "label": "下次执行前清理本日缓存",
               "default": false,
+              "description": "仅下一次运行生效，用于重新签到今天已成功的站点。",
               "icon": "mdi-broom",
               "section": "schedule"
             },
@@ -87,6 +91,7 @@
               "label": "重试关键词",
               "default": "超时|timeout|连接|connection|503|502",
               "placeholder": "支持正则表达式，命中才重签",
+              "description": "用“|”分隔多个错误词；只有失败原因命中时才自动重试。",
               "icon": "mdi-text-search",
               "section": "retry"
             },
@@ -136,7 +141,7 @@
         }
       },
       "package_url": "packages/auto-signin-1.0.0.zip",
-      "sha256": "bd891a05414965b41b0766b61fdd7a4b98296812095a9db5b3fba3bdbdd1fa90"
+      "sha256": "0e18710ab0b48c7d2f81d3ba9567644cd8caefd4f48f4a7c986714897ec842cf"
     },
     {
       "manifest": {
@@ -183,6 +188,7 @@
               "input_type": "switch",
               "label": "启用刷流任务",
               "default": true,
+              "description": "开启后按任务周期自动选种；关闭后不会新增下载。",
               "section": "runtime"
             },
             {
@@ -236,6 +242,7 @@
               "input_type": "number",
               "label": "全局最大下载任务数",
               "default": 30,
+              "description": "所有刷流任务合计不能超过此数量，达到上限后停止添加。",
               "validation": {
                 "minimum": 1,
                 "maximum": 500
@@ -247,6 +254,7 @@
               "input_type": "switch",
               "label": "允许删种时同时删除文件",
               "default": false,
+              "description": "高风险选项。开启后，命中删种规则时会同时删除已下载文件。",
               "section": "safety"
             }
           ]
@@ -260,7 +268,7 @@
         }
       },
       "package_url": "packages/brush-flow-1.0.0.zip",
-      "sha256": "617b0a5c1e2c378452c310a7b75557f76b9964cea317866bb66332077de9f953"
+      "sha256": "1c4d08d98edb4feb68d299ff92a189681c7b30679a050d7e78c272a48ad3f451"
     },
     {
       "manifest": {
@@ -303,6 +311,7 @@
               "input_type": "switch",
               "label": "启用每日维护",
               "default": false,
+              "description": "每天自动扫描并完善演职员资料；关闭后只响应手动执行。",
               "icon": "mdi-calendar-refresh-outline",
               "section": "run"
             },
@@ -312,6 +321,7 @@
               "label": "执行周期",
               "default": "",
               "placeholder": "5位cron表达式，留空自动",
+              "description": "留空时每天运行一次。首次处理大型媒体库可能耗时较长。",
               "icon": "mdi-calendar-clock",
               "section": "run"
             },
@@ -333,6 +343,7 @@
               "input_type": "select",
               "label": "处理范围",
               "default": "missing_any",
+              "description": "建议选择“姓名或角色未中文化”，避免重复改写已有资料。",
               "icon": "mdi-filter-outline",
               "section": "policy",
               "options": [
@@ -359,6 +370,7 @@
               "input_type": "select",
               "label": "资料优先级",
               "default": "tmdb_douban",
+              "description": "首选来源没有可靠资料时，才会使用另一个来源补充。",
               "icon": "mdi-database-search-outline",
               "section": "policy",
               "options": [
@@ -377,6 +389,7 @@
               "input_type": "switch",
               "label": "补充人物简介",
               "default": true,
+              "description": "为缺少简介的人物写入可用的中文资料。",
               "icon": "mdi-text-account",
               "section": "policy"
             },
@@ -385,6 +398,7 @@
               "input_type": "switch",
               "label": "补充人物头像",
               "default": true,
+              "description": "为没有头像的人物下载并写入资料源图片。",
               "icon": "mdi-account-box-outline",
               "section": "policy"
             },
@@ -403,7 +417,7 @@
         "navigation": {}
       },
       "package_url": "packages/cast-profile-enricher-1.0.0.zip",
-      "sha256": "013219f42a1bf7e81e5c1146ed3d11f2e8bab3d3af6d353eeaafaafe941a4ab6"
+      "sha256": "f839ae9fd4f794536f613ce5903c0686f23031c6bfb5cae3ce3a36df530fe55d"
     },
     {
       "manifest": {
@@ -566,6 +580,7 @@
               "label": "执行周期",
               "default": "",
               "placeholder": "5位cron表达式，留空自动",
+              "description": "留空时每 6 小时刷新；已处理作品不会重复订阅。",
               "icon": "mdi-calendar-clock",
               "section": "schedule"
             },
@@ -574,6 +589,7 @@
               "input_type": "switch",
               "label": "使用系统代理服务器",
               "default": false,
+              "description": "仅在直连豆瓣或 RSSHub 失败时开启。",
               "icon": "mdi-server-network",
               "section": "schedule"
             },
@@ -582,6 +598,7 @@
               "input_type": "switch",
               "label": "下次执行前清理历史记录",
               "default": false,
+              "description": "仅下一次执行生效；清理后榜单作品可能重新进入订阅判断。",
               "icon": "mdi-history",
               "section": "schedule"
             },
@@ -591,6 +608,7 @@
               "label": "最低评分",
               "default": 0,
               "placeholder": "评分大于等于该值才订阅",
+              "description": "0 表示不过滤；例如设为 7.5，只处理评分不低于 7.5 的作品。",
               "icon": "mdi-star-outline",
               "validation": {
                 "minimum": 0,
@@ -611,6 +629,7 @@
               "icon": "mdi-trophy-outline",
               "section": "rank",
               "span": true,
+              "description": "可多选。相同作品出现在多个榜单时只处理一次。",
               "options": [
                 {
                   "value": "movie-ustop",
@@ -652,6 +671,7 @@
               "label": "RSSHub 地址",
               "default": "https://rsshub.app",
               "placeholder": "https://rsshub.app",
+              "description": "填写可访问的 RSSHub 根地址；使用完整 RSS 地址时不会用到此项。",
               "icon": "mdi-rss",
               "section": "rss"
             },
@@ -661,6 +681,7 @@
               "label": "自定义榜单地址",
               "default": "",
               "placeholder": "每行一个完整 RSS 地址，或 RSSHub 路由",
+              "description": "示例：/douban/movie/playing 或 https://example.com/feed.xml。",
               "icon": "mdi-link-variant",
               "section": "rss",
               "span": true
@@ -671,7 +692,7 @@
         "navigation": {}
       },
       "package_url": "packages/douban-hot-1.0.0.zip",
-      "sha256": "c0222a6b76e25a4887b877ed7782f355b4a44f5c86b9077833859d67d3696f1c"
+      "sha256": "83401a2e5044f16117bf652e1194887ab47d643ce838e91ec1fdf8d531d031cc"
     },
     {
       "manifest": {
@@ -719,6 +740,7 @@
               "label": "执行周期",
               "default": "",
               "placeholder": "5位cron表达式，留空自动",
+              "description": "留空时每 6 小时刷新一次；已处理作品自动去重。",
               "icon": "mdi-calendar-clock",
               "section": "schedule"
             },
@@ -727,6 +749,7 @@
               "input_type": "switch",
               "label": "下次执行前清理历史记录",
               "default": false,
+              "description": "仅下一次执行生效；清理后榜单作品会重新进入订阅判断。",
               "icon": "mdi-history",
               "section": "schedule"
             },
@@ -740,6 +763,7 @@
               ],
               "icon": "mdi-format-list-bulleted",
               "section": "rank",
+              "description": "电影与剧集榜可同时选择，重复作品只订阅一次。",
               "options": [
                 {
                   "value": "movie",
@@ -768,6 +792,7 @@
               "input_type": "select",
               "label": "电影榜单条数",
               "default": "10",
+              "description": "每次从所选电影类榜单顶部读取的作品数量。",
               "icon": "mdi-numeric",
               "section": "rank",
               "options": [
@@ -803,7 +828,8 @@
               "label": "全网热门订阅",
               "default": true,
               "icon": "mdi-television",
-              "section": "platform"
+              "section": "platform",
+              "description": "开启后读取全网剧集热度榜。"
             },
             {
               "key": "tx_enabled",
@@ -811,7 +837,8 @@
               "label": "腾讯视频热门订阅",
               "default": false,
               "icon": "mdi-television",
-              "section": "platform"
+              "section": "platform",
+              "description": "开启后读取腾讯视频剧集热度榜。"
             },
             {
               "key": "iqy_enabled",
@@ -819,7 +846,8 @@
               "label": "爱奇艺热门订阅",
               "default": false,
               "icon": "mdi-television",
-              "section": "platform"
+              "section": "platform",
+              "description": "开启后读取爱奇艺剧集热度榜。"
             },
             {
               "key": "mg_enabled",
@@ -827,7 +855,8 @@
               "label": "芒果 TV热门订阅",
               "default": false,
               "icon": "mdi-television",
-              "section": "platform"
+              "section": "platform",
+              "description": "开启后读取芒果 TV剧集热度榜。"
             },
             {
               "key": "yk_enabled",
@@ -835,7 +864,8 @@
               "label": "优酷热门订阅",
               "default": false,
               "icon": "mdi-television",
-              "section": "platform"
+              "section": "platform",
+              "description": "开启后读取优酷剧集热度榜。"
             },
             {
               "key": "all_num",
@@ -844,6 +874,7 @@
               "default": "10",
               "icon": "mdi-numeric",
               "section": "platform",
+              "description": "每次从全网热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -878,6 +909,7 @@
               "default": "10",
               "icon": "mdi-numeric",
               "section": "platform",
+              "description": "每次从腾讯视频热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -912,6 +944,7 @@
               "default": "10",
               "icon": "mdi-numeric",
               "section": "platform",
+              "description": "每次从爱奇艺热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -946,6 +979,7 @@
               "default": "10",
               "icon": "mdi-numeric",
               "section": "platform",
+              "description": "每次从芒果 TV热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -980,6 +1014,7 @@
               "default": "10",
               "icon": "mdi-numeric",
               "section": "platform",
+              "description": "每次从优酷热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -1013,7 +1048,7 @@
         "navigation": {}
       },
       "package_url": "packages/maoyan-rank-1.0.0.zip",
-      "sha256": "d97a0eb08e4eb704199f838cf0facea8f8abcc5ca17e2deb115af53c9411d6d3"
+      "sha256": "3e1dc0a718e8c2fcfacc45c17eedf00b97f0b8cd75227fb2c7a2557b2ed8f741"
     },
     {
       "manifest": {
@@ -1040,6 +1075,7 @@
         ],
         "schedule_seconds": 86400,
         "config_schema": {
+          "editor_width": 1080,
           "sections": [
             {
               "key": "run",
@@ -1104,6 +1140,13 @@
               "visible": false
             },
             {
+              "key": "library_targets",
+              "input_type": "textarea",
+              "label": "更新媒体库",
+              "default": [],
+              "visible": false
+            },
+            {
               "key": "include_libraries",
               "input_type": "textarea",
               "label": "媒体库",
@@ -1119,44 +1162,81 @@
               "options": [
                 {
                   "value": "single",
-                  "label": "单图"
+                  "label": "焦点单图｜一张图片铺满"
                 },
                 {
                   "value": "multi",
-                  "label": "多图"
+                  "label": "多图拼贴｜多张剧照组合"
                 },
                 {
                   "value": "poster",
-                  "label": "海报墙"
+                  "label": "海报长廊｜竖版海报排列"
                 },
                 {
                   "value": "animated",
-                  "label": "动态封面"
+                  "label": "动态轮播｜图片渐变切换"
+                },
+                {
+                  "value": "animated_diagonal",
+                  "label": "动态斜向海报墙｜右侧海报循环移动"
+                },
+                {
+                  "value": "diagonal",
+                  "label": "斜向画廊｜倾斜圆角海报墙"
+                },
+                {
+                  "value": "echo",
+                  "label": "扇形叠影｜虚实渐隐卡片"
+                },
+                {
+                  "value": "wedge",
+                  "label": "斜切大图｜留白与整幅剧照"
+                },
+                {
+                  "value": "duo",
+                  "label": "留白双海报｜标题与海报分区"
+                },
+                {
+                  "value": "stack",
+                  "label": "扇形叠卡｜错落层叠海报"
+                },
+                {
+                  "value": "editorial",
+                  "label": "杂志拼版｜主海报与侧栏"
+                },
+                {
+                  "value": "panorama",
+                  "label": "胶片横窗｜三幅横图与底栏"
+                },
+                {
+                  "value": "cinema",
+                  "label": "极简巨幕｜全幅剧照与居中标题"
                 }
               ]
             },
             {
               "key": "cover_style_variant",
               "input_type": "select",
-              "label": "样式变体",
+              "label": "多图布局",
               "default": "1",
               "section": "style",
+              "description": "仅多图拼贴模式使用",
               "options": [
                 {
                   "value": "1",
-                  "label": "样式 1"
+                  "label": "八宫格"
                 },
                 {
                   "value": "2",
-                  "label": "样式 2"
+                  "label": "主次拼贴"
                 },
                 {
                   "value": "3",
-                  "label": "样式 3"
+                  "label": "左右分镜"
                 },
                 {
                   "value": "4",
-                  "label": "样式 4"
+                  "label": "三联画"
                 }
               ]
             },
@@ -1164,9 +1244,13 @@
               "key": "sort_by",
               "input_type": "select",
               "label": "媒体排序",
-              "default": "DateCreated",
+              "default": "Random",
               "section": "style",
               "options": [
+                {
+                  "value": "Random",
+                  "label": "随机选择"
+                },
                 {
                   "value": "DateCreated",
                   "label": "入库时间"
@@ -1174,10 +1258,6 @@
                 {
                   "value": "PremiereDate",
                   "label": "首映时间"
-                },
-                {
-                  "value": "Random",
-                  "label": "随机"
                 }
               ]
             },
@@ -1185,7 +1265,7 @@
               "key": "use_primary",
               "input_type": "switch",
               "label": "优先使用海报图",
-              "default": false,
+              "default": true,
               "section": "style"
             },
             {
@@ -1205,17 +1285,81 @@
             },
             {
               "key": "zh_font_preset",
-              "input_type": "text",
-              "label": "中文字体",
-              "default": "chaohei",
-              "section": "style"
+              "input_type": "select",
+              "label": "主标题字体",
+              "default": "wendao",
+              "section": "style",
+              "options": [
+                {
+                  "value": "wendao",
+                  "label": "文道潮黑"
+                },
+                {
+                  "value": "cuyasong",
+                  "label": "粗雅宋"
+                },
+                {
+                  "value": "modern",
+                  "label": "现代黑体"
+                },
+                {
+                  "value": "bold",
+                  "label": "电影粗黑"
+                },
+                {
+                  "value": "serif",
+                  "label": "典雅宋体"
+                }
+              ]
             },
             {
               "key": "en_font_preset",
-              "input_type": "text",
-              "label": "英文字体",
-              "default": "EmblemaOne",
-              "section": "style"
+              "input_type": "select",
+              "label": "副标题字体",
+              "default": "emblemaone",
+              "section": "style",
+              "options": [
+                {
+                  "value": "emblemaone",
+                  "label": "EmblemaOne"
+                },
+                {
+                  "value": "melete",
+                  "label": "Melete"
+                },
+                {
+                  "value": "phosphate",
+                  "label": "Phosphate"
+                },
+                {
+                  "value": "josefinsans",
+                  "label": "JosefinSans"
+                },
+                {
+                  "value": "lilitaone",
+                  "label": "LilitaOne"
+                },
+                {
+                  "value": "monoton",
+                  "label": "Monoton"
+                },
+                {
+                  "value": "plaster",
+                  "label": "Plaster"
+                },
+                {
+                  "value": "inter",
+                  "label": "Inter 简洁"
+                },
+                {
+                  "value": "cinema",
+                  "label": "Cinema 宽体"
+                },
+                {
+                  "value": "editorial",
+                  "label": "Editorial 衬线"
+                }
+              ]
             },
             {
               "key": "zh_font_size",
@@ -1243,7 +1387,7 @@
               "key": "resolution",
               "input_type": "select",
               "label": "输出分辨率",
-              "default": "480p",
+              "default": "1080p",
               "section": "style",
               "options": [
                 {
@@ -1290,16 +1434,17 @@
               "key": "animation_format",
               "input_type": "select",
               "label": "动态格式",
-              "default": "apng",
+              "default": "webp",
+              "description": "1080p 建议使用 WebP；APNG 文件较大，超过宿主 20 MB 限制时需缩短时长。",
               "section": "animation",
               "options": [
                 {
-                  "value": "apng",
-                  "label": "APNG"
-                },
-                {
                   "value": "webp",
                   "label": "WebP"
+                },
+                {
+                  "value": "apng",
+                  "label": "APNG"
                 },
                 {
                   "value": "gif",
@@ -1311,7 +1456,8 @@
               "key": "animation_duration",
               "input_type": "number",
               "label": "动画时长（秒）",
-              "default": 12,
+              "default": 6,
+              "description": "1080p 建议 6 秒循环；更长动画可能超过 20 MB 上传限制。",
               "validation": {
                 "minimum": 2,
                 "maximum": 60
@@ -1322,6 +1468,7 @@
               "key": "animation_fps",
               "input_type": "number",
               "label": "动画帧率",
+              "description": "逐帧写入临时目录，最多 500 帧；超过时保留时长并降低实际帧率。",
               "default": 12,
               "validation": {
                 "minimum": 1,
@@ -1333,7 +1480,8 @@
               "key": "animation_resolution",
               "input_type": "select",
               "label": "动画分辨率",
-              "default": "320x180",
+              "description": "控制动态封面的输出尺寸；分辨率越高，画面越清晰，生成耗时和文件体积也越大。",
+              "default": "1920x1080",
               "section": "animation",
               "options": [
                 {
@@ -1347,6 +1495,14 @@
                 {
                   "value": "640x360",
                   "label": "640 × 360"
+                },
+                {
+                  "value": "1280x720",
+                  "label": "1280 × 720（720p）"
+                },
+                {
+                  "value": "1920x1080",
+                  "label": "1920 × 1080（1080p）"
                 }
               ]
             },
@@ -1354,7 +1510,7 @@
               "key": "clean_images",
               "input_type": "switch",
               "label": "生成后清理图片缓存",
-              "default": false,
+              "default": true,
               "section": "storage"
             },
             {
@@ -1368,6 +1524,13 @@
               "key": "save_recent_covers",
               "input_type": "switch",
               "label": "保留最近生成封面",
+              "default": true,
+              "section": "storage"
+            },
+            {
+              "key": "skip_unchanged",
+              "input_type": "switch",
+              "label": "跳过未变化封面",
               "default": true,
               "section": "storage"
             },
@@ -1448,7 +1611,6 @@
                 "minimum": 1,
                 "maximum": 50
               },
-              "description": "一次任务最多处理多少个媒体库",
               "section": "run"
             },
             {
@@ -1487,7 +1649,7 @@
             {
               "key": "background_color",
               "input_type": "text",
-              "label": "图片不足时的背景色",
+              "label": "背景底色（留空自动取色）",
               "default": "",
               "placeholder": "例如 #101828，留空则自动取色",
               "section": "style"
@@ -1505,6 +1667,103 @@
               "section": "style"
             },
             {
+              "key": "background_mode",
+              "input_type": "select",
+              "label": "留白背景",
+              "default": "blurred",
+              "section": "style",
+              "description": "用于带留白的样式；模糊、混色、提亮与颗粒仅作用于背景",
+              "options": [
+                {
+                  "value": "solid",
+                  "label": "纯色"
+                },
+                {
+                  "value": "blurred",
+                  "label": "柔焦取色"
+                },
+                {
+                  "value": "gradient",
+                  "label": "柔和渐变"
+                }
+              ]
+            },
+            {
+              "key": "text_finish",
+              "input_type": "select",
+              "label": "文字质感",
+              "default": "shadow",
+              "section": "style",
+              "options": [
+                {
+                  "value": "clean",
+                  "label": "海报白字"
+                },
+                {
+                  "value": "shadow",
+                  "label": "柔影立体"
+                },
+                {
+                  "value": "silver",
+                  "label": "银色质感"
+                }
+              ]
+            },
+            {
+              "key": "background_mix",
+              "input_type": "number",
+              "label": "底色占比（%）",
+              "default": 80,
+              "validation": {
+                "minimum": 0,
+                "maximum": 100
+              },
+              "section": "style"
+            },
+            {
+              "key": "background_light",
+              "input_type": "number",
+              "label": "横向提亮（%）",
+              "default": 35,
+              "validation": {
+                "minimum": 0,
+                "maximum": 100
+              },
+              "section": "style"
+            },
+            {
+              "key": "background_grain",
+              "input_type": "number",
+              "label": "磨砂颗粒",
+              "default": 3,
+              "validation": {
+                "minimum": 0,
+                "maximum": 10
+              },
+              "section": "style"
+            },
+            {
+              "key": "animation_direction",
+              "input_type": "select",
+              "label": "海报移动方向",
+              "default": "up",
+              "section": "style",
+              "options": [
+                {
+                  "value": "up",
+                  "label": "向上"
+                },
+                {
+                  "value": "down",
+                  "label": "向下"
+                },
+                {
+                  "value": "alternate",
+                  "label": "交错滚动"
+                }
+              ]
+            },
+            {
               "key": "jpeg_quality",
               "input_type": "number",
               "label": "JPEG 质量",
@@ -1517,19 +1776,10 @@
               "section": "style"
             },
             {
-              "key": "skip_unchanged",
-              "input_type": "switch",
-              "label": "跳过未变化封面",
-              "default": true,
-              "description": "封面内容没有变化时不重复上传",
-              "section": "storage"
-            },
-            {
               "key": "dry_run",
               "input_type": "switch",
               "label": "预览模式（不上传）",
-              "default": true,
-              "description": "只生成预览结果，不修改媒体服务器中的封面",
+              "default": false,
               "section": "run"
             }
           ]
@@ -1543,7 +1793,7 @@
         }
       },
       "package_url": "packages/emby-cover-generator-1.0.0.zip",
-      "sha256": "16ec37ef5b3407e412cbe808debc48ede18b477557bbc293bd750b7cb6d9b5a0"
+      "sha256": "59b2cdf933dee70def613e039915ae07499ba135938631a48d0a873d45676f65"
     },
     {
       "manifest": {
@@ -1597,6 +1847,7 @@
               "input_type": "switch",
               "label": "启用字幕插件",
               "default": true,
+              "description": "控制自动检查与侧边栏工作台是否可以执行字幕操作。",
               "section": "general"
             },
             {
@@ -1613,6 +1864,7 @@
               "input_type": "switch",
               "label": "显示侧边栏入口",
               "default": true,
+              "description": "关闭后隐藏“字幕管理”入口，不会删除任何字幕文件。",
               "section": "general"
             },
             {
@@ -1664,6 +1916,7 @@
               "input_type": "switch",
               "label": "繁体字幕转简体",
               "default": false,
+              "description": "保存自动匹配的繁体中文字幕时转换为简体。",
               "section": "automatic"
             },
             {
@@ -1671,6 +1924,7 @@
               "input_type": "switch",
               "label": "整理完成后自动搜索",
               "default": false,
+              "description": "媒体整理完成后立即按下方策略搜索并保存外挂字幕。",
               "section": "automatic"
             },
             {
@@ -1678,6 +1932,7 @@
               "input_type": "switch",
               "label": "自动跳过中文媒体",
               "default": true,
+              "description": "中文原声媒体不自动搜索字幕，仍可在工作台手动处理。",
               "section": "automatic"
             },
             {
@@ -1685,6 +1940,7 @@
               "input_type": "select",
               "label": "自动字幕策略",
               "default": "online_then_ai_source",
+              "description": "决定在线字幕和 AI 字幕的尝试顺序。",
               "section": "automatic",
               "options": [
                 {
@@ -1706,6 +1962,7 @@
               "input_type": "select",
               "label": "多字幕处理",
               "default": "best",
+              "description": "控制一次自动任务最多保留多少份候选字幕。",
               "section": "automatic",
               "options": [
                 {
@@ -1755,6 +2012,7 @@
                 "subhd",
                 "zimuku"
               ],
+              "description": "可多选；搜索时会合并结果并按语言与格式排序。",
               "section": "online",
               "options": [
                 {
@@ -1780,6 +2038,7 @@
               "input_type": "switch",
               "label": "在线搜索使用代理",
               "default": false,
+              "description": "仅影响字幕源请求，不影响本地媒体文件读取。",
               "section": "online"
             },
             {
@@ -1849,6 +2108,7 @@
               "input_type": "switch",
               "label": "启用 AI 字幕联动",
               "default": true,
+              "description": "在线字幕不可用时允许调用已配置的 AI 字幕能力。",
               "section": "automatic"
             },
             {
@@ -1856,6 +2116,7 @@
               "input_type": "number",
               "label": "最大调轴偏移（秒）",
               "default": 120,
+              "description": "检测到的偏移超过此值时拒绝自动写入。",
               "validation": {
                 "minimum": 1,
                 "maximum": 300
@@ -1867,6 +2128,7 @@
               "input_type": "number",
               "label": "最小调轴偏移（秒）",
               "default": 0.2,
+              "description": "小于此值视为无需调整，避免无意义重写字幕。",
               "validation": {
                 "minimum": 0.01,
                 "maximum": 1
@@ -1878,6 +2140,7 @@
               "input_type": "select",
               "label": "语音检测方式",
               "default": "webrtc",
+              "description": "WebRTC 更稳健；RMS 更轻量，适合资源受限设备。",
               "section": "timeline",
               "options": [
                 {
@@ -1895,6 +2158,7 @@
               "input_type": "switch",
               "label": "允许低可信偏移",
               "default": false,
+              "description": "开启后可能写入不准确的时间轴，仅建议人工复核场景使用。",
               "section": "timeline"
             }
           ]
@@ -1908,7 +2172,7 @@
         }
       },
       "package_url": "packages/subtitle-manager-1.0.0.zip",
-      "sha256": "bd01d9eeb3376116b95c2f97d1061b3a2f56fd70db2caff4a7bcd2517b0ce274"
+      "sha256": "a36b1b73a1c6c5035f9b467d47e402afabcd344dbf6faeab8f35ae60607f3ba6"
     }
   ]
 }

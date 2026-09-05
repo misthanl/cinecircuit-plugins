@@ -260,7 +260,14 @@ def test_subtitle_plugin_deletes_only_through_sidecar_gateway() -> None:
 
 
 @pytest.mark.parametrize(("image_format", "expected"), [("apng", "PNG"), ("gif", "GIF")])
-def test_cover_renderer_produces_actual_animated_images(image_format: str, expected: str) -> None:
+def test_cover_renderer_produces_actual_animated_images(image_format: str, expected: str, monkeypatch) -> None:
+    import os
+    import shutil
+    from pathlib import Path
+    from cinecircuit_plugins.media_cover_generator import encoding
+
+    if os.name == 'nt' and (executable := shutil.which('ffmpeg')):
+        monkeypatch.setattr(encoding, 'FFMPEG_EXECUTABLE', Path(executable))
     source = []
     for color in ((220, 30, 70), (20, 130, 240), (70, 200, 100)):
         output = io.BytesIO()

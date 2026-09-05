@@ -137,7 +137,7 @@ onMounted(load);
         <p :class="['subtitle-status', error && 'is-error']">{{ error || status }}</p>
         <div class="subtitle-upload">
           <input type="file" accept=".srt,.ass,.ssa,.sub,.vtt,.webvtt" @change="chooseFile">
-          <select :value="language" @change="chooseLanguage"><option v-for="option in languages" :key="option[0]" :value="option[0]">{{ option[1] }}</option></select>
+          <VSelect label="字幕语言" :model-value="language" @update:model-value="language = $event" :items="languages.map(option => ({value:option[0],title:option[1]}))" variant="outlined" density="comfortable" hide-details />
           <button class="subtitle-button" :disabled="!file || uploading" @click="upload">{{ uploading ? "上传中…" : "上传字幕" }}</button>
         </div>
       </main>

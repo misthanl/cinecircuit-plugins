@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
 import { test } from "node:test";
+import { installSelectStub } from '../../tests/select-stub.mjs';
 
 const require = createRequire(resolve("package.json"));
 const { JSDOM } = require("jsdom");
@@ -11,6 +12,7 @@ const vue = require("vue");
 globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = vue;
 const { install } = await import("../../.build/cinecircuit_plugins/brush_flow/frontend.js");
 const { mount, flushPromises } = require("@vue/test-utils");
+installSelectStub(vue,require('@vue/test-utils').config);
 
 function setup(request) {
   let registration;

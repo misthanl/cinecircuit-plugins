@@ -55,6 +55,7 @@ class SiteTrafficPlugin(PluginBase):
                     "input_type": "switch",
                     "label": "启用刷流任务",
                     "default": True,
+                    "description": "开启后按任务周期自动选种；关闭后不会新增下载。",
                     "section": "runtime",
                 },
                 {
@@ -104,6 +105,7 @@ class SiteTrafficPlugin(PluginBase):
                     "input_type": "number",
                     "label": "全局最大下载任务数",
                     "default": 30,
+                    "description": "所有刷流任务合计不能超过此数量，达到上限后停止添加。",
                     "validation": {"minimum": 1, "maximum": 500},
                     "section": "safety",
                 },
@@ -112,6 +114,7 @@ class SiteTrafficPlugin(PluginBase):
                     "input_type": "switch",
                     "label": "允许删种时同时删除文件",
                     "default": False,
+                    "description": "高风险选项。开启后，命中删种规则时会同时删除已下载文件。",
                     "section": "safety",
                 },
             ],

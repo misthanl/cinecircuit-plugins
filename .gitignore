@@ -9,6 +9,7 @@ __pycache__/
 !.env.example
 dist/
 .build/
+.planning/
 node_modules/
 packages/archive/
 packages/*-1.0.[1-9]*.zip
@@ -18,6 +19,7 @@ packages/*-1.0.[1-9]*.zip
 *.tar.gz
 # Machine-specific NAS deployment helper; not part of plugin distribution.
 deploy_installed.py
+scripts/fetch_sample_metadata.py
 migrate.py
 update_installed_package.py
 verify_release.py

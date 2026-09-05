@@ -68,6 +68,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "switch",
                     "label": "启用字幕插件",
                     "default": True,
+                    "description": "控制自动检查与侧边栏工作台是否可以执行字幕操作。",
                     "section": "general",
                 },
                 {
@@ -84,6 +85,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "switch",
                     "label": "显示侧边栏入口",
                     "default": True,
+                    "description": "关闭后隐藏“字幕管理”入口，不会删除任何字幕文件。",
                     "section": "general",
                 },
                 {
@@ -117,6 +119,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "switch",
                     "label": "繁体字幕转简体",
                     "default": False,
+                    "description": "保存自动匹配的繁体中文字幕时转换为简体。",
                     "section": "automatic",
                 },
                 {
@@ -124,6 +127,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "switch",
                     "label": "整理完成后自动搜索",
                     "default": False,
+                    "description": "媒体整理完成后立即按下方策略搜索并保存外挂字幕。",
                     "section": "automatic",
                 },
                 {
@@ -131,6 +135,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "switch",
                     "label": "自动跳过中文媒体",
                     "default": True,
+                    "description": "中文原声媒体不自动搜索字幕，仍可在工作台手动处理。",
                     "section": "automatic",
                 },
                 {
@@ -138,6 +143,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "select",
                     "label": "自动字幕策略",
                     "default": "online_then_ai_source",
+                    "description": "决定在线字幕和 AI 字幕的尝试顺序。",
                     "section": "automatic",
                     "options": [
                         {"value": "online_then_ai_source", "label": "在线优先，失败后 AI"},
@@ -150,6 +156,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "select",
                     "label": "多字幕处理",
                     "default": "best",
+                    "description": "控制一次自动任务最多保留多少份候选字幕。",
                     "section": "automatic",
                     "options": [
                         {"value": "best", "label": "仅最佳字幕"},
@@ -177,6 +184,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "multiple": True,
                     "label": "启用字幕源",
                     "default": ["subhd", "zimuku"],
+                    "description": "可多选；搜索时会合并结果并按语言与格式排序。",
                     "section": "online",
                     "options": [
                         {"value": "subhd", "label": "SubHD"},
@@ -190,6 +198,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "switch",
                     "label": "在线搜索使用代理",
                     "default": False,
+                    "description": "仅影响字幕源请求，不影响本地媒体文件读取。",
                     "section": "online",
                 },
                 {
@@ -259,6 +268,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "switch",
                     "label": "启用 AI 字幕联动",
                     "default": True,
+                    "description": "在线字幕不可用时允许调用已配置的 AI 字幕能力。",
                     "section": "automatic",
                 },
                 {
@@ -266,6 +276,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "number",
                     "label": "最大调轴偏移（秒）",
                     "default": 120,
+                    "description": "检测到的偏移超过此值时拒绝自动写入。",
                     "validation": {"minimum": 1, "maximum": 300},
                     "section": "timeline",
                 },
@@ -274,6 +285,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "number",
                     "label": "最小调轴偏移（秒）",
                     "default": 0.2,
+                    "description": "小于此值视为无需调整，避免无意义重写字幕。",
                     "validation": {"minimum": 0.01, "maximum": 1},
                     "section": "timeline",
                 },
@@ -282,6 +294,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "select",
                     "label": "语音检测方式",
                     "default": "webrtc",
+                    "description": "WebRTC 更稳健；RMS 更轻量，适合资源受限设备。",
                     "section": "timeline",
                     "options": [
                         {"value": "webrtc", "label": "WebRTC VAD"},
@@ -293,6 +306,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                     "input_type": "switch",
                     "label": "允许低可信偏移",
                     "default": False,
+                    "description": "开启后可能写入不准确的时间轴，仅建议人工复核场景使用。",
                     "section": "timeline",
                 },
             ],

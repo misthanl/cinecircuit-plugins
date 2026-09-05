@@ -1,4 +1,5 @@
 import { test } from "node:test";
+import { installSelectStub } from '../../tests/select-stub.mjs';
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { resolve } from "node:path";
@@ -10,6 +11,7 @@ const vue = require("vue");
 globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = vue;
 const { install } = await import("../../.build/cinecircuit_plugins/subtitle_manager/frontend.js");
 const { mount, flushPromises } = require("@vue/test-utils");
+installSelectStub(vue,require('@vue/test-utils').config);
 
 test("Subtitle Manager loads the media catalog, searches online and registers its page", async () => {
   const paths = [];

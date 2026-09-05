@@ -57,6 +57,7 @@ class MaoyanWatchlistPlugin(PluginBase):
                     "label": "执行周期",
                     "default": "",
                     "placeholder": "5位cron表达式，留空自动",
+                    "description": "留空时每 6 小时刷新一次；已处理作品自动去重。",
                     "icon": "mdi-calendar-clock",
                     "section": "schedule",
                 },
@@ -65,6 +66,7 @@ class MaoyanWatchlistPlugin(PluginBase):
                     "input_type": "switch",
                     "label": "下次执行前清理历史记录",
                     "default": False,
+                    "description": "仅下一次执行生效；清理后榜单作品会重新进入订阅判断。",
                     "icon": "mdi-history",
                     "section": "schedule",
                 },
@@ -76,6 +78,7 @@ class MaoyanWatchlistPlugin(PluginBase):
                     "default": ["movie"],
                     "icon": "mdi-format-list-bulleted",
                     "section": "rank",
+                    "description": "电影与剧集榜可同时选择，重复作品只订阅一次。",
                     "options": [
                         {"value": "movie", "label": "电影票房榜单"},
                         {"value": "web-heat", "label": "电视剧热度榜单"},
@@ -89,6 +92,7 @@ class MaoyanWatchlistPlugin(PluginBase):
                     "input_type": "select",
                     "label": "电影榜单条数",
                     "default": "10",
+                    "description": "每次从所选电影类榜单顶部读取的作品数量。",
                     "icon": "mdi-numeric",
                     "section": "rank",
                     "options": [
@@ -103,6 +107,7 @@ class MaoyanWatchlistPlugin(PluginBase):
                         "default": key == "all",
                         "icon": "mdi-television",
                         "section": "platform",
+                        "description": f"开启后读取{label}剧集热度榜。",
                     }
                     for key, label, _ in PLATFORM_OPTIONS
                 ],
@@ -114,6 +119,7 @@ class MaoyanWatchlistPlugin(PluginBase):
                         "default": "10",
                         "icon": "mdi-numeric",
                         "section": "platform",
+                        "description": f"每次从{label}热度榜顶部读取的作品数量。",
                         "options": [
                             {"value": str(value), "label": str(value)}
                             for value in (1, 2, 3, 5, 7, 10)

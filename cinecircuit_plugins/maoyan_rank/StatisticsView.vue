@@ -63,7 +63,7 @@ onMounted(() => load());
   <UiDialog :model-value="true" :max-width="1480" width="calc(100vw - 32px)" @update:model-value="(open: boolean) => { if (!open) context.close(); }">
     <UiCard class="maoyan-dialog">
       <header class="maoyan-dialog__header">
-        <h2>猫眼榜单订阅</h2>
+        <div><h2>猫眼榜单订阅</h2><p>只统计已被插件成功加入订阅的作品，可按来源平台核对自动订阅结果。</p></div>
         <UiButton icon="mdi-close" variant="text" aria-label="关闭" @click="context.close" />
       </header>
       <div class="maoyan-dialog__content">
@@ -103,7 +103,7 @@ onMounted(() => load());
       </div>
       <footer class="maoyan-dialog__actions">
         <UiButton prepend-icon="mdi-refresh" variant="text" :loading="loading" @click="load()">刷新</UiButton>
-        <UiButton class="maoyan-dialog__config" icon="mdi-cog-outline" variant="flat" aria-label="配置猫眼榜单" title="配置猫眼榜单" @click="context.configure" />
+        <UiButton class="maoyan-dialog__config" prepend-icon="mdi-cog-outline" variant="flat" aria-label="配置猫眼榜单" @click="context.configure">调整榜单设置</UiButton>
       </footer>
     </UiCard>
   </UiDialog>
@@ -132,10 +132,10 @@ onMounted(() => load());
 .maoyan-statistics__pagination { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--app-text-muted); font-size: 12px; }
 .maoyan-dialog { display: flex; flex-direction: column; max-height: calc(100dvh - 32px); border: 1px solid var(--app-border); border-radius: 18px !important; background: var(--app-dialog-surface) !important; color: var(--app-text); }
 .maoyan-dialog__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px; }
-.maoyan-dialog__header h2 { margin: 0; font-size: 22px; font-weight: 600; }
+.maoyan-dialog__header h2 { margin: 0; font-size: 22px; font-weight: 600; }.maoyan-dialog__header p{margin:3px 0 0;color:var(--app-text-muted);font-size:11px}
 .maoyan-dialog__content { min-height: 0; overflow: auto; padding: 20px 24px; background: var(--app-surface-subtle); }
 .maoyan-dialog__actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 12px 24px; border-top: 1px solid var(--app-border-subtle); }
-.maoyan-dialog__config { border-radius: 50% !important; color: var(--app-on-accent) !important; background: var(--app-violet-text) !important; }
+.maoyan-dialog__config { color: var(--app-on-accent) !important; background: var(--app-violet-text) !important; }
 .maoyan-dialog__message { padding: 40px 12px; text-align: center; color: var(--app-text-muted); }
 .maoyan-statistics__pagination button:focus-visible { outline: 2px solid var(--app-violet-text); outline-offset: 2px; }
 @media (max-width: 1250px) { .maoyan-statistics__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
