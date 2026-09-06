@@ -120,10 +120,11 @@ def test_auto_signin_uses_one_config_page_without_field_descriptions() -> None:
     assert not schema.get("sections")
     assert all("section" not in field for field in fields)
     assert all("description" not in field for field in fields)
+    assert "auto_cf" not in keys
     assert keys.index("login_sites") < keys.index("sign_sites")
     assert all(
         "icon" not in next(field for field in fields if field["key"] == key)
-        for key in ("enabled", "notification_enabled", "clean", "auto_cf")
+        for key in ("enabled", "notification_enabled", "clean")
     )
 
 

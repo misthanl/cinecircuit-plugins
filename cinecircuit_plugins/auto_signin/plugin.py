@@ -82,13 +82,6 @@ class SiteCheckinPlugin(PluginBase):
                     "icon": "mdi-text-search",
                 },
                 {
-                    "key": "auto_cf",
-                    "input_type": "number",
-                    "label": "自动优选触发次数",
-                    "default": 0,
-                    "validation": {"minimum": 0, "maximum": 20},
-                },
-                {
                     "key": "login_sites",
                     "input_type": "resource_multi_select",
                     "resource_kind": "site",

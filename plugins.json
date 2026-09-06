@@ -70,16 +70,6 @@
               "icon": "mdi-text-search"
             },
             {
-              "key": "auto_cf",
-              "input_type": "number",
-              "label": "自动优选触发次数",
-              "default": 0,
-              "validation": {
-                "minimum": 0,
-                "maximum": 20
-              }
-            },
-            {
               "key": "login_sites",
               "input_type": "resource_multi_select",
               "resource_kind": "site",
@@ -110,7 +100,7 @@
         }
       },
       "package_url": "packages/auto-signin-1.0.0.zip",
-      "sha256": "f6cb283e2e7ac72125505b1adc518ddac7fed99504f6ae385cc883a98cede64e"
+      "sha256": "a3e7828bb729943cfbbeec1148dd502e2318cfd9c198bdcfa35b43922df3a034"
     },
     {
       "manifest": {
