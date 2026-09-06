@@ -38,6 +38,7 @@ class SiteCheckinPlugin(PluginBase):
             "order": 72,
         },
         config_schema={
+            "empty_cron_random_window": {"start": "08:00", "end": "21:00"},
             "fields": [
                 {
                     "key": "enabled",
