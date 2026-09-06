@@ -38,7 +38,7 @@ function date(s:string){return new Date(s).toLocaleString('zh-CN',{hour12:false}
 onMounted(load);
 </script>
 <template>
- <UiDialog :model-value="true" max-width="calc(100vw - 32px)" width="max(75vw, min(600px, calc(100vw - 32px)))" @update:model-value="context.close()">
+ <UiDialog :model-value="true" :max-width="920" width="calc(100vw - 32px)" @update:model-value="context.close()">
  <UiCard class="cover-history" @vue:unmounted="cleanup">
   <header><h2>媒体库视觉封面 · 数据统计</h2><UiButton icon="mdi-close" variant="text" aria-label="关闭" @click="context.close()" /></header>
   <main @scroll="scroll">

@@ -20,6 +20,7 @@ test('cover settings stay compact and desktop history keeps four columns', () =>
   const shared = readFileSync(resolve('cinecircuit_plugins/_shared/ui-consistency.css'), 'utf8');
   const history = readFileSync(resolve('cinecircuit_plugins/media_cover_generator/HistoryView.vue'), 'utf8');
   assert.match(shared, /\.cover-run-settings\) \.v-switch \.v-label \{[\s\S]*?font-size: 12px !important/);
+  assert.match(history, /:max-width="920" width="calc\(100vw - 32px\)"/);
   assert.match(history, /\.cover-history \.gallery\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
   assert.match(history, /@media\(max-width:600px\)\{\.cover-history \.gallery\{grid-template-columns:1fr\}\}/);
 });

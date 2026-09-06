@@ -65,7 +65,7 @@ class LibraryArtworkPlugin(PluginBase):
             "order": 80,
         },
         config_schema={
-            "editor_width": 1080,
+            "editor_width": 920,
             "sections": [
                 {
                     "key": "run",
