@@ -29,7 +29,7 @@
   min-width: 0;
   min-height: var(--app-control-height, 52px) !important;
   color: var(--app-text-secondary, #657087);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 :where(
@@ -47,7 +47,7 @@
 
 :where(.cookiecloud-config-fields, .cover-run-settings) .v-switch .v-label {
   color: var(--app-text, #202939);
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 400;
   opacity: 1;
 }

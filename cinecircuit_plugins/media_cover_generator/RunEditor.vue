@@ -18,5 +18,8 @@ function update(key:string,value:unknown){emit('update:modelValue',{...props.mod
   </div>
 </template>
 <style scoped>
-.cover-run-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:center}@media(max-width:680px){.cover-run-settings{grid-template-columns:1fr}}
+.cover-run-settings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px;align-items:center}
+.cover-run-settings :deep(.v-switch){min-height:40px}
+.cover-run-settings :deep(.v-selection-control){min-height:40px}
+@media(max-width:680px){.cover-run-settings{grid-template-columns:1fr;gap:12px}}
 </style>

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { test } from "node:test";
 import { installSelectStub } from '../../tests/select-stub.mjs';
@@ -14,6 +15,14 @@ const { install } = await import("../../.build/cinecircuit_plugins/media_cover_g
 const { mount, flushPromises } = require("@vue/test-utils");
 installSelectStub(vue,require('@vue/test-utils').config);
 require('@vue/test-utils').config.global.stubs.VBtn=true;
+
+test('cover settings stay compact and desktop history keeps four columns', () => {
+  const shared = readFileSync(resolve('cinecircuit_plugins/_shared/ui-consistency.css'), 'utf8');
+  const history = readFileSync(resolve('cinecircuit_plugins/media_cover_generator/HistoryView.vue'), 'utf8');
+  assert.match(shared, /\.cover-run-settings\) \.v-switch \.v-label \{[\s\S]*?font-size: 12px !important/);
+  assert.match(history, /\.cover-history \.gallery\{grid-template-columns:repeat\(4,minmax\(0,1fr\)\)/);
+  assert.match(history, /@media\(max-width:600px\)\{\.cover-history \.gallery\{grid-template-columns:1fr\}\}/);
+});
 
 test('poster preference defaults on but preserves explicit off', async () => {
   const wrapper=mount(styleEditor(),{props:{modelValue:{}}});
