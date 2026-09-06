@@ -66,6 +66,26 @@
   font-size: var(--app-font-size-label, 11px);
 }
 
+/* Custom plugin editors render Vuetify switches directly instead of through
+ * the host's InlineSwitchRow. Pin their copy to the host's compact form-label
+ * treatment so Vuetify's larger body label cannot change the visual scale. */
+:where(
+  .cookiecloud-config-fields,
+  .cover-run-settings,
+  .cover-targets,
+  .style-editor,
+  .brush,
+  .cover,
+  .subtitle-workspace
+) :is(.v-switch, .v-checkbox, .v-radio) .v-label {
+  color: var(--app-text-secondary, #657087) !important;
+  font-family: var(--app-font-family, inherit) !important;
+  font-size: 13px !important;
+  font-weight: var(--app-font-weight-regular, 400) !important;
+  line-height: 1.35;
+  opacity: 1;
+}
+
 :where(.signin-stat-dialog, .cc-statistics-dialog, .douban-dialog, .maoyan-dialog, .cover-history) {
   overflow: hidden;
   border: 1px solid var(--app-border, #dfe4ee) !important;

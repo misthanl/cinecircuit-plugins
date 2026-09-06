@@ -104,7 +104,7 @@
         }
       },
       "package_url": "packages/auto-signin-1.0.0.zip",
-      "sha256": "ca446216b06e0bde61719fd1735cfd4152d120cf8bdf3f7f1aab6c5c7b4d75e9"
+      "sha256": "541bd18ce2463bb2d000fe3115a508744f6db4931f6a938687c0e88824e5ebec"
     },
     {
       "manifest": {
@@ -231,7 +231,7 @@
         }
       },
       "package_url": "packages/brush-flow-1.0.0.zip",
-      "sha256": "90c7bb935b63c92c6cb62c4445d405d210a22f02b50ded108e0d758380325ae9"
+      "sha256": "ffb68490941f305e68cb0ff27aadcc2271214cc903581ec385244d1d56fc0da4"
     },
     {
       "manifest": {
@@ -495,7 +495,7 @@
         "jobs": []
       },
       "package_url": "packages/cookiecloud-1.0.0.zip",
-      "sha256": "4f61488d6f9939c8256b7f435dff17ad86e9fd67cbc1418b24b6fc3eec85e021"
+      "sha256": "dadf1a9ea294a1ee06044c13153f21adc6f85ce1eb62941c76376ed10ba4fca7"
     },
     {
       "manifest": {
@@ -655,7 +655,7 @@
         "navigation": {}
       },
       "package_url": "packages/douban-hot-1.0.0.zip",
-      "sha256": "798fcbd4c6c0a95cb7dde68b7df624bfe63ee15197e5ebf902fafa095c91e0e0"
+      "sha256": "f3aeb8788aed0ea386bdb0e2f28ce874a359e651c07ae3378f03dee1025327b8"
     },
     {
       "manifest": {
@@ -1011,7 +1011,7 @@
         "navigation": {}
       },
       "package_url": "packages/maoyan-rank-1.0.0.zip",
-      "sha256": "f7e8a85d03f903e50bf3926e679da01b5087dfcb953c4406b9b7d4a7f13b9c34"
+      "sha256": "20170599097c20bf577abedefbef472d553523bfde0c605a646b856a8b306aac"
     },
     {
       "manifest": {
@@ -1760,7 +1760,7 @@
         }
       },
       "package_url": "packages/emby-cover-generator-1.0.1.zip",
-      "sha256": "8b3a019d4000a5bd667106da6a616a7f54d6ac6be244e4676c4e04f1ac35b28c"
+      "sha256": "6b957b72706b6acf1e895675245521af99c67403c744b8867f4146fb4abec62c"
     },
     {
       "manifest": {
@@ -2139,7 +2139,7 @@
         }
       },
       "package_url": "packages/subtitle-manager-1.0.0.zip",
-      "sha256": "aa58250f216158c504b3cf84c7a59cf1768d91f5707f03f9d023798dbf3b45aa"
+      "sha256": "7ddb107ca5768854b1c854848bedddc6bb02e90e2742e9134a1bf59cc1268b22"
     }
   ]
 }
