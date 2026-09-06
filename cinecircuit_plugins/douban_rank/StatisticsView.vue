@@ -112,13 +112,13 @@ onMounted(() => load());
 
 <style scoped>
 .douban-statistics { display: grid; gap: 22px; min-width: 0; }
-.douban-statistics__metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0 0 6px; }
-.douban-statistics__metrics > div { padding: 18px 24px; border-radius: 16px; background: var(--app-surface-muted); }
+.douban-statistics__metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 6px; }
+.douban-statistics__metrics > div { padding: 15px 16px; border: 1px solid var(--app-border-subtle); border-radius: 12px; background: var(--app-surface-muted); }
 .douban-statistics__metrics > div:first-child { background: var(--app-violet-soft); }
-.douban-statistics__metrics dt { color: var(--app-text-muted); font-size: 14px; }
+.douban-statistics__metrics dt { color: var(--app-text-muted); font-size: 12px; }
 .douban-statistics__metrics > div:first-child dt { color: var(--app-violet-text); }
 .douban-statistics__metrics dd { margin: 10px 0 0; color: var(--app-text); font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.douban-statistics__metrics dd span { font-size: 18px; font-weight: 500; }
+.douban-statistics__metrics dd span { font-size: 11px; font-weight: 400; }
 .douban-statistics__page-info { display: flex; justify-content: space-between; color: var(--app-text-muted); font-size: 13px; }
 .douban-statistics__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: -10px; }
 .douban-subscription { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: start; gap: 14px; padding: 14px; min-width: 0; border: 1px solid var(--app-border-subtle); border-radius: 14px; background: var(--app-surface); }
@@ -133,7 +133,7 @@ onMounted(() => load());
 .douban-statistics__pagination { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--app-text-muted); font-size: 12px; }
 .douban-dialog { display: flex; flex-direction: column; max-height: calc(100dvh - 32px); border: 1px solid var(--app-border); border-radius: 18px !important; background: var(--app-dialog-surface) !important; color: var(--app-text); }
 .douban-dialog__header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px 24px; }
-.douban-dialog__header h2 { margin: 0; font-size: 22px; font-weight: 600; }.douban-dialog__header p{margin:3px 0 0;color:var(--app-text-muted);font-size:11px}
+.douban-dialog__header h2 { margin: 0; font-size: 18px; font-weight: 750; }.douban-dialog__header p{margin:3px 0 0;color:var(--app-text-muted);font-size:10px}
 .douban-dialog__content { min-height: 0; overflow: auto; padding: 20px 24px; background: var(--app-surface-subtle); }
 .douban-dialog__actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 12px 24px; border-top: 1px solid var(--app-border-subtle); }
 .douban-dialog__config { color: var(--app-on-accent) !important; background: var(--app-violet-text) !important; }

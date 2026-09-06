@@ -1,5 +1,6 @@
 import type { CineCircuitPluginSdk } from "@cinecircuit/plugin-sdk";
 import SiteTrafficView from "./SiteTrafficView.vue";
+import "../_shared/ui-consistency.css";
 
 const PLUGIN_ID = "brush-flow";
 

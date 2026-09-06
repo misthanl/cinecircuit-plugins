@@ -104,7 +104,7 @@
         }
       },
       "package_url": "packages/auto-signin-1.0.0.zip",
-      "sha256": "6e52fb440ad0b822b2bca9f948ae9f14e9903247cebcd694939eb9186d9937e5"
+      "sha256": "df8c2517990309e6f6089788433ec5f7378be3735fba91ee2e5cc7080c6a8b42"
     },
     {
       "manifest": {
@@ -231,7 +231,7 @@
         }
       },
       "package_url": "packages/brush-flow-1.0.0.zip",
-      "sha256": "1c4d08d98edb4feb68d299ff92a189681c7b30679a050d7e78c272a48ad3f451"
+      "sha256": "2faf5763a81472dbdfc16d6d9bbb1a869395598aff5df767762b738e432fe572"
     },
     {
       "manifest": {
@@ -380,7 +380,7 @@
         "navigation": {}
       },
       "package_url": "packages/cast-profile-enricher-1.0.0.zip",
-      "sha256": "f839ae9fd4f794536f613ce5903c0686f23031c6bfb5cae3ce3a36df530fe55d"
+      "sha256": "bb0587202b6b1a84970620b2fda6f24ed461035f4fd1860dd63feefcad16ebc8"
     },
     {
       "manifest": {
@@ -495,7 +495,7 @@
         "jobs": []
       },
       "package_url": "packages/cookiecloud-1.0.0.zip",
-      "sha256": "7f866de3d4b9967692131125cc1db8c10580e96c772df953cecbf4dc3b0fb08e"
+      "sha256": "1ced7f54a2efc1cb32bcb10d739be3b50da632b39c75d8618484431af9254d19"
     },
     {
       "manifest": {
@@ -655,7 +655,7 @@
         "navigation": {}
       },
       "package_url": "packages/douban-hot-1.0.0.zip",
-      "sha256": "83401a2e5044f16117bf652e1194887ab47d643ce838e91ec1fdf8d531d031cc"
+      "sha256": "3f9b33e847438c774866942a2bac273d6f7171816aeb7abc2fece559326f84d5"
     },
     {
       "manifest": {
@@ -1011,7 +1011,7 @@
         "navigation": {}
       },
       "package_url": "packages/maoyan-rank-1.0.0.zip",
-      "sha256": "3e1dc0a718e8c2fcfacc45c17eedf00b97f0b8cd75227fb2c7a2557b2ed8f741"
+      "sha256": "e2275aef42c7eaf7974633efa038fef386bff8bd4872670f9b86ae998d0eaf4f"
     },
     {
       "manifest": {
@@ -1760,7 +1760,7 @@
         }
       },
       "package_url": "packages/emby-cover-generator-1.0.1.zip",
-      "sha256": "50dd1e93fd3fceb1df321c0af84645523cc1960f7f33cc43e4802bb3ce4efdd4"
+      "sha256": "8042c8a47094851af18f4a84628fe869374358cc23547ad074b3747cfdcc63e1"
     },
     {
       "manifest": {
@@ -2139,7 +2139,7 @@
         }
       },
       "package_url": "packages/subtitle-manager-1.0.0.zip",
-      "sha256": "a36b1b73a1c6c5035f9b467d47e402afabcd344dbf6faeab8f35ae60607f3ba6"
+      "sha256": "b0baef60abd0b98d03575faa477f3d5bbbf4a155a13210db85eb4fb49ce2ea80"
     }
   ]
 }

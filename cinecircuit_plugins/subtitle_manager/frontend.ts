@@ -1,5 +1,6 @@
 import type { CineCircuitPluginSdk } from "@cinecircuit/plugin-sdk";
 import SubtitleWorkspacePageView from "./SubtitleWorkspacePage.vue";
+import "../_shared/ui-consistency.css";
 
 export function install(sdk: CineCircuitPluginSdk) {
   const { defineComponent, h } = sdk.vue;

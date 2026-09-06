@@ -1,6 +1,7 @@
 import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircuit/plugin-sdk";
 import type { PropType } from "vue";
 import StatisticsView from "./StatisticsView.vue";
+import "../_shared/ui-consistency.css";
 
 const ID = "maoyan-rank";
 

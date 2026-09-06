@@ -2,6 +2,7 @@ import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircu
 import type { PropType } from "vue";
 import ConnectionEditorView from "./ConnectionEditor.vue";
 import StatisticsView from "./StatisticsView.vue";
+import "../_shared/ui-consistency.css";
 
 const ID = "cookiecloud";
 

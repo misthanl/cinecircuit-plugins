@@ -2,6 +2,7 @@ import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircu
 import type { PropType } from "vue";
 import AutoSigninPageView from "./AutoSigninPage.vue";
 import StatisticsView from "./StatisticsView.vue";
+import "../_shared/ui-consistency.css";
 
 export function install(sdk: CineCircuitPluginSdk) {
   const { defineComponent, h } = sdk.vue;

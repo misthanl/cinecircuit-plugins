@@ -283,8 +283,8 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .switches label { display: flex; align-items: center; gap: 10px; padding: 14px; border-radius: 10px; background: var(--app-surface-muted, #f5f7fa); cursor: pointer; }
 .switches input { accent-color: #5575e7; }
 .switches span { display: grid; gap: 4px; }
-.switches b { font-size: 14px; }
-.switches small { color: var(--app-text-secondary, #657087); font-size: 12px; }
+.switches b { font-size: 13px; }
+.switches small { color: var(--app-text-secondary, #657087); font-size: 10px; }
 .cover-preview-dialog { position: fixed; inset: 0; width: min(1960px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 0; overflow: hidden; border: 1px solid #394354; border-radius: 14px; background: #10151d; color: #f4f6fc; box-shadow: 0 16px 80px #0009; }
 .cover-preview-dialog::backdrop { background: rgba(3, 7, 14, .86); }
 .cover-preview-shell { display: flex; flex-direction: column; max-height: calc(100dvh - 34px); }

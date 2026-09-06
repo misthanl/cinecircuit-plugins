@@ -4,6 +4,7 @@ import LibraryArtworkView from "./LibraryArtworkView.vue";
 import StyleEditorView from "./StyleEditor.vue";
 import RunEditorView from "./RunEditor.vue";
 import HistoryView from "./HistoryView.vue";
+import "../_shared/ui-consistency.css";
 
 const ID = "emby-cover-generator";
 

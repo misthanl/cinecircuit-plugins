@@ -1,0 +1,263 @@
+/* Shared visual contract for plugin configuration, statistics and workspace pages.
+ * Values mirror the host application's standard configuration dialog and
+ * operational content density. Keep business-specific layouts in each plugin.
+ */
+
+:where(
+  .cookiecloud-config-fields,
+  .cover-run-settings,
+  .cover-targets,
+  .style-editor,
+  .brush,
+  .cover,
+  .subtitle-workspace
+) :is(.v-field) {
+  min-height: var(--app-control-height, 52px);
+  border-radius: 11px;
+  background: var(--control-surface, var(--app-surface, #fff));
+}
+
+:where(
+  .cookiecloud-config-fields,
+  .cover-run-settings,
+  .cover-targets,
+  .style-editor,
+  .brush,
+  .cover,
+  .subtitle-workspace
+) :is(.v-field__input) {
+  min-width: 0;
+  min-height: var(--app-control-height, 52px) !important;
+  color: var(--app-text-secondary, #657087);
+  font-size: 14px;
+}
+
+:where(
+  .cookiecloud-config-fields,
+  .cover-run-settings,
+  .cover-targets,
+  .style-editor,
+  .brush,
+  .cover,
+  .subtitle-workspace
+) :is(.v-label.v-field-label) {
+  color: var(--app-text-secondary, #657087);
+  font-size: 11px;
+}
+
+:where(.cookiecloud-config-fields, .cover-run-settings) .v-switch .v-label {
+  color: var(--app-text, #202939);
+  font-size: 13px !important;
+  font-weight: 400;
+  opacity: 1;
+}
+
+:where(.signin-stat-dialog, .cc-statistics-dialog, .douban-dialog, .maoyan-dialog, .cover-history) {
+  overflow: hidden;
+  border: 1px solid var(--app-border, #dfe4ee) !important;
+  border-radius: 18px !important;
+  background: var(--app-dialog-surface, var(--app-surface, #fff)) !important;
+  color: var(--app-text, #202939);
+}
+
+:where(
+  .signin-stat-dialog__header,
+  .cc-statistics-header,
+  .douban-dialog__header,
+  .maoyan-dialog__header,
+  .cover-history > header
+) {
+  min-height: 80px;
+  padding: 18px 20px !important;
+  border-bottom: 1px solid var(--app-border-subtle, #e7ebf2);
+  background: var(--app-surface, #fff);
+}
+
+:where(
+  .signin-stat-dialog__header,
+  .cc-statistics-header,
+  .douban-dialog__header,
+  .maoyan-dialog__header,
+  .cover-history > header
+) h2 {
+  margin: 0;
+  color: var(--app-text, #202939);
+  font-size: 18px !important;
+  font-weight: 750 !important;
+  line-height: 1.2;
+}
+
+:where(
+  .signin-stat-dialog__header,
+  .cc-statistics-header,
+  .douban-dialog__header,
+  .maoyan-dialog__header
+) p {
+  margin: 3px 0 0;
+  color: var(--app-text-muted, #7a869d);
+  font-size: 10px !important;
+  line-height: 1.4;
+}
+
+:where(
+  .signin-stat-dialog__content,
+  .cc-statistics-content,
+  .douban-dialog__content,
+  .maoyan-dialog__content,
+  .cover-history > main
+) {
+  padding: 20px !important;
+}
+
+:where(
+  .signin-stat-dialog__actions,
+  .cc-statistics-actions,
+  .douban-dialog__actions,
+  .maoyan-dialog__actions,
+  .cover-history > footer
+) {
+  min-height: 64px;
+  padding: 13px 18px !important;
+  border-top: 1px solid var(--app-border-subtle, #e7ebf2);
+  background: var(--app-surface-raised, var(--app-surface, #fff));
+}
+
+:where(
+  .signin-stat-metrics,
+  .cookie-metrics,
+  .douban-statistics__metrics,
+  .maoyan-statistics__metrics,
+  .cover-history .metrics
+) {
+  gap: 12px !important;
+}
+
+:where(
+  .signin-stat-metrics,
+  .cookie-metrics,
+  .douban-statistics__metrics,
+  .maoyan-statistics__metrics,
+  .cover-history .metrics
+) > div {
+  min-width: 0;
+  padding: 15px 16px !important;
+  border: 1px solid var(--app-border-subtle, #e7ebf2);
+  border-radius: 12px !important;
+  background: var(--app-surface, #fff);
+}
+
+:where(
+  .signin-stat-metrics,
+  .cookie-metrics,
+  .douban-statistics__metrics,
+  .maoyan-statistics__metrics,
+  .cover-history .metrics
+) dt,
+:where(.cover-history .metrics) span {
+  color: var(--app-text-muted, #7a869d);
+  font-size: 12px !important;
+}
+
+:where(
+  .signin-stat-metrics,
+  .cookie-metrics,
+  .douban-statistics__metrics,
+  .maoyan-statistics__metrics
+) dd,
+:where(.cover-history .metrics) strong {
+  margin-top: 7px;
+  color: var(--app-text, #202939);
+  font-family: inherit !important;
+  font-size: 24px !important;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+:where(.douban-statistics__metrics, .maoyan-statistics__metrics) dd span,
+.cookie-metric dd > span {
+  color: var(--app-text-muted, #7a869d);
+  font-size: 11px !important;
+  font-weight: 400;
+}
+
+.signin-stat-results {
+  border-radius: 12px !important;
+}
+
+.signin-stat-results > header {
+  min-height: 44px;
+  padding: 10px 12px !important;
+}
+
+.signin-stat-results article {
+  min-height: 68px;
+  padding: 10px 12px !important;
+}
+
+.signin-stat-results article strong {
+  color: var(--app-text, #202939);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.signin-stat-results article p {
+  font-size: 12px !important;
+}
+
+.signin-stat-results :is(article span, time) {
+  font-size: 10px !important;
+}
+
+:where(.signin-page, .brush, .cover, .subtitle-workspace) {
+  min-width: 0;
+  color: var(--app-text, #17243a);
+  font-family: inherit !important;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+:where(.signin-hero, .brush-head, .cover-head, .subtitle-hero) h1 {
+  font-size: 27px !important;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+:where(.signin-panel, .brush-panel, .cover-card, .subtitle-panel) h2 {
+  font-size: 18px !important;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+:where(.signin-button, .brush button, .cover button, .subtitle-button) {
+  min-height: 40px;
+  border-radius: 9px !important;
+  font-size: 13px;
+  letter-spacing: 0;
+}
+
+:where(.brush-field input, .brush-field select, .cover-field input, .cover-field select, .subtitle-search, .subtitle-upload input) {
+  min-height: 52px;
+  border-radius: 11px;
+  color: var(--app-text-secondary, #657087);
+  font: inherit;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  :where(
+    .signin-stat-dialog__header,
+    .cc-statistics-header,
+    .douban-dialog__header,
+    .maoyan-dialog__header,
+    .cover-history > header,
+    .signin-stat-dialog__content,
+    .cc-statistics-content,
+    .douban-dialog__content,
+    .maoyan-dialog__content,
+    .cover-history > main
+  ) {
+    padding: 16px !important;
+  }
+}
