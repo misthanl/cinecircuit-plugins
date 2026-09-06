@@ -8,6 +8,27 @@
   .cover-run-settings,
   .cover-targets,
   .style-editor,
+  .signin-page,
+  .brush,
+  .cover,
+  .subtitle-workspace,
+  .signin-stat-dialog,
+  .cc-statistics-dialog,
+  .douban-dialog,
+  .maoyan-dialog,
+  .cover-history
+) {
+  color: var(--app-text, #1a2434);
+  font-family: var(--app-font-family, inherit) !important;
+  font-size: var(--app-font-size-body, 14px);
+  font-weight: var(--app-font-weight-regular, 400);
+}
+
+:where(
+  .cookiecloud-config-fields,
+  .cover-run-settings,
+  .cover-targets,
+  .style-editor,
   .brush,
   .cover,
   .subtitle-workspace
@@ -29,7 +50,7 @@
   min-width: 0;
   min-height: var(--app-control-height, 52px) !important;
   color: var(--app-text-secondary, #657087);
-  font-size: 13px;
+  font-size: var(--app-font-size-control, 14px);
 }
 
 :where(
@@ -42,14 +63,7 @@
   .subtitle-workspace
 ) :is(.v-label.v-field-label) {
   color: var(--app-text-secondary, #657087);
-  font-size: 11px;
-}
-
-:where(.cookiecloud-config-fields, .cover-run-settings) .v-switch .v-label {
-  color: var(--app-text, #202939);
-  font-size: 12px !important;
-  font-weight: 400;
-  opacity: 1;
+  font-size: var(--app-font-size-label, 11px);
 }
 
 :where(.signin-stat-dialog, .cc-statistics-dialog, .douban-dialog, .maoyan-dialog, .cover-history) {
@@ -82,8 +96,8 @@
 ) h2 {
   margin: 0;
   color: var(--app-text, #202939);
-  font-size: 18px !important;
-  font-weight: 750 !important;
+  font-size: var(--app-font-size-section-title, 18px) !important;
+  font-weight: var(--app-font-weight-heading, 750) !important;
   line-height: 1.2;
 }
 
@@ -95,7 +109,7 @@
 ) p {
   margin: 3px 0 0;
   color: var(--app-text-muted, #7a869d);
-  font-size: 10px !important;
+  font-size: var(--app-font-size-helper, 10px) !important;
   line-height: 1.4;
 }
 
@@ -168,8 +182,8 @@
   margin-top: 7px;
   color: var(--app-text, #202939);
   font-family: inherit !important;
-  font-size: 24px !important;
-  font-weight: 700;
+  font-size: var(--app-font-size-metric, 24px) !important;
+  font-weight: var(--app-font-weight-metric, 700);
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
 }
@@ -178,7 +192,7 @@
 .cookie-metric dd > span {
   color: var(--app-text-muted, #7a869d);
   font-size: 11px !important;
-  font-weight: 400;
+  font-weight: var(--app-font-weight-regular, 400);
 }
 
 .signin-stat-results {
@@ -198,7 +212,7 @@
 .signin-stat-results article strong {
   color: var(--app-text, #202939);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: var(--app-font-weight-medium, 650);
 }
 
 .signin-stat-results article p {
@@ -212,8 +226,8 @@
 :where(.signin-page, .brush, .cover, .subtitle-workspace) {
   min-width: 0;
   color: var(--app-text, #17243a);
-  font-family: inherit !important;
-  font-size: 14px;
+  font-family: var(--app-font-family, inherit) !important;
+  font-size: var(--app-font-size-body, 14px);
   line-height: 1.5;
 }
 
@@ -225,8 +239,8 @@
 }
 
 :where(.signin-panel, .brush-panel, .cover-card, .subtitle-panel) h2 {
-  font-size: 18px !important;
-  font-weight: 700;
+  font-size: var(--app-font-size-section-title, 18px) !important;
+  font-weight: var(--app-font-weight-metric, 700);
   line-height: 1.3;
 }
 
@@ -242,7 +256,7 @@
   border-radius: 11px;
   color: var(--app-text-secondary, #657087);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--app-font-size-control, 14px);
 }
 
 @media (max-width: 700px) {
