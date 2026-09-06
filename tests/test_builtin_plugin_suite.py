@@ -112,6 +112,21 @@ def test_notification_capable_builtin_plugins_are_explicit_opt_in() -> None:
         assert PluginPermission.NOTIFICATION_SEND in manifest.permissions
 
 
+def test_auto_signin_uses_one_config_page_without_field_descriptions() -> None:
+    schema = SiteCheckinPlugin.manifest.config_schema
+    fields = schema["fields"]
+    keys = [field["key"] for field in fields]
+
+    assert not schema.get("sections")
+    assert all("section" not in field for field in fields)
+    assert all("description" not in field for field in fields)
+    assert keys.index("login_sites") < keys.index("sign_sites")
+    assert all(
+        "icon" not in next(field for field in fields if field["key"] == key)
+        for key in ("enabled", "notification_enabled", "clean", "auto_cf")
+    )
+
+
 @pytest.mark.parametrize(
     ("expression", "expected"),
     [
@@ -215,6 +230,86 @@ def test_auto_signin_retries_only_matching_transient_failures() -> None:
 
     assert result["updated_count"] == 1
     assert signer.await_count == 2
+
+
+def test_auto_signin_notifications_use_site_names_and_include_login_results() -> None:
+    notifier = AsyncMock()
+    recorder = Mock()
+    context = SimpleNamespace(
+        config={
+            "enabled": True,
+            "sign_sites": ["site-sign"],
+            "login_sites": ["site-login"],
+            "notification_enabled": True,
+        },
+        sites=SimpleNamespace(
+            configurations=AsyncMock(
+                return_value={
+                    "items": [
+                        {"id": "site-sign", "name": "春天站"},
+                        {"id": "site-login", "name": "海岸站"},
+                    ]
+                }
+            ),
+            sign_in=AsyncMock(return_value={"ok": True, "message": "今日已签到"}),
+            check=AsyncMock(return_value={"ok": True, "status": "checked"}),
+        ),
+        items=SimpleNamespace(record=recorder),
+        notifications=SimpleNamespace(send=notifier),
+    )
+
+    result = asyncio.run(SiteCheckinPlugin().run(context))
+
+    assert result["updated_count"] == 2
+    assert notifier.await_count == 2
+    login_title, login_body = notifier.await_args_list[0].args
+    sign_title, sign_body = notifier.await_args_list[1].args
+    assert login_title == "站点任务完成：保持登录 1/1"
+    assert login_body == "保持登录｜海岸站：登录状态正常"
+    assert sign_title == "站点任务完成：签到 1/1"
+    assert sign_body == "签到｜春天站：今日已签到"
+    assert "site-sign" not in sign_body
+    assert "site-login" not in login_body
+    recorded_payloads = [call.kwargs["payload"] for call in recorder.call_args_list]
+    assert {payload["site_name"] for payload in recorded_payloads} == {"春天站", "海岸站"}
+
+
+def test_auto_signin_runs_signin_and_login_when_same_site_is_selected() -> None:
+    order: list[str] = []
+
+    async def check(site_id: str) -> dict[str, object]:
+        order.append(f"login:{site_id}")
+        return {"ok": True, "message": "登录正常"}
+
+    async def sign_in(site_id: str) -> dict[str, object]:
+        order.append(f"sign:{site_id}")
+        return {"ok": True, "message": "签到完成"}
+
+    context = SimpleNamespace(
+        config={
+            "enabled": True,
+            "sign_sites": ["site-both"],
+            "login_sites": ["site-both"],
+            "queue_cnt": 2,
+        },
+        sites=SimpleNamespace(
+            configurations=AsyncMock(
+                return_value={"items": [{"id": "site-both", "name": "双任务站"}]}
+            ),
+            sign_in=AsyncMock(side_effect=sign_in),
+            check=AsyncMock(side_effect=check),
+        ),
+        items=SimpleNamespace(record=Mock()),
+        notifications=SimpleNamespace(send=AsyncMock()),
+    )
+
+    result = asyncio.run(SiteCheckinPlugin().run(context))
+
+    assert result["site_count"] == 2
+    assert result["updated_count"] == 2
+    assert order == ["login:site-both", "sign:site-both"]
+    context.sites.sign_in.assert_awaited_once_with("site-both")
+    context.sites.check.assert_awaited_once_with("site-both")
 
 
 def test_media_cover_inventory_uses_selectable_servers_and_libraries() -> None:

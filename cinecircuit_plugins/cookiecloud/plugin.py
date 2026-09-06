@@ -23,7 +23,7 @@ class CookieCloudPlugin(PluginBase):
         id="cookiecloud",
         name="CookieCloud 站点同步",
         version="1.0.0",
-        description="接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。",
+        description="接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点",
         icon="mdi-cloud-sync-outline",
         api_version=2,
         permissions=(
@@ -37,7 +37,7 @@ class CookieCloudPlugin(PluginBase):
         schedule_seconds=24 * 60 * 60,
         frontend_module="frontend.js",
         config_schema={
-            "description": "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。",
+            "description": "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点",
             "sections": [
                 {
                     "key": "connection",

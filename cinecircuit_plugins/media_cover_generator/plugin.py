@@ -43,7 +43,7 @@ class LibraryArtworkPlugin(PluginBase):
         id="emby-cover-generator",
         name="媒体库视觉封面",
         version="1.0.1",
-        description="为媒体服务器媒体库生成静态或动态风格封面，支持媒体库选择、标题、字体、分辨率和历史清理。",
+        description="为媒体服务器媒体库生成静态或动态风格封面",
         icon="mdi-image-multiple-outline",
         permissions=(
             PluginPermission.MEDIA_SERVER_READ,

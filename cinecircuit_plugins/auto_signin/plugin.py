@@ -28,7 +28,7 @@ class SiteCheckinPlugin(PluginBase):
             PluginPermission.SITE_SIGN_IN,
             PluginPermission.NOTIFICATION_SEND,
         ),
-        capabilities=("scheduled_task", "plugin_page", "site_automation"),
+        capabilities=("scheduled_task", "plugin_page", "statistics_page", "site_automation"),
         schedule_seconds=24 * 60 * 60,
         frontend_module="frontend.js",
         navigation={
@@ -38,27 +38,12 @@ class SiteCheckinPlugin(PluginBase):
             "order": 72,
         },
         config_schema={
-            "sections": [
-                {
-                    "key": "schedule",
-                    "title": "执行设置",
-                    "description": "站点选择请在插件的“自动签到”页面中勾选。",
-                },
-                {
-                    "key": "retry",
-                    "title": "失败重试",
-                    "description": "只有错误信息命中关键词时才进入本次重试队列。",
-                },
-            ],
             "fields": [
                 {
                     "key": "enabled",
                     "input_type": "switch",
                     "label": "启用自动签到",
                     "default": True,
-                    "description": "按下方周期自动执行；关闭后仍可在插件页面手动运行。",
-                    "icon": "mdi-toggle-switch-outline",
-                    "section": "schedule",
                 },
                 {
                     "key": "cron",
@@ -66,37 +51,27 @@ class SiteCheckinPlugin(PluginBase):
                     "label": "执行周期",
                     "default": "",
                     "placeholder": "5位cron表达式，留空自动",
-                    "description": "留空时每天执行一次；也可以用可视化周期选择器调整。",
                     "icon": "mdi-calendar-clock",
-                    "section": "schedule",
                 },
                 {
                     "key": "notification_enabled",
                     "input_type": "switch",
                     "label": "发送通知",
                     "default": False,
-                    "description": "开启后发送每次签到任务的执行结果。",
-                    "icon": "mdi-bell-outline",
-                    "section": "schedule",
                 },
                 {
                     "key": "queue_cnt",
                     "input_type": "number",
                     "label": "并发队列数量",
                     "default": 5,
-                    "description": "同时签到的站点数；网络不稳定时建议设为 2～5。",
                     "icon": "mdi-format-list-numbered",
                     "validation": {"minimum": 1, "maximum": 20},
-                    "section": "schedule",
                 },
                 {
                     "key": "clean",
                     "input_type": "switch",
                     "label": "下次执行前清理本日缓存",
                     "default": False,
-                    "description": "仅下一次运行生效，用于重新签到今天已成功的站点。",
-                    "icon": "mdi-broom",
-                    "section": "schedule",
                 },
                 {
                     "key": "retry_keyword",
@@ -104,28 +79,14 @@ class SiteCheckinPlugin(PluginBase):
                     "label": "重试关键词",
                     "default": "超时|timeout|连接|connection|503|502",
                     "placeholder": "支持正则表达式，命中才重签",
-                    "description": "用“|”分隔多个错误词；只有失败原因命中时才自动重试。",
                     "icon": "mdi-text-search",
-                    "section": "retry",
                 },
                 {
                     "key": "auto_cf",
                     "input_type": "number",
                     "label": "自动优选触发次数",
                     "default": 0,
-                    "description": "命中重试关键词达到此次数后触发站点优选；0 表示关闭。",
-                    "icon": "mdi-cloud-refresh-outline",
                     "validation": {"minimum": 0, "maximum": 20},
-                    "section": "retry",
-                },
-                {
-                    "key": "sign_sites",
-                    "input_type": "resource_multi_select",
-                    "resource_kind": "site",
-                    "required_capabilities": ["sign_in"],
-                    "label": "签到站点",
-                    "default": [],
-                    "description": "选择需要每日自动签到的 PT 站点。",
                 },
                 {
                     "key": "login_sites",
@@ -134,7 +95,14 @@ class SiteCheckinPlugin(PluginBase):
                     "required_capabilities": ["check"],
                     "label": "保持登录站点",
                     "default": [],
-                    "description": "选择仅检测并保持登录状态的 PT 站点。",
+                },
+                {
+                    "key": "sign_sites",
+                    "input_type": "resource_multi_select",
+                    "resource_kind": "site",
+                    "required_capabilities": ["sign_in"],
+                    "label": "签到站点",
+                    "default": [],
                 },
             ],
         },
@@ -144,32 +112,35 @@ class SiteCheckinPlugin(PluginBase):
         if not bool(context.config.get("enabled", True)):
             return {"status": "disabled", "site_count": 0, "updated_count": 0, "results": []}
         site_ids = self._list(context.config.get("sign_sites"))
-        login_ids = [
-            value
-            for value in self._list(context.config.get("login_sites"))
-            if value not in site_ids
-        ]
+        login_ids = self._list(context.config.get("login_sites"))
         semaphore = asyncio.Semaphore(min(20, max(1, int(context.config.get("queue_cnt") or 5))))
-        results = list(
-            await asyncio.gather(
-                *(self._execute_site(context, semaphore, site_id, "sign") for site_id in site_ids),
-                *(
-                    self._execute_site(context, semaphore, site_id, "login")
-                    for site_id in login_ids
-                ),
+        site_names = await self._site_names(context)
+        results: list[dict[str, Any]] = []
+        for mode, selected_ids in (("login", login_ids), ("sign", site_ids)):
+            batch = list(
+                await asyncio.gather(
+                    *(
+                        self._execute_site(context, semaphore, site_id, mode)
+                        for site_id in selected_ids
+                    )
+                )
             )
-        )
-        results = await self._retry_failed_sites(context, semaphore, results)
-        for row in results:
-            row.setdefault("status", "checked" if row.get("ok") else "failed")
-        for row in results:
-            context.items.record(
-                f"{row['mode']}:{row['site_id']}",
-                "signed" if row.get("ok") else "failed",
-                payload={"site_id": row["site_id"], "mode": row["mode"]},
-                result=row,
-            )
-        await self._notify_site_results(context, results)
+            batch = await self._retry_failed_sites(context, semaphore, batch)
+            for row in batch:
+                row.setdefault("status", "checked" if row.get("ok") else "failed")
+                row["site_name"] = site_names.get(str(row["site_id"]), str(row["site_id"]))
+                context.items.record(
+                    f"{row['mode']}:{row['site_id']}",
+                    "signed" if row.get("ok") else "failed",
+                    payload={
+                        "site_id": row["site_id"],
+                        "site_name": row["site_name"],
+                        "mode": row["mode"],
+                    },
+                    result=row,
+                )
+            await self._notify_site_results(context, batch)
+            results.extend(batch)
         return {
             "site_count": len(results),
             "updated_count": sum(1 for row in results if row.get("ok")),
@@ -227,15 +198,47 @@ class SiteCheckinPlugin(PluginBase):
     @staticmethod
     async def _notify_site_results(context: PluginContext, results: list[dict[str, Any]]) -> None:
         if bool(context.config.get("notification_enabled")) and results:
-            success = sum(1 for row in results if row.get("ok"))
+            sign_rows = [row for row in results if row.get("mode") == "sign"]
+            login_rows = [row for row in results if row.get("mode") == "login"]
+            summaries = []
+            if sign_rows:
+                summaries.append(
+                    f"签到 {sum(1 for row in sign_rows if row.get('ok'))}/{len(sign_rows)}"
+                )
+            if login_rows:
+                summaries.append(
+                    f"保持登录 {sum(1 for row in login_rows if row.get('ok'))}/{len(login_rows)}"
+                )
             details = "\n".join(
-                f"{row['site_id']}：{row.get('message') or row.get('status')}" for row in results
+                SiteCheckinPlugin._notification_line(row) for row in results
             )
             await context.notifications.send(
-                f"站点签到完成：成功 {success}/{len(results)}",
+                f"站点任务完成：{'，'.join(summaries)}",
                 details,
                 notification_type="plugin",
             )
+
+    @staticmethod
+    def _notification_line(row: dict[str, Any]) -> str:
+        mode = "保持登录" if row.get("mode") == "login" else "签到"
+        fallback = (
+            "登录状态正常"
+            if row.get("mode") == "login" and row.get("ok")
+            else "签到完成" if row.get("ok") else "执行失败"
+        )
+        return f"{mode}｜{row.get('site_name') or row['site_id']}：{row.get('message') or fallback}"
+
+    @staticmethod
+    async def _site_names(context: PluginContext) -> dict[str, str]:
+        try:
+            inventory = await context.sites.configurations()
+        except (AttributeError, KeyError, RuntimeError, ValueError):
+            return {}
+        return {
+            str(item.get("id") or ""): str(item.get("name") or item.get("id") or "")
+            for item in inventory.get("items", [])
+            if item.get("id")
+        }
 
     async def handle_api(self, request: PluginApiRequest, context: PluginContext) -> dict[str, Any]:
         if request.action == "inventory" and request.method == "GET":
@@ -247,6 +250,7 @@ class SiteCheckinPlugin(PluginBase):
                     "sign_sites": self._list(context.config.get("sign_sites")),
                     "login_sites": self._list(context.config.get("login_sites")),
                 },
+                "history": context.items.list(100),
             }
         if request.action == "site" and request.method == "POST":
             site_id = str(request.payload.get("site_id") or "")

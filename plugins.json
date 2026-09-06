@@ -17,32 +17,18 @@
         "capabilities": [
           "scheduled_task",
           "plugin_page",
+          "statistics_page",
           "site_automation"
         ],
         "events": [],
         "schedule_seconds": 86400,
         "config_schema": {
-          "sections": [
-            {
-              "key": "schedule",
-              "title": "执行设置",
-              "description": "站点选择请在插件的“自动签到”页面中勾选。"
-            },
-            {
-              "key": "retry",
-              "title": "失败重试",
-              "description": "只有错误信息命中关键词时才进入本次重试队列。"
-            }
-          ],
           "fields": [
             {
               "key": "enabled",
               "input_type": "switch",
               "label": "启用自动签到",
-              "default": true,
-              "description": "按下方周期自动执行；关闭后仍可在插件页面手动运行。",
-              "icon": "mdi-toggle-switch-outline",
-              "section": "schedule"
+              "default": true
             },
             {
               "key": "cron",
@@ -50,40 +36,30 @@
               "label": "执行周期",
               "default": "",
               "placeholder": "5位cron表达式，留空自动",
-              "description": "留空时每天执行一次；也可以用可视化周期选择器调整。",
-              "icon": "mdi-calendar-clock",
-              "section": "schedule"
+              "icon": "mdi-calendar-clock"
             },
             {
               "key": "notification_enabled",
               "input_type": "switch",
               "label": "发送通知",
-              "default": false,
-              "description": "开启后发送每次签到任务的执行结果。",
-              "icon": "mdi-bell-outline",
-              "section": "schedule"
+              "default": false
             },
             {
               "key": "queue_cnt",
               "input_type": "number",
               "label": "并发队列数量",
               "default": 5,
-              "description": "同时签到的站点数；网络不稳定时建议设为 2～5。",
               "icon": "mdi-format-list-numbered",
               "validation": {
                 "minimum": 1,
                 "maximum": 20
-              },
-              "section": "schedule"
+              }
             },
             {
               "key": "clean",
               "input_type": "switch",
               "label": "下次执行前清理本日缓存",
-              "default": false,
-              "description": "仅下一次运行生效，用于重新签到今天已成功的站点。",
-              "icon": "mdi-broom",
-              "section": "schedule"
+              "default": false
             },
             {
               "key": "retry_keyword",
@@ -91,33 +67,17 @@
               "label": "重试关键词",
               "default": "超时|timeout|连接|connection|503|502",
               "placeholder": "支持正则表达式，命中才重签",
-              "description": "用“|”分隔多个错误词；只有失败原因命中时才自动重试。",
-              "icon": "mdi-text-search",
-              "section": "retry"
+              "icon": "mdi-text-search"
             },
             {
               "key": "auto_cf",
               "input_type": "number",
               "label": "自动优选触发次数",
               "default": 0,
-              "description": "命中重试关键词达到此次数后触发站点优选；0 表示关闭。",
-              "icon": "mdi-cloud-refresh-outline",
               "validation": {
                 "minimum": 0,
                 "maximum": 20
-              },
-              "section": "retry"
-            },
-            {
-              "key": "sign_sites",
-              "input_type": "resource_multi_select",
-              "resource_kind": "site",
-              "required_capabilities": [
-                "sign_in"
-              ],
-              "label": "签到站点",
-              "default": [],
-              "description": "选择需要每日自动签到的 PT 站点。"
+              }
             },
             {
               "key": "login_sites",
@@ -127,8 +87,17 @@
                 "check"
               ],
               "label": "保持登录站点",
-              "default": [],
-              "description": "选择仅检测并保持登录状态的 PT 站点。"
+              "default": []
+            },
+            {
+              "key": "sign_sites",
+              "input_type": "resource_multi_select",
+              "resource_kind": "site",
+              "required_capabilities": [
+                "sign_in"
+              ],
+              "label": "签到站点",
+              "default": []
             }
           ]
         },
@@ -141,7 +110,7 @@
         }
       },
       "package_url": "packages/auto-signin-1.0.0.zip",
-      "sha256": "0e18710ab0b48c7d2f81d3ba9567644cd8caefd4f48f4a7c986714897ec842cf"
+      "sha256": "f6cb283e2e7ac72125505b1adc518ddac7fed99504f6ae385cc883a98cede64e"
     },
     {
       "manifest": {
@@ -424,7 +393,7 @@
         "id": "cookiecloud",
         "name": "CookieCloud 站点同步",
         "version": "1.0.0",
-        "description": "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。",
+        "description": "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点",
         "icon": "mdi-cloud-sync-outline",
         "api_version": 2,
         "entrypoint": "plugin:CookieCloudPlugin",
@@ -444,7 +413,7 @@
         "events": [],
         "schedule_seconds": 86400,
         "config_schema": {
-          "description": "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点。",
+          "description": "接收浏览器 CookieCloud 快照，定时验证并更新或添加受支持的 PT 站点",
           "sections": [
             {
               "key": "connection",
@@ -532,7 +501,7 @@
         "jobs": []
       },
       "package_url": "packages/cookiecloud-1.0.0.zip",
-      "sha256": "622401af370c5ecd3f16e9dcbbda21b57b1c0b637a79bc4e56bef755abaf5079"
+      "sha256": "7f866de3d4b9967692131125cc1db8c10580e96c772df953cecbf4dc3b0fb08e"
     },
     {
       "manifest": {
@@ -1055,7 +1024,7 @@
         "id": "emby-cover-generator",
         "name": "媒体库视觉封面",
         "version": "1.0.1",
-        "description": "为媒体服务器媒体库生成静态或动态风格封面，支持媒体库选择、标题、字体、分辨率和历史清理。",
+        "description": "为媒体服务器媒体库生成静态或动态风格封面",
         "icon": "mdi-image-multiple-outline",
         "api_version": 1,
         "entrypoint": "plugin:LibraryArtworkPlugin",
@@ -1797,7 +1766,7 @@
         }
       },
       "package_url": "packages/emby-cover-generator-1.0.1.zip",
-      "sha256": "095bad21f234833bfdbe08d1ed2de7494f3793a0248a77e2629499fc3b4b48d4"
+      "sha256": "50dd1e93fd3fceb1df321c0af84645523cc1960f7f33cc43e4802bb3ce4efdd4"
     },
     {
       "manifest": {
