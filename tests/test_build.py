@@ -61,6 +61,8 @@ class Plugin(PluginBase):
         return {{"value": VALUE}}
 '''
     (directory / "plugin.py").write_text(source, encoding="utf-8")
+    for notice in ("LICENSE", "LICENSE_SCOPE.md"):
+        (tmp_path / notice).write_bytes((plugin_build.ROOT / notice).read_bytes())
     monkeypatch.setattr(plugin_build, "ROOT", tmp_path)
     monkeypatch.setattr(plugin_build, "check_dependencies", lambda: None)
     monkeypatch.setattr(plugin_build, "build_frontends", lambda: None)
@@ -73,6 +75,8 @@ class Plugin(PluginBase):
         assert b"from ._shared.counter import VALUE" in archive.read("plugin.py")
         assert archive.read("_shared/counter.py") == (shared / "counter.py").read_bytes()
         assert json.loads(archive.read("manifest.json"))["version"] == "1.0.0"
+        for notice in ("LICENSE", "LICENSE_SCOPE.md"):
+            assert archive.read(notice) == (tmp_path / notice).read_bytes()
     plugin_build.build(content_addressed=True)
     repeated = json.loads((tmp_path / "dist/packages.json").read_text())["plugins"][0]
     assert repeated["sha256"] == first["sha256"]

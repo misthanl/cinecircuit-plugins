@@ -74,6 +74,8 @@ def build(*, content_addressed=False):
         shared = False
         with PackageArchive(package, "w", ZIP_DEFLATED) as archive:
             archive.writestr("manifest.json", json.dumps(manifest, ensure_ascii=False, indent=2))
+            for notice in ("LICENSE", "LICENSE_SCOPE.md"):
+                archive.writestr(notice, (ROOT / notice).read_bytes())
             for path in sorted(directory.rglob("*")):
                 if not path.is_file() or "__pycache__" in path.parts:
                     continue

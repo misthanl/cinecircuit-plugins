@@ -102,8 +102,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/auto-signin-1.0.0-efef3687380a4a0b.zip",
-      "sha256": "efef3687380a4a0b19bd1190f7a110d650ea963c40200a2a140fab96bae621d4"
+      "package_url": "packages/auto-signin-1.0.0-ae96924f1ee2c499.zip",
+      "sha256": "ae96924f1ee2c499146a055165ed6812f71e5a7ade94e82cf12392607f5cf4c8"
     },
     {
       "manifest": {
@@ -239,8 +239,8 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.0-99ada1772ac37436.zip",
-      "sha256": "99ada1772ac37436c03c7a7d102cc6f86a3a5805aecceeb39d343bfc6b2fd125"
+      "package_url": "packages/brush-flow-1.0.0-fe639d100005bb86.zip",
+      "sha256": "fe639d100005bb863f52a63f7d347af1e6e10ad3525a484bb1e738bc38f51201"
     },
     {
       "manifest": {
@@ -391,8 +391,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.0-e522a31150b5f375.zip",
-      "sha256": "e522a31150b5f37563ca750ea3b9700d51b56471ddd0d1f8e50544ea293db16b"
+      "package_url": "packages/cast-profile-enricher-1.0.0-c5078bc8ca04ad72.zip",
+      "sha256": "c5078bc8ca04ad729f7ff4cc71e227dd5c74763bcb25f54c614142e29b46eef6"
     },
     {
       "manifest": {
@@ -512,8 +512,8 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.0-811b7bde06921fc6.zip",
-      "sha256": "811b7bde06921fc6f52a857bb82fb65abd46456491c4417c88f28e972cdd25d9"
+      "package_url": "packages/cookiecloud-1.0.0-faad329b2988b9ae.zip",
+      "sha256": "faad329b2988b9ae8b6cfa40201a0cbb9981d5c5f91d8bee7613a54fc665aebf"
     },
     {
       "manifest": {
@@ -648,8 +648,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/douban-hot-1.0.0-0d1b4adc40bd9ccd.zip",
-      "sha256": "0d1b4adc40bd9ccd0ebd2573fc5c4835639a045cd258698d528acf40cf4043fd"
+      "package_url": "packages/douban-hot-1.0.0-fb641c99736b5dd1.zip",
+      "sha256": "fb641c99736b5dd144d6d0cde943cabe4cb087d017315c2a331c62720269cce4"
     },
     {
       "manifest": {
@@ -998,8 +998,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.0-074b98a2da1f87f6.zip",
-      "sha256": "074b98a2da1f87f63d876c67c2e279cb50c555b76f45b5d409ed56f5bac3150c"
+      "package_url": "packages/maoyan-rank-1.0.0-19be5824a825c982.zip",
+      "sha256": "19be5824a825c9824a7d91b87ed1231922823945c20af7383d3724838215868c"
     },
     {
       "manifest": {
@@ -1769,8 +1769,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/emby-cover-generator-1.0.1-79deba51df4564c3.zip",
-      "sha256": "79deba51df4564c37b095ae93ba1cd5d61277aaf9e417936c8d220504e000dd0"
+      "package_url": "packages/emby-cover-generator-1.0.1-993ce98224e29e75.zip",
+      "sha256": "993ce98224e29e7508cb93e4084605565fb4e06d3086901b30d34d0b4770191c"
     },
     {
       "manifest": {
@@ -1848,8 +1848,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/storage-recycle-cleaner-1.0.0-5158a4fcd1a0bc40.zip",
-      "sha256": "5158a4fcd1a0bc401d0a56c336ce1e079cd0ac9d16821dc7f93f2a9ca61d6daf"
+      "package_url": "packages/storage-recycle-cleaner-1.0.0-01939319821be622.zip",
+      "sha256": "01939319821be622e5264a70eef26a77399142c730072f536b9607ec4f146803"
     },
     {
       "manifest": {
@@ -2224,8 +2224,8 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.0-558e190dfe13b1a7.zip",
-      "sha256": "558e190dfe13b1a75f1c14d49f2c7a99dcf9d3d45a8bbb2f7e061bbfc9f5edfe"
+      "package_url": "packages/subtitle-manager-1.0.0-3318dae7a88845b6.zip",
+      "sha256": "3318dae7a88845b6f90dc45881682d5d63e413ed98b30bd83124a0b8a586b06c"
     }
   ]
 }

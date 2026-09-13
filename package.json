@@ -2,6 +2,7 @@
   "name": "cinecircuit-plugins",
   "private": true,
   "version": "1.0.0",
+  "license": "GPL-3.0-only",
   "type": "module",
   "engines": {
     "node": ">=22.18.0"
