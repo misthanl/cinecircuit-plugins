@@ -1,0 +1,8 @@
+line-length = 100
+extend-exclude = ["cinecircuit_plugins/subtitle_manager/_vendor"]
+
+[lint]
+select = ["E4", "E7", "E9", "F", "C901"]
+
+[lint.mccabe]
+max-complexity = 10

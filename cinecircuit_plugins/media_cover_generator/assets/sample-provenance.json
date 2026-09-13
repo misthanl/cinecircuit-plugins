@@ -1,0 +1,250 @@
+{
+  "renderer": "CoverRenderer.render / render_animated",
+  "static_jpeg_quality": 96,
+  "postprocess": null,
+  "movies": [
+    {
+      "id": 693134,
+      "title": "沙丘2",
+      "original_title": "Dune: Part Two",
+      "poster_path": "/9uaCR4HEZqxUqgORq0uZqTNm43G.jpg",
+      "backdrop_path": "/eZ239CUp1d6OryZEBPnO2n87gMG.jpg",
+      "source_dimensions": [
+        2000,
+        3000
+      ],
+      "source_url": "https://image.tmdb.org/t/p/original/9uaCR4HEZqxUqgORq0uZqTNm43G.jpg",
+      "source_sha256": "2039f062008321a4e4fa8d73edd4e929f6eb82482918a9d88d2ebf1c6b418947"
+    },
+    {
+      "id": 157336,
+      "title": "星际穿越",
+      "original_title": "Interstellar",
+      "poster_path": "/spQm5r317XPNHK1941ChWmqzkZs.jpg",
+      "backdrop_path": "/5XNQBqnBwPA9yT0jZ0p3s8bbLh0.jpg",
+      "source_dimensions": [
+        2000,
+        3000
+      ],
+      "source_url": "https://image.tmdb.org/t/p/original/spQm5r317XPNHK1941ChWmqzkZs.jpg",
+      "source_sha256": "62debcdf2ffdc75ea20248d8cc3e0432b3e7ff8675cb7942141dee01d658050e"
+    },
+    {
+      "id": 27205,
+      "title": "盗梦空间",
+      "original_title": "Inception",
+      "poster_path": "/89W962aAnPS3N3BdKgy2BvUhnCh.jpg",
+      "backdrop_path": "/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg",
+      "source_dimensions": [
+        2000,
+        3000
+      ],
+      "source_url": "https://image.tmdb.org/t/p/original/89W962aAnPS3N3BdKgy2BvUhnCh.jpg",
+      "source_sha256": "2d2ec3004d5c869c9ce0d605f7da2cc149bfebd5f70e824a49fb695f5deb6932"
+    },
+    {
+      "id": 286217,
+      "title": "火星救援",
+      "original_title": "The Martian",
+      "poster_path": "/4N94tiD7fLRHEl9z0OgruTBDorz.jpg",
+      "backdrop_path": "/lzMS0CI3FLQYC5EgJoWeIaEt0lm.jpg",
+      "source_dimensions": [
+        2000,
+        3000
+      ],
+      "source_url": "https://image.tmdb.org/t/p/original/4N94tiD7fLRHEl9z0OgruTBDorz.jpg",
+      "source_sha256": "6e6115225b1cc6d5ac00404c855f571b3152933649c55aa13a4421188df5207e"
+    },
+    {
+      "id": 335984,
+      "title": "银翼杀手2049",
+      "original_title": "Blade Runner 2049",
+      "poster_path": "/sxA89XGotN9c5u5O1GWpbYYX3Ks.jpg",
+      "backdrop_path": "/gNdLJU9TxrpGx4dkZidjys3fyy0.jpg",
+      "source_dimensions": [
+        1000,
+        1500
+      ],
+      "source_url": "https://image.tmdb.org/t/p/original/sxA89XGotN9c5u5O1GWpbYYX3Ks.jpg",
+      "source_sha256": "9af6c86405a1b1f0bd19e5d22e7791c94b0bf2bc2ce9488f57994b6a0e70c872"
+    },
+    {
+      "id": 19995,
+      "title": "阿凡达",
+      "original_title": "Avatar",
+      "poster_path": "/yTapYDvTQgxKUdilCYXRrGfpofj.jpg",
+      "backdrop_path": "/vL5LR6WdxWPjLPFRLe133jXWsh5.jpg",
+      "source_dimensions": [
+        2000,
+        3000
+      ],
+      "source_url": "https://image.tmdb.org/t/p/original/yTapYDvTQgxKUdilCYXRrGfpofj.jpg",
+      "source_sha256": "fb6e4e3e67a0752ec49fa5f2529aa9c3b23e5217cb8e75fb1611f99c866fac40"
+    },
+    {
+      "id": 438631,
+      "title": "沙丘",
+      "original_title": "Dune",
+      "poster_path": "/6hsJknqlPceFxExOe87z5VGgNG9.jpg",
+      "backdrop_path": "/zRKQW58MBEY078AxkHxEJzUskCl.jpg",
+      "source_dimensions": [
+        2000,
+        3000
+      ],
+      "source_url": "https://image.tmdb.org/t/p/original/6hsJknqlPceFxExOe87z5VGgNG9.jpg",
+      "source_sha256": "1c848854c057cde170ba82b3e0ae17e5d7252ba44f3b213ceafcff6ef3ab88b4"
+    },
+    {
+      "id": 76341,
+      "title": "疯狂的麦克斯4：狂暴之路",
+      "original_title": "Mad Max: Fury Road",
+      "poster_path": "/jGMjF2SRawSsp8taI7BL8cC2Gp7.jpg",
+      "backdrop_path": "/uT895WNwm0aIJRtGizcQhrejWUo.jpg",
+      "source_dimensions": [
+        1000,
+        1500
+      ],
+      "source_url": "https://image.tmdb.org/t/p/original/jGMjF2SRawSsp8taI7BL8cC2Gp7.jpg",
+      "source_sha256": "041f6018f63ce54c44f76b42918da3179fd618667d619594653a2c0ac2d8008d"
+    }
+  ],
+  "outputs": [
+    {
+      "file": "sample-single.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "spotlight",
+      "sha256": "1f6e78a156b72dea7a5465f9d951c8ca78d13fbe7ae32b5248db06ec573329d4"
+    },
+    {
+      "file": "sample-multi.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "mosaic",
+      "sha256": "8035b4ea11e946eabc41a76a1bc6bddb36a2caaa86e8b7f8892601939564b577"
+    },
+    {
+      "file": "sample-poster.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "filmstrip",
+      "sha256": "cf2cebf8d1f185fc3f3d346db74c4c8fcf62a037a0cd592531c8859d46c6d3a5"
+    },
+    {
+      "file": "variant-grid.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "mosaic",
+      "sha256": "8035b4ea11e946eabc41a76a1bc6bddb36a2caaa86e8b7f8892601939564b577"
+    },
+    {
+      "file": "variant-focus.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "mosaic_focus",
+      "sha256": "7affb316a33592f2965039aa4b44fb60387583c9b9a71b13034f4d6a0f2529a4"
+    },
+    {
+      "file": "variant-split.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "split",
+      "sha256": "c6187fc12e476a7c5e6ddaf41aae14d21cc07fb6f8dcdaab24a0ed1a70b5fb9e"
+    },
+    {
+      "file": "variant-triptych.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "triptych",
+      "sha256": "6afc69ecfc9be6f19b0e222a032105543b98c22db5480812ccc2d188fdafefc8"
+    },
+    {
+      "file": "sample-diagonal.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "diagonal",
+      "sha256": "6dee2cfc0cfab93a4df91d7b02e328a4ff480acdaef0c878018903a555067d4e"
+    },
+    {
+      "file": "sample-duo.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "duo",
+      "sha256": "f06d975fa2b0f1551aff550f784b1513c093ccb6a1c94e8fae2f146d3e436c6f"
+    },
+    {
+      "file": "sample-stack.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "stack",
+      "sha256": "78a08ba85ba54bb64b27ba62c07b15626c5f525089aa99893b356a55dccaf29b"
+    },
+    {
+      "file": "sample-editorial.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "editorial",
+      "sha256": "0ea390da525b2f94ff7ba579ee6b68873941815a1b2890f40d4587790df27956"
+    },
+    {
+      "file": "sample-panorama.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "panorama",
+      "sha256": "f0e821b0fc0038496f93237d849e31eecb575b6a3b8c0c689e7a58463bc77189"
+    },
+    {
+      "file": "sample-cinema.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "cinema",
+      "sha256": "f336e99da7541406994ce4c335b63094028329e20391b78839f63b376d88b734"
+    },
+    {
+      "file": "sample-echo.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "echo",
+      "sha256": "b29fcbc9afb974f6f7f9a586242c6b8a90371fad27ceea6c736ba2f3a85ea8ab"
+    },
+    {
+      "file": "sample-wedge.jpg",
+      "width": 1920,
+      "height": 1080,
+      "renderer_style": "wedge",
+      "sha256": "9f8ec6a3d319e7af96233ed8adc991b23c102fa846a173dc3c950cd0486121af"
+    },
+    {
+      "file": "sample-animated.webp",
+      "width": 1280,
+      "height": 720,
+      "frames": 22,
+      "sha256": "afd5cbaf02126ad890f8710d2b6aace4bbb580b4b268d6cad49501af065f2b33",
+      "requested_fps": 12,
+      "duration_seconds": 3,
+      "source_assets": [
+        "source-00.jpg",
+        "source-01.jpg"
+      ]
+    },
+    {
+      "file": "sample-animated-diagonal.webp",
+      "width": 1280,
+      "height": 720,
+      "frames": 36,
+      "sha256": "3b62b1b6059b32da49f98b2c69f95bda87ac2011d074e45fe8a9008de5917be9",
+      "requested_fps": 12,
+      "duration_seconds": 3,
+      "source_assets": [
+        "source-00.jpg",
+        "source-01.jpg",
+        "source-02.jpg",
+        "source-03.jpg",
+        "source-04.jpg",
+        "source-05.jpg",
+        "source-06.jpg",
+        "source-07.jpg"
+      ]
+    }
+  ]
+}

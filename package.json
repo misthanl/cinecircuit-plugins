@@ -1,0 +1,32 @@
+{
+  "name": "cinecircuit-plugins",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "test:host-integration": "node tests/run-host-integration.mjs",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "build:frontend": "node scripts/build-frontends.mjs",
+    "test:frontend": "node scripts/build-frontends.mjs && node --test cinecircuit_plugins/*/frontend.test.mjs",
+    "lint": "eslint cinecircuit_plugins",
+    "quality:frontend": "pnpm run lint && pnpm run typecheck && pnpm run test:frontend"
+  },
+  "devDependencies": {
+    "@cinecircuit/plugin-sdk": "file:./sdk",
+    "@eslint/js": "9.39.2",
+    "@vitejs/plugin-vue": "6.0.8",
+    "@vue/test-utils": "2.4.11",
+    "eslint": "9.39.2",
+    "eslint-plugin-vue": "10.10.0",
+    "jsdom": "30.0.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.57.1",
+    "vite": "7.3.6",
+    "vue": "3.5.26",
+    "vue-eslint-parser": "10.2.0",
+    "vue-tsc": "3.3.11"
+  }
+}

@@ -1,0 +1,49 @@
+name: Plugin quality
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: cinecircuit-plugins
+      - uses: actions/checkout@v4
+        with:
+          repository: misthanl/cinecircuit
+          path: cinecircuit
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.18.0'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.19.0
+      - name: Install host SDK test runtime
+        run: |
+          python -m pip install -r cinecircuit/requirements.lock -r cinecircuit/requirements-dev.lock
+          python -m pip install -e ./cinecircuit --no-deps
+      - name: Install plugin frontend dependencies
+        working-directory: cinecircuit-plugins
+        run: pnpm install --frozen-lockfile
+      - name: Python quality and SDK boundary
+        working-directory: cinecircuit-plugins
+        run: python scripts/quality.py
+      - name: Backend regression tests
+        working-directory: cinecircuit-plugins
+        run: python -m pytest tests cinecircuit_plugins -q
+      - name: Frontend budgets, types and regression tests
+        working-directory: cinecircuit-plugins
+        run: pnpm run quality:frontend
+      - name: Verify reproducible packages and packaged SDK boundary
+        working-directory: cinecircuit-plugins
+        run: python build.py --content-addressed
