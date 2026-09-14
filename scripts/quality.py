@@ -46,9 +46,22 @@ def dependency_boundaries():
     return subprocess.run(command, cwd=HOST, check=False).returncode
 
 
+def stylesheet_lengths():
+    violations = []
+    for path in sorted(SOURCE.rglob("*.css")):
+        length = len(path.read_text(encoding="utf-8-sig").splitlines())
+        if length > 1000:
+            violations.append(f"{path.relative_to(ROOT)}: stylesheet {length} > 1000 lines")
+    return violations
+
+
 def main():
-    violations = function_lengths()
-    print("\n".join(violations) if violations else "Python lengths: functions <= 50, modules <= 1000 lines.")
+    violations = function_lengths() + stylesheet_lengths()
+    print(
+        "\n".join(violations)
+        if violations
+        else "Source lengths: Python functions <= 50, Python/CSS files <= 1000 lines."
+    )
     lint = subprocess.run(
         [sys.executable, "-m", "ruff", "check", *map(str, sources())],
         cwd=ROOT,

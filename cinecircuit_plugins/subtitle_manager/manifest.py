@@ -7,7 +7,7 @@ MANIFEST = PluginManifest(
     entrypoint="plugin:SubtitleWorkspacePlugin",
     id="subtitle-manager",
     name="字幕管理助手",
-    version="1.0.0",
+    version="1.0.1",
     description="在线搜索、自动匹配并管理媒体外挂字幕。",
     icon="mdi-subtitles-outline",
     permissions=(
@@ -164,25 +164,6 @@ MANIFEST = PluginManifest(
                 ],
             },
             {
-                "key": "subdl_api_key", "input_type": "password", "label": "SubDL API Key",
-                "default": "", "secret": True, "encrypted": True, "section": "online",
-                "description": "在 subdl.com 账户的 API 页面获取。",
-            },
-            {
-                "key": "subdl_api_url", "input_type": "url", "label": "SubDL API 地址",
-                "default": "https://api.subdl.com/api/v1", "section": "online",
-            },
-            {
-                "key": "shooter_api_url", "input_type": "url", "label": "射手影音 API 地址",
-                "default": "https://www.shooter.cn/api/subapi.php", "section": "online",
-                "description": "按视频文件哈希匹配，支持本地视频和可访问、支持 Range 的 STRM 视频。",
-            },
-            {
-                "key": "xunlei_api_url", "input_type": "url", "label": "迅雷看看 API 地址",
-                "default": "http://sub.xmp.sandai.net:8000/subxl", "section": "online",
-                "description": "按视频文件哈希匹配，支持本地视频和可访问、支持 Range 的 STRM 视频。",
-            },
-            {
                 "key": "online_use_proxy",
                 "input_type": "switch",
                 "label": "在线搜索使用代理",
@@ -269,6 +250,25 @@ MANIFEST = PluginManifest(
                 "secret": True,
                 "encrypted": True,
                 "section": "online",
+            },
+            {
+                "key": "subdl_api_key", "input_type": "password", "label": "SubDL API Key",
+                "default": "", "secret": True, "encrypted": True, "section": "online",
+                "description": "在 subdl.com 账户的 API 页面获取。",
+            },
+            {
+                "key": "subdl_api_url", "input_type": "url", "label": "SubDL API 地址",
+                "default": "https://api.subdl.com/api/v1", "section": "online",
+            },
+            {
+                "key": "shooter_api_url", "input_type": "url", "label": "射手影音 API 地址",
+                "default": "https://www.shooter.cn/api/subapi.php", "section": "online",
+                "description": "按视频文件哈希匹配，支持本地视频和可访问、支持 Range 的 STRM 视频。",
+            },
+            {
+                "key": "xunlei_api_url", "input_type": "url", "label": "迅雷看看 API 地址",
+                "default": "http://sub.xmp.sandai.net:8000/subxl", "section": "online",
+                "description": "按视频文件哈希匹配，支持本地视频和可访问、支持 Range 的 STRM 视频。",
             },
         ],
     },

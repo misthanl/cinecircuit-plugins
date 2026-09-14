@@ -160,6 +160,26 @@ class SourceRequests:
             self.next_at[source] = time.monotonic() + (1.0 if source == "douban" else 0.25)
 
 
+def log_checkpoint_event(
+    context: Any, operation: str, status: str, message: str, details: dict
+) -> None:
+    level = context.logger.warning if status in {"partial", "failed"} else context.logger.info
+    level(
+        json.dumps(
+            {
+                "plugin_event": {
+                    "operation_id": operation,
+                    "status": status,
+                    "stage": "started" if status == "running" else "completed",
+                    "message": message,
+                    "details": details,
+                }
+            },
+            ensure_ascii=False,
+        )
+    )
+
+
 async def process_checkpoint(
     plugin: Any, context: Any, state: Any, server: str, media: dict
 ) -> None:
@@ -174,24 +194,7 @@ async def process_checkpoint(
     previous_failures = state.failures
     operation = "media:" + digest([server, media.get("id")])
 
-    def log_event(status: str, message: str, details: dict) -> None:
-        level = context.logger.warning if status in {"partial", "failed"} else context.logger.info
-        level(
-            json.dumps(
-                {
-                    "plugin_event": {
-                        "operation_id": operation,
-                        "status": status,
-                        "stage": "started" if status == "running" else "completed",
-                        "message": message,
-                        "details": details,
-                    }
-                },
-                ensure_ascii=False,
-            )
-        )
-
-    log_event("running", f"演职员资料：{title}", {})
+    log_checkpoint_event(context, operation, "running", f"演职员资料：{title}", {})
     try:
         outcome = await plugin._process_media(context, state, server, media) or {}
         status = outcome.get("status", "completed")
@@ -199,7 +202,9 @@ async def process_checkpoint(
             status = "partial"
         if status == "completed":
             maintenance.write(key, True)
-        log_event(
+        log_checkpoint_event(
+            context,
+            operation,
             status,
             f"{title}：{outcome.get('message') or ('处理完成' if status == 'completed' else '存在未完成项目')}",
             {
@@ -208,7 +213,9 @@ async def process_checkpoint(
             },
         )
     except BaseException as error:
-        log_event(
+        log_checkpoint_event(
+            context,
+            operation,
             "cancelled" if isinstance(error, asyncio.CancelledError) else "failed",
             f"{title}：处理已中断"
             if isinstance(error, asyncio.CancelledError)

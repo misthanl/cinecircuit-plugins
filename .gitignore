@@ -9,11 +9,10 @@ __pycache__/
 !.env.example
 dist/
 .build/
+.build-*/
 .planning/
 node_modules/
 packages/archive/
-packages/*-1.0.[1-9]*.zip
-!packages/emby-cover-generator-1.0.1.zip
 *.db
 *.db-*
 *.log

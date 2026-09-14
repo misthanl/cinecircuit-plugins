@@ -84,7 +84,7 @@ def build(*, content_addressed=False):
                 if path.suffix == ".vue":
                     continue
                 # Subtitle styles are already embedded in its frontend.js.
-                if manifest['id'] == 'subtitle-manager' and path.name == 'subtitle-workspace.css':
+                if manifest['id'] == 'subtitle-manager' and path.suffix == '.css':
                     continue
                 # These cover previews are already embedded verbatim by Vite.
                 # Keep full-size JPEGs and source photos for the preview API, but

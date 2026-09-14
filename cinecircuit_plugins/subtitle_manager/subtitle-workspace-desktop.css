@@ -1,0 +1,489 @@
+/* Desktop workbench: the media rail and subtitle results are the only scrollers. */
+@media (min-width: 901px) {
+  .subtitle-workspace {
+    height: calc(100vh - 102px);
+    min-height: 560px;
+    overflow: hidden;
+  }
+  .subtitle-browser {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.045);
+  }
+  .subtitle-toolbar {
+    min-height: 58px;
+    padding: 8px 16px;
+  }
+  .subtitle-heading {
+    flex: 0 1 auto;
+  }
+  .subtitle-heading::before {
+    width: 28px;
+    height: 28px;
+  }
+  .subtitle-heading h1 {
+    font-size: 17px;
+  }
+  .subtitle-controls {
+    min-width: 0;
+    max-width: 590px;
+  }
+  .subtitle-search-wrap {
+    width: auto;
+    min-width: 180px;
+    flex: 1 1 320px;
+  }
+  .subtitle-notice {
+    min-height: 30px;
+    padding: 6px 16px;
+  }
+  .subtitle-layout {
+    min-height: 0;
+    flex: 1 1 auto;
+    align-items: stretch;
+    grid-template-columns: 300px minmax(0, 1fr);
+    overflow: hidden;
+  }
+  .subtitle-sidebar {
+    position: static;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    align-self: stretch;
+    overflow: hidden;
+    background: var(--app-surface-subtle);
+  }
+  .subtitle-sidebar .subtitle-section-heading {
+    min-height: 44px;
+    padding: 0 14px;
+    background: var(--app-surface);
+  }
+  .subtitle-list {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .subtitle-media {
+    min-height: 58px;
+    padding: 7px 12px;
+  }
+  .subtitle-detail {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .subtitle-detail-heading {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 18px 10px;
+  }
+  .subtitle-detail-copy {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .subtitle-detail-heading h2 {
+    font-size: 18px;
+  }
+  .subtitle-detail-heading p {
+    margin-top: 4px;
+  }
+  .subtitle-identity {
+    margin-top: 6px;
+  }
+  .subtitle-identity small {
+    width: auto;
+    margin: 0 0 0 8px;
+  }
+  .subtitle-summary-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+  }
+  .subtitle-local-stat {
+    min-width: 76px;
+    margin-right: 4px;
+    padding-right: 16px;
+  }
+  .subtitle-local-stat span,
+  .subtitle-local-stat strong {
+    display: block;
+    white-space: nowrap;
+  }
+  .subtitle-local-stat span {
+    color: var(--app-text-muted);
+    font-size: var(--app-font-size-label, 11px);
+  }
+  .subtitle-local-stat strong {
+    margin-top: 3px;
+    color: var(--app-text);
+    font-size: 14px;
+  }
+  .subtitle-files-section {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+  .subtitle-files-heading {
+    min-height: 48px;
+    flex: 0 0 auto;
+  }
+  .subtitle-empty-files {
+    min-height: 150px;
+  }
+  .subtitle-empty-inline {
+    min-height: 34px;
+    flex: 0 0 auto;
+    padding: 8px 0;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  .subtitle-file-list {
+    max-height: none;
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .subtitle-upload-section {
+    flex: 0 0 auto;
+  }
+  .subtitle-online-panel {
+    display: flex;
+    min-height: 0;
+    flex: 1 1 auto;
+    flex-direction: column;
+    margin: 0;
+    overflow: hidden;
+    border-top: 0;
+  }
+  .subtitle-source-progress,
+  .subtitle-captcha-list,
+  .subtitle-manual-actions {
+    flex: 0 0 auto;
+  }
+  .subtitle-source-filter {
+    display: block;
+    flex: 0 0 auto;
+    padding: 8px 0;
+    border: 0;
+  }
+  .subtitle-source-label {
+    display: none;
+  }
+  .subtitle-source-list {
+    gap: 7px;
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .subtitle-source-list::-webkit-scrollbar {
+    display: none;
+  }
+  .subtitle-source {
+    min-height: 34px;
+    padding: 0 11px;
+    border: 1px solid var(--app-border-subtle);
+    border-radius: 9px;
+    background: var(--app-surface);
+  }
+  .subtitle-source.is-ready,
+  .subtitle-source.is-restricted,
+  .subtitle-source.is-error {
+    border-left-width: 1px;
+    border-left-color: var(--app-border-subtle);
+  }
+  .subtitle-source::after {
+    display: none;
+  }
+  .subtitle-source.is-active {
+    border-color: rgba(var(--v-theme-primary), 0.55);
+    background: var(--app-surface-selected, rgba(var(--v-theme-primary), 0.07));
+    box-shadow: 0 0 0 1px rgba(var(--v-theme-primary), 0.08);
+  }
+  .subtitle-online-results {
+    min-height: 150px;
+    flex: 1 1 auto;
+    margin-top: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+  .subtitle-online-empty {
+    display: grid;
+    min-height: 120px;
+    flex: 1 1 auto;
+    place-items: center;
+    border: 1px dashed var(--app-border-subtle);
+    border-radius: var(--app-control-radius, 11px);
+    color: var(--app-text-muted);
+    font-size: var(--app-font-size-label, 11px);
+  }
+  .subtitle-online-file {
+    min-height: 54px;
+    padding: 7px 12px;
+  }
+  .subtitle-online-file .subtitle-file-mark {
+    width: 36px;
+    height: 28px;
+  }
+  .subtitle-preview-action {
+    bottom: 0;
+  }
+  .subtitle-list,
+  .subtitle-file-list,
+  .subtitle-online-results {
+    scrollbar-width: thin;
+    scrollbar-color: var(--app-border) transparent;
+  }
+  .subtitle-list::-webkit-scrollbar,
+  .subtitle-file-list::-webkit-scrollbar,
+  .subtitle-online-results::-webkit-scrollbar {
+    width: 7px;
+  }
+  .subtitle-list::-webkit-scrollbar-thumb,
+  .subtitle-file-list::-webkit-scrollbar-thumb,
+  .subtitle-online-results::-webkit-scrollbar-thumb {
+    border: 2px solid transparent;
+    border-radius: 999px;
+    background: var(--app-border);
+    background-clip: padding-box;
+  }
+  /* Keep header and rows in the same scrollport so fractional columns share
+     one content width even when the vertical scrollbar is present. */
+  .subtitle-local-list,
+  .subtitle-online-results {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+  }
+  .subtitle-local-list > .subtitle-file-list,
+  .subtitle-online-results > .subtitle-file-list {
+    display: contents;
+  }
+  .subtitle-local-columns,
+  .subtitle-online-columns {
+    position: sticky;
+    z-index: 2;
+    top: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .subtitle-detail-heading {
+    display: block;
+  }
+  .subtitle-detail-copy {
+    min-width: 0;
+  }
+  .subtitle-summary-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .subtitle-local-stat {
+    margin-right: auto;
+  }
+  .subtitle-local-stat span,
+  .subtitle-local-stat strong {
+    display: inline;
+  }
+  .subtitle-local-stat strong {
+    margin-left: 6px;
+  }
+  .subtitle-online-empty {
+    padding: 24px 12px;
+    color: var(--app-text-muted);
+    font-size: var(--app-font-size-label, 11px);
+    text-align: center;
+  }
+}
+
+/* Final phone overrides stay last so the tablet fallback cannot flatten the
+   compact media header or reintroduce desktop table chrome. */
+@media (max-width: 680px) {
+  .subtitle-layout,
+  .subtitle-sidebar {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .subtitle-sidebar-tools {
+    width: 100%;
+    min-width: 0;
+  }
+  .subtitle-sidebar-tools .subtitle-sidebar-search {
+    flex: 1 1 0;
+  }
+  .subtitle-sidebar-tools .subtitle-search {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .subtitle-list {
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: scroll !important;
+    overflow-y: hidden !important;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+    touch-action: pan-x;
+    -webkit-overflow-scrolling: touch;
+  }
+  .subtitle-media {
+    width: min(78vw, 280px);
+    flex: 0 0 min(78vw, 280px);
+    touch-action: pan-x;
+  }
+  .subtitle-detail-heading {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    align-items: center;
+    gap: 7px 12px;
+    padding: 12px;
+  }
+  .subtitle-poster {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+  }
+  .subtitle-detail-copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .subtitle-detail-copy .subtitle-identity {
+    max-width: 100%;
+    flex-wrap: nowrap;
+    gap: 4px;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .subtitle-detail-copy .subtitle-identity span {
+    flex: 0 0 auto;
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .subtitle-detail-copy .subtitle-identity span + span::before {
+    margin: 0 4px 0 0;
+  }
+  .subtitle-summary-actions {
+    grid-column: 2;
+    grid-row: 2;
+    margin: 0;
+  }
+  .subtitle-content-tabs:not(.has-online-tools) {
+    position: relative;
+    gap: 6px;
+  }
+  .subtitle-online-panel {
+    margin-top: 0;
+    border-top: 0;
+  }
+  .subtitle-content-tabs:not(.has-online-tools) .subtitle-content-tab-list {
+    width: calc(100% - 76px);
+  }
+  .subtitle-tab-action {
+    position: static;
+    width: 70px;
+    height: 34px;
+    min-height: 34px;
+    flex: 0 0 70px;
+    padding: 0 8px;
+  }
+  .subtitle-content-tabs.has-online-tools {
+    position: relative;
+    min-height: 46px;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    overflow: visible;
+  }
+  .subtitle-content-tabs.has-online-tools .subtitle-content-tab-list {
+    width: calc(100% - 76px);
+    min-height: 46px;
+  }
+  .subtitle-mobile-search-trigger {
+    display: grid;
+    width: 70px;
+    height: 34px;
+    min-height: 34px;
+    flex: 0 0 70px;
+    padding: 0;
+    border: 1px solid var(--app-border-subtle);
+    border-radius: 10px;
+    background: var(--app-surface);
+    cursor: pointer;
+    place-items: center;
+  }
+  .subtitle-mobile-search-trigger[aria-expanded="true"] {
+    border-color: rgba(var(--v-theme-primary), 0.5);
+    background: rgba(var(--v-theme-primary), 0.07);
+  }
+  .subtitle-mobile-search-trigger svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    color: var(--app-text-muted);
+  }
+  .subtitle-tab-search-controls {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 8px);
+    right: 8px;
+    left: 8px;
+    display: none;
+    width: auto;
+    padding: 10px;
+    border: 1px solid var(--app-border-subtle);
+    border-radius: 12px;
+    background: var(--app-surface);
+    box-shadow: var(--app-shadow-overlay, 0 14px 34px rgba(15, 23, 42, 0.18));
+  }
+  .subtitle-tab-search-controls.is-mobile-open {
+    display: flex;
+  }
+  .subtitle-dialog-backdrop {
+    align-items: center;
+    padding: max(14px, env(safe-area-inset-top)) 10px
+      max(14px, env(safe-area-inset-bottom));
+  }
+  .subtitle-dialog:not(.subtitle-preview-dialog) {
+    max-height: min(620px, calc(100dvh - 72px));
+  }
+  .subtitle-preview-dialog,
+  .subtitle-preview-dialog.is-single {
+    width: calc(100vw - 28px);
+    height: min(620px, calc(100dvh - 112px));
+    min-height: 0;
+    max-height: 78dvh;
+    border-radius: 16px;
+  }
+  .subtitle-preview-dialog.is-single .subtitle-preview-dialog-body {
+    min-height: 0;
+  }
+  .subtitle-preview-dialog.is-single .subtitle-preview-content {
+    min-height: 0;
+  }
+  .subtitle-preview-dialog.is-single .subtitle-preview-excerpt {
+    max-height: none;
+  }
+  .subtitle-local-columns,
+  .subtitle-online-columns {
+    display: none;
+  }
+}
+
+/* One mobile scrollport; the card edge stays above the host navigation dock. */

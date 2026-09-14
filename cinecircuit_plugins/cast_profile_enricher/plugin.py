@@ -287,6 +287,9 @@ class CastProfileEnricherPlugin(PluginBase):
                 and f"{server_id}:{after.get('Id') or ''}" not in state.changed_people
                 for before, after in zip(original_people, people)
             )
+        return self._media_role_outcome(context, original_people, people)
+
+    def _media_role_outcome(self, context, original_people, people):
         remaining = sum(
             str(p.get("Type") or "").casefold() == "actor"
             and self._want_role(context, p)
@@ -616,12 +619,7 @@ class CastProfileEnricherPlugin(PluginBase):
                     merged = self._merge_profiles([merged, actor])
                     if not self._missing_fields(context, merged, include_name=include_name):
                         break
-                actor_id = actor.get("douban_person_id") or actor.get("source_id")
-                payload = (
-                    {"source_key": source, "source_id": str(actor_id), "name": name}
-                    if actor_id
-                    else await self._source_payload(context, source, name, metadata)
-                )
+                payload = await self._actor_payload(context, source, name, metadata, actor)
                 if not payload:
                     # Skipping a name search is not evidence that the person
                     # does not exist; do not authorize unresolved removal.
@@ -642,6 +640,12 @@ class CastProfileEnricherPlugin(PluginBase):
         return annotate_profile(
             merged, existing, metadata, lookup_complete, checked, source_matched
         )
+
+    async def _actor_payload(self, context, source, name, metadata, actor):
+        actor_id = actor.get("douban_person_id") or actor.get("source_id")
+        if actor_id:
+            return {"source_key": source, "source_id": str(actor_id), "name": name}
+        return await self._source_payload(context, source, name, metadata)
 
     @staticmethod
     def _existing_profile(person, metadata, name):

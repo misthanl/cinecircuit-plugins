@@ -4,7 +4,6 @@ import asyncio
 import json
 from pathlib import PurePosixPath
 import re
-from urllib.parse import unquote
 
 from ..subtitle_download import fetch, fetch_links, fetch_prefix
 from ..subtitle_files import FORMATS
@@ -14,6 +13,7 @@ from .base import (
     SourceSearchResult, SourceState, http_failure, infer_subtitle_language,
 )
 from ..video_hash import fingerprint, identity_value, sample_ranges
+from .legacy_names import legacy_subtitle_name
 
 
 class HashSource:
@@ -200,9 +200,8 @@ class XunleiSource(HashSource):
 
     async def _rows(self, digest, path, request):
         content, _ = await fetch(self.client, self.base + "/" + digest + ".json")
-        # Historical records can contain invalid UTF-8 in display names. Keep
-        # the otherwise valid response, like the reference Go JSON decoder.
-        payload = json.loads(content.decode("utf-8", errors="replace"))
+        # Preserve legacy filename bytes until decoding individual records.
+        payload = json.loads(content.decode("utf-8", errors="surrogateescape"))
         return _response_rows(payload)
 
     def _candidate(self, row, index, request, evidence):
@@ -216,8 +215,7 @@ class XunleiSource(HashSource):
         # The historical API frequently returns URL-encoded absolute Windows
         # paths. Only expose the decoded basename; the remote path is neither
         # useful to the user nor a valid local filename.
-        decoded_name = unquote(raw_name, errors="replace").replace("\\", "/")
-        name = PurePosixPath(decoded_name).name or "subtitle.srt"
+        name = legacy_subtitle_name(raw_name)
         suffix = PurePosixPath(name).suffix.lstrip(".").lower()
         extension = suffix if suffix in FORMATS else ""
         return SourceCandidate(

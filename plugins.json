@@ -246,7 +246,7 @@
       "manifest": {
         "id": "cast-profile-enricher",
         "name": "演职员资料完善",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "补充影视人物的中文姓名、简介、角色信息与头像。",
         "icon": "mdi-account-star-outline",
         "api_version": 1,
@@ -391,8 +391,175 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.0-c5078bc8ca04ad72.zip",
-      "sha256": "c5078bc8ca04ad729f7ff4cc71e227dd5c74763bcb25f54c614142e29b46eef6"
+      "package_url": "packages/cast-profile-enricher-1.0.1-f2272c46374212a9.zip",
+      "sha256": "f2272c46374212a941a54ad5c78ba316f1f8518d0d203ecce9cc37b6afceaf71"
+    },
+    {
+      "manifest": {
+        "id": "cloud-copy",
+        "name": "跨网盘复制",
+        "version": "1.0.0",
+        "description": "通过统一存储能力复制文件，支持秒传、校验后秒传及可选服务器中转。保留源文件。",
+        "icon": "mdi-content-copy",
+        "api_version": 2,
+        "entrypoint": "plugin:CloudCopyPlugin",
+        "permissions": [
+          "storage:read",
+          "storage:copy",
+          "storage:read_content",
+          "organizer:submit",
+          "sync:submit"
+        ],
+        "capabilities": [
+          "scheduled_task",
+          "storage_tool",
+          "plugin_page"
+        ],
+        "events": [],
+        "schedule_seconds": 0,
+        "config_schema": {
+          "description_display": "hidden",
+          "layout": {
+            "columns": 2,
+            "row_gap": 14,
+            "column_gap": 16
+          },
+          "fields": [
+            {
+              "key": "full_scan_enabled",
+              "input_type": "switch",
+              "label": "定时全量",
+              "default": false
+            },
+            {
+              "key": "full_scan_interval_minutes",
+              "input_type": "number",
+              "label": "全量执行间隔（分钟）",
+              "default": 60
+            },
+            {
+              "key": "life_events_enabled",
+              "input_type": "switch",
+              "label": "生活事件",
+              "default": false
+            },
+            {
+              "key": "life_events_since",
+              "input_type": "number",
+              "label": "事件起始时间",
+              "default": 0,
+              "visible": false
+            },
+            {
+              "key": "show_sidebar_nav",
+              "input_type": "switch",
+              "label": "开启侧边栏菜单",
+              "default": true
+            },
+            {
+              "key": "source",
+              "input_type": "resource_select",
+              "resource_kind": "storage",
+              "label": "源网盘",
+              "required_capabilities": [
+                "file_copy_source"
+              ],
+              "default": null
+            },
+            {
+              "key": "source_root",
+              "input_type": "cloud_directory",
+              "parent_field": "source",
+              "label": "源目录",
+              "default": "0"
+            },
+            {
+              "key": "target",
+              "input_type": "resource_select",
+              "resource_kind": "storage",
+              "label": "目标网盘",
+              "required_capabilities": [
+                "file_copy_target"
+              ],
+              "default": null
+            },
+            {
+              "key": "target_root",
+              "input_type": "cloud_directory",
+              "parent_field": "target",
+              "label": "目标目录",
+              "default": "0"
+            },
+            {
+              "key": "policy",
+              "input_type": "select",
+              "label": "复制策略",
+              "default": "metadata",
+              "options": [
+                {
+                  "value": "metadata",
+                  "label": "仅使用已有校验信息"
+                },
+                {
+                  "value": "verify",
+                  "label": "允许读取源文件验证秒传"
+                },
+                {
+                  "value": "relay",
+                  "label": "允许服务器中转上传"
+                }
+              ]
+            },
+            {
+              "key": "max_gib",
+              "input_type": "number",
+              "label": "单文件临时空间上限（GiB）",
+              "default": 10
+            },
+            {
+              "key": "followup",
+              "input_type": "select",
+              "label": "复制完成后",
+              "default": "none",
+              "options": [
+                {
+                  "value": "none",
+                  "label": "仅复制"
+                },
+                {
+                  "value": "organize",
+                  "label": "交接整理"
+                },
+                {
+                  "value": "sync",
+                  "label": "同步本批文件"
+                }
+              ]
+            }
+          ]
+        },
+        "frontend_module": "frontend.js",
+        "navigation": {
+          "title": "跨网盘复制",
+          "icon": "mdi-content-copy",
+          "section": "tools",
+          "order": 66,
+          "visibility_config_key": "show_sidebar_nav"
+        },
+        "jobs": [
+          {
+            "name": "copy",
+            "interval_seconds": 60,
+            "cron": "",
+            "events": [],
+            "manual": true,
+            "timeout_seconds": 3600,
+            "coalesce": true
+          }
+        ]
+      },
+      "package_url": "packages/cloud-copy-1.0.0-740bef7bd9dddab1.zip",
+      "sha256": "740bef7bd9dddab129ccc81bdd2440ad03fa97f3cae57ffd00c2620842636889"
     },
     {
       "manifest": {
@@ -1855,7 +2022,7 @@
       "manifest": {
         "id": "subtitle-manager",
         "name": "字幕管理助手",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "在线搜索、自动匹配并管理媒体外挂字幕。",
         "icon": "mdi-subtitles-outline",
         "api_version": 1,
@@ -2092,39 +2259,6 @@
               ]
             },
             {
-              "key": "subdl_api_key",
-              "input_type": "password",
-              "label": "SubDL API Key",
-              "default": "",
-              "secret": true,
-              "encrypted": true,
-              "section": "online",
-              "description": "在 subdl.com 账户的 API 页面获取。"
-            },
-            {
-              "key": "subdl_api_url",
-              "input_type": "url",
-              "label": "SubDL API 地址",
-              "default": "https://api.subdl.com/api/v1",
-              "section": "online"
-            },
-            {
-              "key": "shooter_api_url",
-              "input_type": "url",
-              "label": "射手影音 API 地址",
-              "default": "https://www.shooter.cn/api/subapi.php",
-              "section": "online",
-              "description": "按视频文件哈希匹配，支持本地视频和可访问、支持 Range 的 STRM 视频。"
-            },
-            {
-              "key": "xunlei_api_url",
-              "input_type": "url",
-              "label": "迅雷看看 API 地址",
-              "default": "http://sub.xmp.sandai.net:8000/subxl",
-              "section": "online",
-              "description": "按视频文件哈希匹配，支持本地视频和可访问、支持 Range 的 STRM 视频。"
-            },
-            {
               "key": "online_use_proxy",
               "input_type": "switch",
               "label": "在线搜索使用代理",
@@ -2212,6 +2346,39 @@
               "secret": true,
               "encrypted": true,
               "section": "online"
+            },
+            {
+              "key": "subdl_api_key",
+              "input_type": "password",
+              "label": "SubDL API Key",
+              "default": "",
+              "secret": true,
+              "encrypted": true,
+              "section": "online",
+              "description": "在 subdl.com 账户的 API 页面获取。"
+            },
+            {
+              "key": "subdl_api_url",
+              "input_type": "url",
+              "label": "SubDL API 地址",
+              "default": "https://api.subdl.com/api/v1",
+              "section": "online"
+            },
+            {
+              "key": "shooter_api_url",
+              "input_type": "url",
+              "label": "射手影音 API 地址",
+              "default": "https://www.shooter.cn/api/subapi.php",
+              "section": "online",
+              "description": "按视频文件哈希匹配，支持本地视频和可访问、支持 Range 的 STRM 视频。"
+            },
+            {
+              "key": "xunlei_api_url",
+              "input_type": "url",
+              "label": "迅雷看看 API 地址",
+              "default": "http://sub.xmp.sandai.net:8000/subxl",
+              "section": "online",
+              "description": "按视频文件哈希匹配，支持本地视频和可访问、支持 Range 的 STRM 视频。"
             }
           ]
         },
@@ -2224,8 +2391,8 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.0-3318dae7a88845b6.zip",
-      "sha256": "3318dae7a88845b6f90dc45881682d5d63e413ed98b30bd83124a0b8a586b06c"
+      "package_url": "packages/subtitle-manager-1.0.1-11505584989da484.zip",
+      "sha256": "11505584989da4849b2f81797a90ac3ad98bbb5ff19975ece03d921a1cc2796d"
     }
   ]
 }
