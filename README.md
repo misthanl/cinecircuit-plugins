@@ -6,16 +6,16 @@
 
 | 插件 | 功能 |
 | --- | --- |
-| 站点签到管理 | 自动登录并签到配置的 PT 站点 |
-| 站点刷流 | 根据站点与规则选种、下载和删种 |
-| 演职员资料完善 | 补全人物中文姓名、简介、角色与头像 |
-| CookieCloud 站点同步 | 同步浏览器 Cookie，验证并更新站点 |
-| 豆瓣榜追更 | 根据榜单与筛选条件添加影视订阅 |
-| 猫眼榜追更 | 根据猫眼影视榜单添加订阅 |
-| 媒体库视觉工坊 | 生成并上传媒体库静态或动态封面 |
-| 网盘回收站清理 | 定时清理所选网盘回收站 |
-| 跨网盘复制 | 在不同网盘账号之间按策略秒传或中转复制，支持自动补齐和工作流交接 |
-| 字幕自动管理 | 搜索、匹配并下载媒体字幕 |
+| [站点签到管理](cinecircuit_plugins/auto_signin/README.md) | 自动登录并签到配置的 PT 站点 |
+| [站点刷流](cinecircuit_plugins/brush_flow/README.md) | 根据站点与规则选种、下载和删种 |
+| [演职员资料完善](cinecircuit_plugins/cast_profile_enricher/README.md) | 补全人物中文姓名、简介、角色与头像 |
+| [CookieCloud 站点同步](cinecircuit_plugins/cookiecloud/README.md) | 同步浏览器 Cookie，验证并更新站点 |
+| [豆瓣榜追更](cinecircuit_plugins/douban_rank/README.md) | 根据榜单与筛选条件添加影视订阅 |
+| [猫眼榜追更](cinecircuit_plugins/maoyan_rank/README.md) | 根据猫眼影视榜单添加订阅 |
+| [媒体库视觉工坊](cinecircuit_plugins/media_cover_generator/README.md) | 生成并上传媒体库静态或动态封面 |
+| [网盘回收站清理](cinecircuit_plugins/storage_recycle_cleaner/README.md) | 定时清理所选网盘回收站 |
+| [跨网盘复制](cinecircuit_plugins/cloud_copy/README.md) | 在不同网盘账号之间按策略秒传或中转复制，支持自动补齐和工作流交接 |
+| [字幕自动管理](cinecircuit_plugins/subtitle_manager/README.md) | 搜索、匹配并下载媒体字幕 |
 
 可用配置、所需权限和触发方式以各插件清单与应用界面为准。
 
