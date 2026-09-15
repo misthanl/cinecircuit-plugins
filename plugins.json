@@ -102,8 +102,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/auto-signin-1.0.0-ae96924f1ee2c499.zip",
-      "sha256": "ae96924f1ee2c499146a055165ed6812f71e5a7ade94e82cf12392607f5cf4c8"
+      "package_url": "packages/auto-signin-1.0.0-d98b5e1cf2b86b80.zip",
+      "sha256": "d98b5e1cf2b86b807fc07fa7673363023ec9020a79f4f08087d1268651806c4b"
     },
     {
       "manifest": {
@@ -239,8 +239,8 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.0-fe639d100005bb86.zip",
-      "sha256": "fe639d100005bb863f52a63f7d347af1e6e10ad3525a484bb1e738bc38f51201"
+      "package_url": "packages/brush-flow-1.0.0-dcf331683700dce4.zip",
+      "sha256": "dcf331683700dce4cf702956d6ed8b4f34ec76c9efebfd4bbfd8b3b6cb133bfa"
     },
     {
       "manifest": {
@@ -391,8 +391,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.1-f2272c46374212a9.zip",
-      "sha256": "f2272c46374212a941a54ad5c78ba316f1f8518d0d203ecce9cc37b6afceaf71"
+      "package_url": "packages/cast-profile-enricher-1.0.1-5860bf46377a67a0.zip",
+      "sha256": "5860bf46377a67a09cebfed02ef38f44ae6491c68e221713ac3ee8e951a56194"
     },
     {
       "manifest": {
@@ -511,6 +511,12 @@
               ]
             },
             {
+              "key": "temporary_directory",
+              "input_type": "local_directory",
+              "label": "临时目录",
+              "default": ""
+            },
+            {
               "key": "max_gib",
               "input_type": "number",
               "label": "单文件临时空间上限（GiB）",
@@ -558,8 +564,8 @@
           }
         ]
       },
-      "package_url": "packages/cloud-copy-1.0.0-740bef7bd9dddab1.zip",
-      "sha256": "740bef7bd9dddab129ccc81bdd2440ad03fa97f3cae57ffd00c2620842636889"
+      "package_url": "packages/cloud-copy-1.0.0-51750faf5ad49a17.zip",
+      "sha256": "51750faf5ad49a1739b46fee5fa7bd33497dfebc6451e1d7bc9e23e02e042e75"
     },
     {
       "manifest": {
@@ -679,8 +685,8 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.0-faad329b2988b9ae.zip",
-      "sha256": "faad329b2988b9ae8b6cfa40201a0cbb9981d5c5f91d8bee7613a54fc665aebf"
+      "package_url": "packages/cookiecloud-1.0.0-33f7d12f7ab651c8.zip",
+      "sha256": "33f7d12f7ab651c857c2908a25fbe0505b0e0dc4a7751341b9fdfcd391009fbd"
     },
     {
       "manifest": {
@@ -815,8 +821,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/douban-hot-1.0.0-fb641c99736b5dd1.zip",
-      "sha256": "fb641c99736b5dd144d6d0cde943cabe4cb087d017315c2a331c62720269cce4"
+      "package_url": "packages/douban-hot-1.0.0-f94dce742a0d0346.zip",
+      "sha256": "f94dce742a0d03466cd65ca2cf8721ebc94d7841fcb7fd63930e077bbd665a75"
     },
     {
       "manifest": {
@@ -1165,8 +1171,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.0-19be5824a825c982.zip",
-      "sha256": "19be5824a825c9824a7d91b87ed1231922823945c20af7383d3724838215868c"
+      "package_url": "packages/maoyan-rank-1.0.0-ad16352b62630b7d.zip",
+      "sha256": "ad16352b62630b7d247f268e5f426f94929e858f496a6f84f319f8b57fbd46c1"
     },
     {
       "manifest": {
@@ -1936,8 +1942,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/emby-cover-generator-1.0.1-993ce98224e29e75.zip",
-      "sha256": "993ce98224e29e7508cb93e4084605565fb4e06d3086901b30d34d0b4770191c"
+      "package_url": "packages/emby-cover-generator-1.0.1-23e4684bdcc9fb8b.zip",
+      "sha256": "23e4684bdcc9fb8b09d21990cbd0675040cf099f9d8c71b723969fb0ff2e6ebc"
     },
     {
       "manifest": {
@@ -2015,8 +2021,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/storage-recycle-cleaner-1.0.0-01939319821be622.zip",
-      "sha256": "01939319821be622e5264a70eef26a77399142c730072f536b9607ec4f146803"
+      "package_url": "packages/storage-recycle-cleaner-1.0.0-42cb52c5935fe18a.zip",
+      "sha256": "42cb52c5935fe18aa4f77b35c73f9c22a252ae43d265352f7bc88e9538e56531"
     },
     {
       "manifest": {
@@ -2391,8 +2397,8 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.1-11505584989da484.zip",
-      "sha256": "11505584989da4849b2f81797a90ac3ad98bbb5ff19975ece03d921a1cc2796d"
+      "package_url": "packages/subtitle-manager-1.0.1-887b2d20707bcda1.zip",
+      "sha256": "887b2d20707bcda1ded177d4c1035530c26dbec1748fb593bd5e9c9d1df6a8c1"
     }
   ]
 }

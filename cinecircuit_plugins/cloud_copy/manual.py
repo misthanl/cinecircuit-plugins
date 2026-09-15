@@ -7,7 +7,8 @@ import re
 import time
 from typing import Any
 
-from .statistics import records_from
+from .journal import records_from, all_batches
+from .batch_summary import present_batch, result_message
 
 
 async def catalog(storage, source, target=None):
@@ -35,7 +36,7 @@ async def api(plugin, request, context):
     if request.action == "browse" and request.method == "GET":
         return await browse(storage, request.query)
     if request.action == "batches" and request.method == "GET":
-        return list_batches(index)
+        return list_batches(index, context)
     if request.action == "batch" and request.method == "GET":
         identity = task_id(request.query.get("id"))
         task = index.get("task-" + identity)
@@ -90,17 +91,17 @@ async def browse(storage, query):
     )
 
 
-def list_batches(index):
-    rows: list[dict[str, Any]] = []
-    after = ""
-    while True:
-        page = index.list(prefix="task-", limit=500, after=after)
-        rows.extend(row["value"] for row in page)
-        if len(page) < 500:
-            break
-        after = page[-1]["key"]
-    rows.sort(key=lambda row: row["created_at"], reverse=True)
-    return {"items": rows[:50]}
+def list_batches(index, context=None):
+    rows = [row for row in all_batches(index) if not row.get("hidden")]
+    return {"items": [present_batch(row, context.state.scoped("manual-" + row["id"]))
+                      if context else row for row in rows[:50]]}
+
+
+def require_temporary_directory(data):
+    directory = str(data.get("temporary_directory") or "").strip()
+    if data.get("policy", "metadata") != "metadata" and not directory:
+        raise ValueError("请先在插件配置中设置临时目录，再使用读取源文件验证秒传或服务器中转上传")
+    return directory
 
 
 def copy_options(data):
@@ -130,6 +131,7 @@ async def submit(storage, index, context, data):
         raise ValueError("请选择 1 至 500 个文件或文件夹")
     selected = {str(value) for value in selected}
     policy, followup, max_gib = copy_options(data)
+    temporary_directory = require_temporary_directory({**data, "temporary_directory": context.config.get("temporary_directory", "")})
     items = await selected_items(storage, source, root, selected)
     same = await storage.same_account(source, target)
     if same and root == destination:
@@ -157,6 +159,7 @@ async def submit(storage, index, context, data):
         "policy": policy,
         "followup": followup,
         "max_gib": max_gib,
+        "temporary_directory": temporary_directory,
     }
     return create_manual_batch(context, index, identity, config, items)
 
@@ -230,12 +233,16 @@ async def run_one(plugin, context):
     state = context.state.scoped("manual-" + identity)
     progress = state.get("progress")
     batch_context = copy(context)
-    batch_context.config = task["config"]
+    batch_context.config = {**task["config"], "temporary_directory": context.config.get("temporary_directory", "")}
     source, target, destination = (
         task["config"][key] for key in ("source", "target", "target_root")
     )
     storage = context.sdk.require("storage", min_version=2)
+    task.update(status="running", phase="正在扫描所选目录", current_file="", updated_at=time.time())
+    index.set("task-" + identity, task)
+    context.logger.info("手动复制批次 %s 开始：%s → %s", identity, source, target)
     try:
+        require_temporary_directory(batch_context.config)
         await plugin.scan_page(
             storage,
             state,
@@ -245,24 +252,42 @@ async def run_one(plugin, context):
             destination,
             await storage.same_account(source, target),
         )
-        processed = 0
-        while progress["pending"] and processed < 20:
-            await plugin.copy_one(
-                batch_context, storage, state, source, target, destination, progress["pending"][0]
-            )
-            progress["pending"].pop(0)
-            state.set("progress", progress)
-            processed += 1
-        records = list(records_from(state))
-        task.update(
-            processed=len(records),
-            pending=len(progress["pending"]),
-            directories=len(progress["folders"]),
-            completed=sum(row["status"] == "completed" for row in records),
-            attention=sum(row["status"] != "completed" for row in records),
-        )
+        await process_pending(plugin, batch_context, storage, state, index, task, progress)
+        refresh_counts(task, state, progress)
         task["status"] = "running" if progress["pending"] or progress["folders"] else "completed"
     except Exception as exc:
         task.update(status="failed", error=str(exc))
-    task["updated_at"] = time.time()
+        context.logger.exception("手动复制批次 %s 执行失败", identity)
+    task.update(current_file="", phase="等待下一轮处理" if task["status"] == "running" else "", updated_at=time.time())
     index.set("task-" + identity, task)
+    summary = present_batch(task, state)
+    message = f"手动复制批次 {identity}：{result_message(summary)}"
+    context.logger.info("%s，状态=%s", message, summary["outcome"])
+    result_status = {"completed": "success", "running": "success"}.get(summary["outcome"], summary["outcome"])
+    return {"status": result_status, "message": message, "batch_id": identity, "error": task.get("error", "")}
+
+
+def refresh_counts(task, state, progress):
+    records = list(records_from(state))
+    task.update(processed=len(records), completed=sum(row["status"] == "completed" for row in records), attention=sum(row["status"] != "completed" for row in records), pending=len(progress["pending"]), directories=len(progress["folders"]), updated_at=time.time())
+
+
+async def process_pending(plugin, context, storage, state, index, task, progress):
+    identity = task["id"]
+    source, target, destination = (task["config"][key] for key in ("source", "target", "target_root"))
+    for _ in range(20):
+        if not progress["pending"]:
+            break
+        item = progress["pending"][0]
+        path = item.get("relative_path") or item["name"]
+        phase = "正在校验并尝试秒传" if task["config"]["policy"] == "verify" else "正在复制"
+        task.update(current_file=path, phase=phase, updated_at=time.time())
+        index.set("task-" + identity, task)
+        context.logger.info("手动复制批次 %s：开始处理 %s", identity, path)
+        await plugin.copy_one(context, storage, state, source, target, destination, item)
+        progress["pending"].pop(0)
+        state.set("progress", progress)
+        refresh_counts(task, state, progress)
+        index.set("task-" + identity, task)
+        record: dict[str, Any] = next((row for row in records_from(state) if row["path"] == path), {})
+        context.logger.info("手动复制批次 %s：%s，结果=%s，原因=%s", identity, path, record.get("status", "unknown"), record.get("reason") or "无")

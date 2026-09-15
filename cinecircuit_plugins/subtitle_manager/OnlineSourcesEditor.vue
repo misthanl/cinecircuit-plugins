@@ -17,13 +17,13 @@ const selected = computed(() => {
   return Array.isArray(value) ? value.map(String) : [];
 });
 const groups = [
-  { key: "subdl", title: "SubDL", fields: ["subdl_api_url", "subdl_api_key"] },
-  { key: "shooter", title: "射手影音", fields: ["shooter_api_url"] },
-  { key: "xunlei", title: "迅雷看看", fields: ["xunlei_api_url"] },
   { key: "subhd", title: "SubHD", fields: ["subhd_url"] },
   { key: "zimuku", title: "字幕库", fields: ["zimuku_url"] },
   { key: "assrt", title: "ASSRT", fields: ["assrt_api_url", "assrt_api_key", "assrt_search_url"] },
   { key: "opensubtitles", title: "OpenSubtitles", fields: ["opensubtitles_api_url", "opensubtitles_api_key", "opensubtitles_username", "opensubtitles_password"] },
+  { key: "subdl", title: "SubDL", fields: ["subdl_api_url", "subdl_api_key"] },
+  { key: "shooter", title: "射手影音", fields: ["shooter_api_url"] },
+  { key: "xunlei", title: "迅雷看看", fields: ["xunlei_api_url"] },
 ];
 const visibleGroups = computed(() => groups.filter(group => selected.value.includes(group.key)));
 function fieldsFor(keys: string[]) { return orderedFields(props.fields || [], keys); }

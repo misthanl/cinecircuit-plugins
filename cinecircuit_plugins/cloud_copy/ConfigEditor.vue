@@ -12,12 +12,13 @@ const triggerItems = computed(() => [
   ...(supportsEvents.value ? [{ title: "生活事件", value: "events" }] : []),
 ]);
 const fieldModel = computed(() => ({ ...props.modelValue, source: props.modelValue.source || null, target: props.modelValue.target || null }));
-const field = (key: string) => props.fields.filter(item => item.key === key);
+const field = (key: string) => props.fields.filter(item => item.key === key).map(item => key === "policy" && !String(props.modelValue.temporary_directory || "").trim() ? {...item, options: Array.isArray(item.options) ? item.options.filter(option => option.value === "metadata") : []} : item);
 function updateTrigger(value: string) {
   update({ full_scan_enabled: value === "full", life_events_enabled: value === "events" });
 }
 function update(next: Record<string, unknown>) {
   const merged = { ...props.modelValue, ...next };
+  if (!String(merged.temporary_directory || "").trim()) merged.policy = "metadata";
   const sourceChanged = merged.source !== props.modelValue.source;
   if (sourceChanged) merged.source_root = "0";
   if (merged.target !== props.modelValue.target) merged.target_root = "0";
@@ -42,7 +43,7 @@ onMounted(async () => {
       <VSelect :model-value="trigger" :items="triggerItems" label="触发方式" variant="outlined" :disabled="disabled" @update:model-value="updateTrigger" />
       <VTextField v-if="modelValue.full_scan_enabled" :model-value="modelValue.full_scan_interval_minutes ?? 60" label="全量执行间隔（分钟）" type="number" min="1" step="1" variant="outlined" :disabled="disabled" :rules="[(value: string) => Number.isInteger(Number(value)) && Number(value) > 0 || '请输入大于 0 的整数分钟']" @update:model-value="update({full_scan_interval_minutes: $event === '' ? '' : Number($event)})" />
     </div>
-    <component :is="schemaFieldsComponent" v-for="key in ['policy', 'max_gib', 'followup']" :key="key" :fields="field(key)" :model-value="fieldModel" :disabled="disabled" plugin-id="cloud-copy" compact @update:model-value="update" />
+    <component :is="schemaFieldsComponent" v-for="key in ['policy', 'temporary_directory', 'max_gib', 'followup']" :key="key" :fields="field(key)" :model-value="fieldModel" :disabled="disabled" plugin-id="cloud-copy" compact @update:model-value="update" />
   </div>
 </template>
 <style scoped>

@@ -117,6 +117,12 @@ class CloudCopyPlugin(PluginBase):
                     ],
                 },
                 {
+                    "key": "temporary_directory",
+                    "input_type": "local_directory",
+                    "label": "临时目录",
+                    "default": "",
+                },
+                {
                     "key": "max_gib",
                     "input_type": "number",
                     "label": "单文件临时空间上限（GiB）",
@@ -138,8 +144,10 @@ class CloudCopyPlugin(PluginBase):
     )
 
     @staticmethod
-    def settings(context):
+    def settings(context, *, validate_policy=True):
         config = context.config
+        if validate_policy:
+            manual.require_temporary_directory(config)
         source, target = str(config.get("source") or ""), str(config.get("target") or "")
         if not source or not target:
             raise ValueError("请选择源网盘与目标网盘")
@@ -153,25 +161,25 @@ class CloudCopyPlugin(PluginBase):
         return source, root, target, destination, identity
 
     async def run(self, context):
-        await manual.run_one(self, context)
+        manual_result = await manual.run_one(self, context)
         if context.trigger != "manual" and (
             not context.config.get("source") or not context.config.get("target")
         ):
-            return {"status": "skipped", "reason": "disabled"}
+            return manual_result or {"status": "idle", "reason": "disabled"}
         source, root, target, destination, rule = self.settings(context)
         state = context.state.scoped("copy-" + rule)
         progress = state.get("progress") or {"folders": [], "pending": [], "last_scan": 0}
         storage = context.sdk.require("storage", min_version=2)
         await prepare_triggers(context, state, progress, storage, source, root)
         if state.get("paused", False):
-            return {"status": "skipped", "reason": "paused"}
+            return manual_result or {"status": "idle", "reason": "paused"}
         if (
             not progress["folders"]
             and not progress["pending"]
             and not state.get("rescan_requested", False)
             and not progress.get("events_active")
         ):
-            return {"status": "skipped", "reason": "no_trigger"}
+            return manual_result or {"status": "idle", "reason": "no_trigger"}
         same_account = await storage.same_account(source, target)
         if same_account and root == destination:
             raise ValueError("源目录与目标目录属于同一账号且相同")
@@ -196,6 +204,7 @@ class CloudCopyPlugin(PluginBase):
             "processed": processed,
             "pending": len(progress["pending"]),
             "directories_remaining": len(progress["folders"]),
+            "results": [manual_result] if manual_result else [],
         }
 
     async def collect_changes(
@@ -283,6 +292,7 @@ class CloudCopyPlugin(PluginBase):
 
     @staticmethod
     async def submit_copy(context, storage, source, target, parent, target_name, item):
+        temporary_directory = manual.require_temporary_directory(context.config)
         return await storage.copy_file(
             source,
             item["file_id"],
@@ -291,6 +301,7 @@ class CloudCopyPlugin(PluginBase):
             target_name,
             policy=context.config.get("policy", "metadata"),
             max_bytes=int(float(context.config.get("max_gib") or 10) * 1024**3),
+            temporary_directory=temporary_directory,
             expected={"size": item.get("size"), "checksums": item.get("checksums", {})},
         )
 
@@ -318,32 +329,63 @@ class CloudCopyPlugin(PluginBase):
             parent = await storage.ensure_directory(target, parent, name)
         # A crash after submission must not cause blind replay. Explicit retry
         # checks the target before writing again through the SDK.
-        target_name = (
-            previous.get("target_name", path.name)
-            if previous.get("recovering") and previous.get("version") == version
-            else path.name
+        records[identity] = self.pending_record(previous, version, path, parent, item)
+        state.set(key, records)
+        result = await self.copy_with_conflict_name(
+            context,
+            storage,
+            state,
+            records,
+            identity,
+            previous,
+            source,
+            target,
         )
-        records[identity] = {
+        await self.record_copy_result(
+            context, storage, state, key, records, identity, target, result
+        )
+
+    @staticmethod
+    def pending_record(previous, version, path, parent, item):
+        recovering = previous.get("recovering") and previous.get("version") == version
+        return {
             "version": version,
             "status": "uncertain",
             "path": str(path),
-            "target_name": target_name,
+            "target_name": previous.get("target_name", path.name) if recovering else path.name,
             "updated_at": time.time(),
             "parent_id": parent,
+            "source_item": dict(item),
         }
-        state.set(key, records)
+
+    async def copy_with_conflict_name(
+        self,
+        context,
+        storage,
+        state,
+        records,
+        identity,
+        previous,
+        source,
+        target,
+    ):
+        record = records[identity]
+        key = "records-" + identity[:3]
+        parent, target_name, item = (
+            record["parent_id"],
+            record["target_name"],
+            record["source_item"],
+        )
         result = await self.submit_copy(context, storage, source, target, parent, target_name, item)
         if result["status"] == "conflict" and not previous.get("recovering"):
-            alternate = f"{path.stem} [{identity[:8]}-{version[:8]}]{path.suffix}"
-            target_name = alternate
+            path = PurePosixPath(record["path"])
+            alternate = f"{path.stem} [{identity[:8]}-{record['version'][:8]}]{path.suffix}"
             records[identity]["target_name"] = alternate
             state.set(key, records)
             result = await self.submit_copy(
                 context, storage, source, target, parent, alternate, item
             )
-        await self.record_copy_result(
-            context, storage, state, key, records, identity, target, result
-        )
+        return result
 
     async def record_copy_result(
         self, context, storage, state, key, records, identity, target, result
@@ -380,10 +422,23 @@ class CloudCopyPlugin(PluginBase):
         state.set(key, records)
 
     async def handle_api(self, request, context):
+        if (
+            request.action in ("record-retry", "record-delete", "batch-delete", "batch-retry")
+            and request.method == "POST"
+        ):
+            from .record_actions import action
+
+            return await action(self, request, context)
         if request.action in ("browse", "batches", "batch", "batch-retry", "submit"):
             return await manual.api(self, request, context)
         if request.action == "options":
-            return await context.sdk.require("storage", min_version=2).configurations()
+            options = await context.sdk.require("storage", min_version=2).configurations()
+            return {
+                **options,
+                "temporary_directory_configured": bool(
+                    str(context.config.get("temporary_directory") or "").strip()
+                ),
+            }
         if request.action == "status":
             return await snapshot(self, request, context)
         _, _, _, _, rule = self.settings(context)

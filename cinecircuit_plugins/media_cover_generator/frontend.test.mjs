@@ -15,6 +15,19 @@ const { install } = await import("../../.build/cinecircuit_plugins/media_cover_g
 const { mount, flushPromises } = require("@vue/test-utils");
 installSelectStub(vue,require('@vue/test-utils').config);
 require('@vue/test-utils').config.global.stubs.VBtn=true;
+for (const name of ['VSwitch', 'VTextField']) {
+  require('@vue/test-utils').config.global.components[name] = vue.defineComponent({
+    props: ['modelValue', 'label', 'disabled', 'type', 'hideDetails', 'density', 'variant'],
+    emits: ['update:modelValue'],
+    setup: (props, { emit }) => () => vue.h('label', [props.label, vue.h('input', {
+      type: name === 'VSwitch' ? 'checkbox' : props.type,
+      checked: name === 'VSwitch' ? props.modelValue : undefined,
+      value: name === 'VSwitch' ? undefined : props.modelValue,
+      disabled: props.disabled,
+      onChange: event => emit('update:modelValue', name === 'VSwitch' ? event.target.checked : event.target.value),
+    })]),
+  });
+}
 
 test('cover settings stay compact and desktop history keeps four columns', () => {
   const shared = readFileSync(resolve('cinecircuit_plugins/_shared/ui-consistency.css'), 'utf8');

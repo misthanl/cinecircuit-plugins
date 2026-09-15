@@ -25,7 +25,14 @@ globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = vue;
 const { install: installPlugin } = await import(
   "../../.build/cinecircuit_plugins/subtitle_manager/frontend.js"
 );
-const { mount, flushPromises } = require("@vue/test-utils");
+const { mount, flushPromises, config } = require("@vue/test-utils");
+config.global.stubs.VIcon = true;
+config.global.components.VBtn = vue.defineComponent({
+  props: { disabled: Boolean, loading: Boolean, variant: String, color: String },
+  setup(props, { slots, attrs }) {
+    return () => vue.h("button", { ...attrs, disabled: props.disabled || props.loading }, slots.default?.());
+  },
+});
 
 // Every page fixture supplies the required SDK dialog component; render only
 // the opened dialog, matching the host's modelValue contract.

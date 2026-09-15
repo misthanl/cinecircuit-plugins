@@ -55,7 +55,10 @@ def test_selected_file_runs_without_automatic_config_and_is_idempotent():
     assert task == again
     gateway.copy_file.assert_not_called()
     assert ctx.config == {}
-    asyncio.run(plugin.run(ctx))
+    outcome = asyncio.run(plugin.run(ctx))
+    assert outcome["status"] == "success"
+    assert outcome["batch_id"] == task["id"]
+    assert ctx.logger.info.call_count >= 3
     gateway.copy_file.assert_awaited_once()
     assert gateway.copy_file.call_args.args[1] == "file"
     asyncio.run(plugin.run(ctx))
@@ -63,6 +66,46 @@ def test_selected_file_runs_without_automatic_config_and_is_idempotent():
     result = asyncio.run(plugin.handle_api(SimpleNamespace(action="batch", method="GET", query={"id": task["id"]}), ctx))
     assert result["completed"] == 1
     assert result["records"][0]["path"] == "movie.mkv"
+
+
+def test_manual_progress_is_visible_while_copy_is_awaiting_and_failure_is_logged():
+    ctx, gateway = setup()
+    ctx.config["temporary_directory"] = "/media/copy-temp"
+    plugin = CloudCopyPlugin()
+    task = asyncio.run(plugin.handle_api(request(policy="verify"), ctx))
+
+    async def copying(*args, **kwargs):
+        live = ctx.state.scoped("manual-batches").get("task-" + task["id"])
+        assert live["status"] == "running"
+        assert live["current_file"] == "movie.mkv"
+        assert "校验" in live["phase"]
+        raise RuntimeError("fixture transfer failure")
+
+    gateway.copy_file.side_effect = copying
+    outcome = asyncio.run(plugin.run(ctx))
+    assert outcome["status"] == "failed"
+    assert "fixture transfer failure" in outcome["error"]
+    ctx.logger.exception.assert_called_once()
+
+
+@pytest.mark.parametrize("policy", ["verify", "relay"])
+def test_missing_directory_blocks_manual_content_copy(policy):
+    ctx, gateway = setup()
+    with pytest.raises(ValueError, match="临时目录"):
+        asyncio.run(CloudCopyPlugin().handle_api(request(policy=policy, temporary_directory="/untrusted/request"), ctx))
+    gateway.copy_file.assert_not_called()
+
+
+def test_clearing_directory_blocks_already_queued_content_copy():
+    ctx, gateway = setup()
+    ctx.config["temporary_directory"] = "/media/copy-temp"
+    plugin = CloudCopyPlugin()
+    asyncio.run(plugin.handle_api(request(policy="verify"), ctx))
+    ctx.config["temporary_directory"] = ""
+    result = asyncio.run(plugin.run(ctx))
+    assert result["status"] == "failed"
+    assert "临时目录" in result["error"]
+    gateway.copy_file.assert_not_called()
 
 
 def test_folder_selection_keeps_name_and_does_not_scan_unselected_folder():

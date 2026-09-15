@@ -57,6 +57,7 @@ def context(source, target):
     return SimpleNamespace(
         config={"source": source, "target": target, "target_root": "destination", "enabled": True},
         trigger="manual",
+        logger=Mock(),
         sdk=Mock(require=Mock(return_value=gateway)),
         state=State(),
     )
@@ -309,7 +310,7 @@ def test_invalid_schedule_is_rejected_without_copying():
 def test_partial_configuration_does_not_fail_background_poll():
     ctx = context("source", "")
     ctx.trigger = "scheduled"
-    assert asyncio.run(CloudCopyPlugin().run(ctx))["status"] == "skipped"
+    assert asyncio.run(CloudCopyPlugin().run(ctx))["status"] == "idle"
     ctx.sdk.require.assert_not_called()
 
 
