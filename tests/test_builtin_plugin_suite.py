@@ -536,3 +536,35 @@ def test_subtitle_plugin_enforces_configured_timeline_limit() -> None:
                 context,
             )
         )
+
+
+def test_auto_signin_skips_daily_success_but_retries_failure_and_runs_next_day():
+    from datetime import datetime
+    records = {}
+    def record(key, status, **values):
+        records[key] = {"status": status, **values}
+    context = SimpleNamespace(
+        config={"enabled": True, "sign_sites": ["good", "retry"], "login_sites": ["good"]},
+        sites=SimpleNamespace(
+            sign_in=AsyncMock(side_effect=[{"ok": True}, {"ok": False}, {"ok": True}, {"ok": True}, {"ok": True}]),
+            check=AsyncMock(return_value={"ok": True}),
+        ),
+        items=SimpleNamespace(get=records.get, record=record),
+        notifications=SimpleNamespace(send=AsyncMock()),
+    )
+    plugin = SiteCheckinPlugin()
+    asyncio.run(plugin.run(context))
+    before = dict(records)
+    second = asyncio.run(plugin.run(context))
+    assert second["skipped_count"] == 2
+    assert context.sites.sign_in.await_count == 3
+    assert context.sites.check.await_count == 1
+    today = datetime.now().astimezone().date().isoformat()
+    assert records[f"{today}:sign:good"] == before[f"{today}:sign:good"]
+    assert asyncio.run(plugin.run(context))["skipped_count"] == 3
+    records.update({key.replace(today, "1900-01-01"): value for key, value in list(records.items())})
+    for key in list(records):
+        if key.startswith(today): del records[key]
+    assert asyncio.run(plugin.run(context))["skipped_count"] == 0
+    assert context.sites.check.await_count == 2
+    assert context.sites.sign_in.await_count == 5

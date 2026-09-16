@@ -4,7 +4,7 @@
       "manifest": {
         "id": "auto-signin",
         "name": "站点签到助手",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "自动登录并签到指定 PT 站点。",
         "icon": "mdi-calendar-check-outline",
         "api_version": 1,
@@ -102,8 +102,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/auto-signin-1.0.0-d98b5e1cf2b86b80.zip",
-      "sha256": "d98b5e1cf2b86b807fc07fa7673363023ec9020a79f4f08087d1268651806c4b"
+      "package_url": "packages/auto-signin-1.0.1-54e0070387a42514.zip",
+      "sha256": "54e0070387a42514f5befa259f9cb2186f17ee31473b0811a72b6ec02163db07"
     },
     {
       "manifest": {

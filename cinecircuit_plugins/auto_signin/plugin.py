@@ -21,7 +21,7 @@ class SiteCheckinPlugin(PluginBase):
         entrypoint="plugin:SiteCheckinPlugin",
         id="auto-signin",
         name="站点签到助手",
-        version="1.0.0",
+        version="1.0.1",
         description="自动登录并签到指定 PT 站点。",
         icon="mdi-calendar-check-outline",
         permissions=(
@@ -117,12 +117,19 @@ class SiteCheckinPlugin(PluginBase):
         )
         site_names = await self._site_names(context)
         results: list[dict[str, Any]] = []
+        today = datetime.now().astimezone().date().isoformat()
+        skipped_count = 0
         for mode, selected_ids in (("login", login_ids), ("sign", site_ids)):
+            pending_ids = [
+                site_id for site_id in selected_ids
+                if not self._completed_today(context, today, mode, site_id)
+            ]
+            skipped_count += len(selected_ids) - len(pending_ids)
             batch = list(
                 await asyncio.gather(
                     *(
                         self._execute_site(context, semaphore, site_id, mode)
-                        for site_id in selected_ids
+                        for site_id in pending_ids
                     )
                 )
             )
@@ -135,7 +142,7 @@ class SiteCheckinPlugin(PluginBase):
                 # Keep one result per site, mode and server-local day so the statistics
                 # view can render an actual seven-day history matrix.
                 context.items.record(
-                    f"{datetime.now().astimezone().date().isoformat()}:{row['mode']}:{row['site_id']}",
+                    f"{today}:{row['mode']}:{row['site_id']}",
                     "signed" if row.get("ok") else "failed",
                     payload={
                         "site_id": row["site_id"],
@@ -148,9 +155,19 @@ class SiteCheckinPlugin(PluginBase):
             results.extend(batch)
         return {
             "site_count": len(results),
+            "skipped_count": skipped_count,
             "updated_count": sum(1 for row in results if row.get("ok")),
             "results": results,
         }
+
+    @staticmethod
+    def _completed_today(context: PluginContext, today: str, mode: str, site_id: str) -> bool:
+        getter = getattr(context.items, "get", None)
+        saved = getter(f"{today}:{mode}:{site_id}") if callable(getter) else None
+        if not isinstance(saved, dict):
+            return False
+        result = saved.get("result") or {}
+        return saved.get("status") == "signed" or result.get("ok") is True
 
     @staticmethod
     async def _execute_site(
