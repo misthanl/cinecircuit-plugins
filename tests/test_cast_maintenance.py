@@ -154,9 +154,12 @@ def test_cancelled_media_is_retried_and_completed_media_is_checkpointed():
 
 def test_douban_query_disables_duplicate_tmdb_fallback():
     context = _context()
-    context.media_servers.item_metadata = AsyncMock(return_value={
-        "name": "Example Actor", "provider_ids": {"Tmdb": "7", "Douban": "12"},
-    })
+    context.media_servers.item_metadata = AsyncMock(
+        return_value={
+            "name": "Example Actor",
+            "provider_ids": {"Tmdb": "7", "Douban": "12"},
+        }
+    )
     context.media.person_detail = AsyncMock(
         side_effect=[{"name": "示例演员"}, {"name": "示例演员", "biography": "简介"}]
     )
@@ -168,7 +171,7 @@ def test_douban_query_disables_duplicate_tmdb_fallback():
     context.media.search_people.assert_not_awaited()
 
 
-def test_resume_skips_successful_media_but_retries_interrupted_media():
+def test_new_run_never_restores_previous_completed_media():
     async def scenario():
         context = _context()
         context.state = MemoryState()
@@ -181,8 +184,8 @@ def test_resume_skips_successful_media_but_retries_interrupted_media():
         resumed.maintenance = Maintenance(context, resumed)
         await process_checkpoint(plugin, context, resumed, "server", {"id": "done"})
         await process_checkpoint(plugin, context, resumed, "server", {"id": "unfinished"})
-        assert resumed.resumed_media == 1
-        assert plugin._process_media.await_count == 2
+        assert resumed.resumed_media == 0
+        assert plugin._process_media.await_count == 3
 
     asyncio.run(scenario())
 
@@ -193,10 +196,16 @@ def test_partial_media_is_not_checkpointed_and_logs_share_operation(caplog):
         context.state = MemoryState()
         state = _RunState()
         state.maintenance = Maintenance(context, state)
-        plugin = SimpleNamespace(_process_media=AsyncMock(return_value={
-            "status": "partial", "remaining_roles": 1, "updated_roles": 0,
-            "message": "角色未完成",
-        }))
+        plugin = SimpleNamespace(
+            _process_media=AsyncMock(
+                return_value={
+                    "status": "partial",
+                    "remaining_roles": 1,
+                    "updated_roles": 0,
+                    "message": "角色未完成",
+                }
+            )
+        )
         media = {"id": "m1", "name": "示例作品"}
         await process_checkpoint(plugin, context, state, "s1", media)
         assert not state.maintenance.read(state.maintenance.done_key("s1", media))
@@ -205,9 +214,14 @@ def test_partial_media_is_not_checkpointed_and_logs_share_operation(caplog):
 
     import json
     import logging
+
     with caplog.at_level(logging.INFO):
         asyncio.run(scenario())
-    events = [json.loads(record.message)["plugin_event"] for record in caplog.records if record.message.startswith('{"plugin_event":')]
+    events = [
+        json.loads(record.message)["plugin_event"]
+        for record in caplog.records
+        if record.message.startswith('{"plugin_event":')
+    ]
     assert len(events) == 4
     assert len({event["operation_id"] for event in events}) == 1
     assert [event["status"] for event in events] == ["running", "partial", "running", "partial"]

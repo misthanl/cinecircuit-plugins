@@ -33,6 +33,7 @@ export function install(sdk: CineCircuitPluginSdk) {
         ...attrs,
         context: props.context,
         request: sdk.request,
+        imageComponent: sdk.ui.components.Image,
         buttonComponent: Button,
         cardComponent: Card,
         dialogComponent: Dialog,

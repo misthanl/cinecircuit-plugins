@@ -38,7 +38,7 @@ class DoubanWatchlistPlugin(PluginBase):
         entrypoint="plugin:DoubanWatchlistPlugin",
         id="douban-hot",
         name="豆瓣榜单追踪",
-        version="1.0.0",
+        version="1.0.1",
         description="跟踪豆瓣热门榜单，筛选作品并自动添加订阅。",
         icon="mdi-movie-search-outline",
         permissions=(

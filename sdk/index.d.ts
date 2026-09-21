@@ -50,6 +50,7 @@ export interface CineCircuitPluginSdk {
   };
   ui: {
     components: Record<string, Component> & {
+      Image?: Component;
       Alert: Component;
       Button: Component;
       Card: Component;

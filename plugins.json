@@ -246,7 +246,7 @@
       "manifest": {
         "id": "cast-profile-enricher",
         "name": "演职员资料完善",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "补充影视人物的中文姓名、简介、角色信息与头像。",
         "icon": "mdi-account-star-outline",
         "api_version": 1,
@@ -391,8 +391,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.1-5860bf46377a67a0.zip",
-      "sha256": "5860bf46377a67a09cebfed02ef38f44ae6491c68e221713ac3ee8e951a56194"
+      "package_url": "packages/cast-profile-enricher-1.0.2-93c976170a09c171.zip",
+      "sha256": "93c976170a09c171e7e269da30b4f3902d52e45d4f2f8fecc05dbb66ab1b2398"
     },
     {
       "manifest": {
@@ -692,7 +692,7 @@
       "manifest": {
         "id": "douban-hot",
         "name": "豆瓣榜单追踪",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "跟踪豆瓣热门榜单，筛选作品并自动添加订阅。",
         "icon": "mdi-movie-search-outline",
         "api_version": 1,
@@ -821,14 +821,14 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/douban-hot-1.0.0-f94dce742a0d0346.zip",
-      "sha256": "f94dce742a0d03466cd65ca2cf8721ebc94d7841fcb7fd63930e077bbd665a75"
+      "package_url": "packages/douban-hot-1.0.1-b87400c50c93620b.zip",
+      "sha256": "b87400c50c93620b331af2b31a3e044f34eea0d5ffeaf1671ad8a50bc082a899"
     },
     {
       "manifest": {
         "id": "maoyan-rank",
         "name": "猫眼榜单追踪",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "跟踪猫眼影视榜单，筛选作品并自动添加订阅。",
         "icon": "mdi-movie-search-outline",
         "api_version": 1,
@@ -1171,8 +1171,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.0-ad16352b62630b7d.zip",
-      "sha256": "ad16352b62630b7d247f268e5f426f94929e858f496a6f84f319f8b57fbd46c1"
+      "package_url": "packages/maoyan-rank-1.0.1-dd439711e28b65bf.zip",
+      "sha256": "dd439711e28b65bfced8e0cd276b4f760821abb5611caa4e2043dca84c2c3efb"
     },
     {
       "manifest": {

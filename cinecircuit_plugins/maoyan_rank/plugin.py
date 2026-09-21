@@ -32,7 +32,7 @@ class MaoyanWatchlistPlugin(PluginBase):
         entrypoint="plugin:MaoyanWatchlistPlugin",
         id="maoyan-rank",
         name="猫眼榜单追踪",
-        version="1.0.0",
+        version="1.0.1",
         description="跟踪猫眼影视榜单，筛选作品并自动添加订阅。",
         icon="mdi-movie-search-outline",
         permissions=(PluginPermission.MEDIA_DISCOVER, PluginPermission.SUBSCRIPTION_CREATE,

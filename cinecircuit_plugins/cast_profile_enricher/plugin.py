@@ -29,6 +29,12 @@ class CastProfileEnricherPlugin(PluginBase):
 
     manifest = manifest
 
+    async def on_lifecycle(
+        self, event: str, context: PluginContext, previous_version: str = ""
+    ) -> None:
+        if event in {"install", "enable", "upgrade"}:
+            await asyncio.to_thread(Maintenance, context, _RunState())
+
     async def run(self, context: PluginContext) -> dict[str, Any]:
         if getattr(context, "trigger", "manual") == "scheduled" and not bool(
             context.config.get("enabled", False)

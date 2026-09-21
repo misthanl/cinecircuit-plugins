@@ -1,4 +1,4 @@
-"""Bounded source lookups and resumable, plugin-owned maintenance state."""
+"""Bounded source lookups and disposable, plugin-owned maintenance state."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import hashlib
 import json
 import time
 import uuid
+from collections import OrderedDict
 from typing import Any
 
 
@@ -21,20 +22,39 @@ class Maintenance:
         gateway = getattr(context, "state", None)
         self.store = gateway.scoped("cast-maintenance-v2") if gateway else None
         self.scope = digest(["v3", context.config, targets])
-        previous = self.read("run:" + self.scope) or {}
-        self.run = previous.get("token") if previous.get("status") != "completed" else None
-        self.run = self.run or uuid.uuid4().hex
+        self.run = uuid.uuid4().hex
+        self.completed: set[str] = set()
+        self.cache_ready = False
+        self.next_cleanup = 0.0
+        self.clean_cache()
         self.started = time.monotonic()
         self.started_at = time.time()
         self.current: dict[str, str] = {}
-        self.write("run:" + self.scope, {"token": self.run, "status": "running"})
+
+    def clean_cache(self) -> None:
+        if time.monotonic() < self.next_cleanup:
+            return
+        self.next_cleanup = time.monotonic() + 60
+        try:
+            prune = getattr(self.store, "prune_cache", None)
+            self.cache_ready = bool(
+                prune and prune(prefix="cache:", max_entries=1000, max_bytes=8 * 1024 * 1024) < 200
+            )
+        except Exception:
+            self.cache_ready = False
 
     def read(self, key: str) -> Any:
-        return self.store.get(key) if self.store else None
+        try:
+            return self.store.get(key) if self.store else None
+        except Exception:
+            return None
 
     def write(self, key: str, value: Any, ttl: int = 7 * 86400) -> None:
         if self.store:
-            self.store.set(key, value, ttl_seconds=ttl)
+            try:
+                self.store.set(key, value, ttl_seconds=ttl)
+            except Exception:
+                pass  # Disposable progress must never interrupt media processing.
 
     def done_key(self, server: str, media: dict) -> str:
         return "done:" + digest([self.run, server, media.get("id")])
@@ -56,7 +76,6 @@ class Maintenance:
         )
 
     def finish(self, status: str) -> None:
-        self.write("run:" + self.scope, {"token": self.run, "status": status})
         self.progress()
         self.write("progress", {**(self.read("progress") or self.state.result()), "status": status})
 
@@ -68,8 +87,9 @@ class SourceRequests:
 
     def __init__(self, original: Any, maintenance: Maintenance) -> None:
         self.original, self.maintenance = original, maintenance
-        self.cache: dict[str, Any] = {}
-        self.locks: dict[str, asyncio.Lock] = {}
+        self.cache: OrderedDict[str, Any] = OrderedDict()
+        self.cache_bytes = 0
+        self.locks = [asyncio.Lock() for _ in range(64)]
         self.slots = {"tmdb": asyncio.Semaphore(2), "douban": asyncio.Semaphore(1)}
         self.gates = {key: asyncio.Lock() for key in self.slots}
         self.next_at = dict.fromkeys(self.slots, 0.0)
@@ -84,14 +104,18 @@ class SourceRequests:
                 kwargs.get("source") or (args[0] if name in {"detail", "person_detail"} else "tmdb")
             )
             key = "cache:v3:" + digest([name, args, kwargs])
-            async with self.locks.setdefault(key, asyncio.Lock()):
+            async with self.locks[int(key[-8:], 16) % len(self.locks)]:
                 return await self.cached(key, source, method, args, kwargs)
 
         return invoke
 
     async def cached(self, key: str, source: str, method: Any, args: Any, kwargs: Any) -> Any:
-        value = self.cache.get(key) or self.maintenance.read(key)
-        if value is not None:
+        self.maintenance.clean_cache()
+        cached = self.cache.get(key)
+        value = cached[0] if cached else self.maintenance.read(key)
+        if isinstance(value, dict) and "data" in value:
+            if cached is None:
+                self.remember(key, value["data"], persist=False)
             self.maintenance.state.cache_hits += 1
             return copy.deepcopy(value["data"])
         self.maintenance.progress(source=source)
@@ -104,17 +128,40 @@ class SourceRequests:
                 "人物来源请求失败：%s / %s", source, type(error).__name__
             )
             raise
+        self.remember(key, result)
+        return copy.deepcopy(result)
+
+    def remember(self, key: str, result: Any, *, persist: bool = True) -> None:
         record = {"data": result}
-        self.cache[key] = record
-        useful = self.has_data(result)
-        if useful and len(json.dumps(record, default=str).encode()) < 190_000:
+        try:
+            encoded_size = len(
+                json.dumps(record, ensure_ascii=False, separators=(",", ":")).encode()
+            )
+        except (TypeError, ValueError):
+            return
+        if encoded_size > 190_000:
+            return
+        while self.cache and (
+            len(self.cache) >= 1000 or self.cache_bytes + encoded_size > 8 * 1024 * 1024
+        ):
+            _, (_, old_size) = self.cache.popitem(last=False)
+            self.cache_bytes -= old_size
+        self.cache[key] = (record, encoded_size)
+        self.cache_bytes += encoded_size
+        if persist and self.has_data(result) and self.maintenance.cache_ready:
             try:
-                self.maintenance.write(key, record, 86400 if useful else 1800)
+                self.maintenance.store.set_cache(
+                    key,
+                    record,
+                    prefix="cache:",
+                    max_entries=1000,
+                    max_bytes=8 * 1024 * 1024,
+                    ttl_seconds=86400,
+                )
             except Exception as error:
                 self.maintenance.context.logger.warning(
                     "人物缓存未持久化：%s", type(error).__name__
                 )
-        return copy.deepcopy(result)
 
     @staticmethod
     def has_data(result: Any) -> bool:
@@ -185,7 +232,7 @@ async def process_checkpoint(
 ) -> None:
     maintenance = state.maintenance
     key = maintenance.done_key(server, media)
-    if maintenance.read(key):
+    if key in maintenance.completed:
         state.resumed_media += 1
         return
     title = str(media.get("name") or media.get("id") or "未知作品")
@@ -201,7 +248,7 @@ async def process_checkpoint(
         if str(media.get("id")) in state.retry_media or state.failures != previous_failures:
             status = "partial"
         if status == "completed":
-            maintenance.write(key, True)
+            maintenance.completed.add(key)
         log_checkpoint_event(
             context,
             operation,

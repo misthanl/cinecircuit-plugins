@@ -11,11 +11,13 @@ interface StatisticsResponse { items: SubscriptionRecord[]; total: number; movie
 const props = defineProps<{
   context: PluginContributionContext;
   request: CineCircuitPluginSdk["request"];
+  imageComponent?: Component;
   buttonComponent: Component;
   cardComponent: Component;
   dialogComponent: Component;
   alertComponent: Component;
 }>();
+const UiImage = props.imageComponent;
 const UiButton = props.buttonComponent;
 const UiCard = props.cardComponent;
 const UiDialog = props.dialogComponent;
@@ -111,8 +113,8 @@ onMounted(() => load());
             <div ref="historyGrid" class="maoyan-statistics__grid" :aria-busy="loading" :style="historyHeight ? { minHeight: `${historyHeight}px` } : undefined">
               <article v-for="item in history.items" :key="item.id" class="maoyan-subscription">
                 <div class="maoyan-subscription__poster">
-                  <img v-if="posterUrl(item.poster) && !failedPosters.has(item.id)" :src="posterUrl(item.poster)" :alt="`${item.title}海报`" loading="lazy" @error="markPosterFailed(item.id)">
-                  <span v-else>无海报</span>
+                  <UiImage v-if="UiImage && posterUrl(item.poster) && !failedPosters.has(item.id)" :src="posterUrl(item.poster)" :alt="`${item.title}海报`" loading="lazy" @error="markPosterFailed(item.id)" />
+                  <span v-else>{{ UiImage ? "无海报" : "请更新主程序" }}</span>
                 </div>
                 <div class="maoyan-subscription__body">
                   <h3 :title="item.title">{{ item.title }}</h3>

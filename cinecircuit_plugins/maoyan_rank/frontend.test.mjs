@@ -71,7 +71,7 @@ async function statistics(latest = true, records = [], requestOverride) {
   let component;
   const Surface = { render() { return vue.h('div', this.$slots.default?.()); } };
   const Button = { props: ['disabled'], render() { return vue.h('button', { disabled: this.disabled }, this.$slots.default?.()); } };
-  install({ vue, ui: { components: { Button, Card: Surface, Dialog: Surface, Alert: Surface } },
+  install({ vue, ui: { components: { Image: "img", Button, Card: Surface, Dialog: Surface, Alert: Surface } },
     registerContribution(entry) { component = entry.component; },
     request: requestOverride || (async () => ({ items: records, total: records.length, page: 1, pages: 1, cumulative: { checked: 25, subscribed: 10, existing: 12, retry: 3 }, latest_run: latest ? {
       status: 'completed', updated_at: '2026-09-08T06:30:00Z', checked: 2, subscribed: 1, existing: 0, retry: 1,
@@ -170,5 +170,23 @@ test('history gallery retains metadata to the right of a safe portrait poster', 
   assert(card.get('.maoyan-subscription__time').attributes('title').includes('2026-09-08'));
   assert(source.includes('grid-template-columns: repeat(4, minmax(0, 1fr))'));
   for (const width of [1100, 850, 600]) assert(source.includes(`max-width: ${width}px`));
+  wrapper.unmount();
+});
+
+test("statistics delegates protected posters to the host authenticated image component", async () => {
+  let statistics;
+  const Shell = { render() { return vue.h("div", this.$slots.default?.()); } };
+  const Image = { props: ["src"], emits: ["error"], render() { return vue.h("span", { "data-protected-source": this.src }); } };
+  install({ vue, ui: { components: { Button: Shell, Card: Shell, Dialog: Shell, Alert: Shell, Image } }, registerEditor() {}, registerContribution(entry) { statistics = entry.component; },
+    request: async () => ({ items: [{ id: 1, title: "Fixture", poster: "https://image.tmdb.org/t/p/w500/test.jpg", subscribed_at: "2026-09-21T00:00:00Z" }], total: 1, page: 1, pages: 1 }) });
+  const wrapper = mount(statistics, { props: { context: { close() {} } } });
+  await flushPromises();
+  const image = wrapper.findComponent(Image);
+  assert(image.exists());
+  assert(image.props("src").startsWith("/explore/image-proxy?source_key=tmdb&url="));
+  assert.equal(wrapper.findAll("img").length, 0);
+  image.vm.$emit("error", new Error("fixture"));
+  await flushPromises();
+  assert.equal(wrapper.findComponent(Image).exists(), false);
   wrapper.unmount();
 });

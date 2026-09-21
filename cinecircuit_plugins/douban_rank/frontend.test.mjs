@@ -15,7 +15,7 @@ const Button = { props: ["disabled", "loading"], emits: ["click"], setup: (props
 test("Douban grouped editor preserves television and RSS settings when movies change", async () => {
   let editor;
   const Fields = { props: ["fields", "modelValue"], emits: ["update:modelValue"], setup: () => () => vue.h("div") };
-  install({ vue, ui: { components: { Button, Card: Box, Dialog: Box, Alert: Box, SchemaFields: Fields } }, registerEditor: value => { editor = value; }, registerContribution() {} });
+  install({ vue, ui: { components: { Image: "img", Button, Card: Box, Dialog: Box, Alert: Box, SchemaFields: Fields } }, registerEditor: value => { editor = value; }, registerContribution() {} });
   const wrapper = mount(editor.component, { props: { modelValue: { ranks: ["movie-real-time", "tv-hot"], rss_addrs: "/feed" } }, attrs: { fields: [{ key: "ranks", options: [{ value: "movie-real-time", label: "电影" }, { value: "tv-hot", label: "电视剧" }] }] } });
   const groups = wrapper.findAllComponents(Fields);
   assert.equal(groups.length, 2);
@@ -26,7 +26,7 @@ test("Douban grouped editor preserves television and RSS settings when movies ch
 });
 function component(request) {
   let contribution;
-  install({ vue, request, ui: { components: { Button, Card: Box, Dialog: Box, Alert: Box } }, registerContribution: value => { contribution = value; } });
+  install({ vue, request, ui: { components: { Image: "img", Button, Card: Box, Dialog: Box, Alert: Box } }, registerContribution: value => { contribution = value; } });
   assert.equal(contribution.slot, "plugin.statistics");
   return contribution.component;
 }
@@ -63,5 +63,23 @@ test("Douban retries errors and shows an empty history without a log table", asy
   await flushPromises();
   assert.match(wrapper.text(), /暂无订阅记录/);
   assert.equal(wrapper.find("table").exists(), false);
+  wrapper.unmount();
+});
+
+test("statistics delegates protected posters to the host authenticated image component", async () => {
+  let statistics;
+  const Shell = { render() { return vue.h("div", this.$slots.default?.()); } };
+  const Image = { props: ["src"], emits: ["error"], render() { return vue.h("span", { "data-protected-source": this.src }); } };
+  install({ vue, ui: { components: { Button: Shell, Card: Shell, Dialog: Shell, Alert: Shell, Image } }, registerEditor() {}, registerContribution(entry) { statistics = entry.component; },
+    request: async () => ({ items: [{ id: 1, title: "Fixture", poster: "https://image.tmdb.org/t/p/w500/test.jpg", subscribed_at: "2026-09-21T00:00:00Z" }], total: 1, page: 1, pages: 1 }) });
+  const wrapper = mount(statistics, { props: { context: { close() {} } } });
+  await flushPromises();
+  const image = wrapper.findComponent(Image);
+  assert(image.exists());
+  assert(image.props("src").startsWith("/explore/image-proxy?source_key=tmdb&url="));
+  assert.equal(wrapper.findAll("img").length, 0);
+  image.vm.$emit("error", new Error("fixture"));
+  await flushPromises();
+  assert.equal(wrapper.findComponent(Image).exists(), false);
   wrapper.unmount();
 });
