@@ -13,12 +13,12 @@ from cinecircuit_plugins.maoyan_rank.plugin import MaoyanWatchlistPlugin
     ({"num": "3", "web_movie_num": None}, (3, 3)),
 ])
 def test_movie_limits_are_independent_and_preserve_legacy_settings(config, expected):
-    def response(url):
+    def response(url, **kwargs):
         if "dashboard-ajax/movie" in url:
             payload = {"movieList": {"list": [{"movieInfo": {"movieName": str(index)}} for index in range(10)]}}
         else:
             payload = {"data": {"list": [{"name": str(index)} for index in range(10)]}}
-        return SimpleNamespace(json=lambda: payload)
+        return SimpleNamespace(status_code=200, json=lambda: payload)
     client = SimpleNamespace(get=AsyncMock(side_effect=response))
     rows = asyncio.run(MaoyanWatchlistPlugin()._movie_candidates(client, config, ["movie", "web-movie"]))
     assert tuple(sum(row["board"] == board for row in rows) for board in ["电影票房榜", "网络电影榜"]) == expected
@@ -72,7 +72,7 @@ def test_platform_defaults_off_but_saved_selection_still_works():
     plugin = MaoyanWatchlistPlugin()
     fields = {field["key"]: field for field in plugin.manifest.config_schema["fields"]}
     assert fields["all_enabled"]["default"] is False
-    client = SimpleNamespace(get=AsyncMock(return_value=SimpleNamespace(json=lambda: {})))
+    client = SimpleNamespace(get=AsyncMock(return_value=SimpleNamespace(status_code=200, json=lambda: {"dataList": {"list": []}})))
     assert asyncio.run(plugin._television_candidates(client, {}, ["web-heat"])) == []
     client.get.assert_not_awaited()
     asyncio.run(plugin._television_candidates(client, {"all_enabled": True}, ["web-heat"]))

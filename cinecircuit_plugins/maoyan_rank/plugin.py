@@ -14,6 +14,7 @@ from .statistics import subscription_history, save_run_snapshot, cumulative_stat
 from .identity import match_identity, exact_candidates
 from .prefetch import identity_prefetch
 from .timing import stage_timing
+from .requests import BoardClient, BoardRequestError, board_date as request_board_date, board_payload
 
 
 PLATFORM_OPTIONS = (
@@ -32,7 +33,7 @@ class MaoyanWatchlistPlugin(PluginBase):
         entrypoint="plugin:MaoyanWatchlistPlugin",
         id="maoyan-rank",
         name="猫眼榜单追踪",
-        version="1.0.1",
+        version="1.0.2",
         description="跟踪猫眼影视榜单，筛选作品并自动添加订阅。",
         icon="mdi-movie-search-outline",
         permissions=(PluginPermission.MEDIA_DISCOVER, PluginPermission.SUBSCRIPTION_CREATE,
@@ -158,17 +159,24 @@ class MaoyanWatchlistPlugin(PluginBase):
             if cleared is not None:
                 save_run_snapshot(getattr(context, "state", None), [], "running", reset=True)
                 context.logger.info("已清理 %s 条榜单处理记录，已有订阅保留", cleared)
-        async with http_client(timeout=25, follow_redirects=True) as client:
+        async with http_client(timeout=25, follow_redirects=True) as transport:
+            client = BoardClient(transport)
             board_date = datetime.now(ZoneInfo("Asia/Shanghai")).date().isoformat()
             with stage_timing(context, "movie_boards"):
                 movie_rows = await self._movie_candidates(client, config, selected)
             with stage_timing(context, "tv_boards"):
                 tv_rows = await self._television_candidates(client, config, selected)
+        for error in client.errors:
+            context.logger.warning("%s；其余榜单继续处理，下次重试", error)
+        if client.errors and not client.succeeded:
+            raise BoardRequestError("所选榜单全部获取失败：" + "；".join(client.errors))
         rows = self._dedupe(movie_rows, "movie") + self._dedupe(tv_rows, "tv")
         for row in rows:
             row.setdefault("board_date", board_date)
         actions = await self._subscribe_candidates(context, rows, actions=actions)
         return {
+            "board_errors": client.errors,
+            "partial": bool(client.errors),
             "candidate_count": len(rows),
             "updated_count": sum(1 for row in actions if row.get("status") == "subscribed"),
             "candidates": rows,
@@ -180,7 +188,7 @@ class MaoyanWatchlistPlugin(PluginBase):
     ) -> list[dict[str, Any]]:
         rows: list[dict[str, Any]] = []
         if "movie" in selected:
-            payload = (await client.get("https://piaofang.maoyan.com/dashboard-ajax/movie")).json()
+            payload = await board_payload(client, "/dashboard-ajax/movie", "电影票房榜")
             entries = list((payload.get("movieList") or {}).get("list") or [])
             rows.extend(
                 {
@@ -200,9 +208,10 @@ class MaoyanWatchlistPlugin(PluginBase):
     async def _web_movie_candidates(
         self, client: Any, config: dict[str, Any]
     ) -> list[dict[str, Any]]:
-        today = datetime.now().strftime("%Y-%m-%d")
-        url = f"https://piaofang.maoyan.com/dashboard/webMaoYanHotData?seriesType=0&platform=20&date={today}&networkHot=3"
-        payload = (await client.get(url)).json()
+        payload = await board_payload(client, "/dashboard/webMaoYanHotData", "网络电影榜", {
+            "seriesType": 0, "platform": 20, "date": request_board_date("%Y-%m-%d"),
+            "networkHot": 3,
+        })
         entries = list((payload.get("data") or {}).get("list") or [])
         return [
             {
@@ -230,8 +239,12 @@ class MaoyanWatchlistPlugin(PluginBase):
             for platform_key, platform_label, platform_value in PLATFORM_OPTIONS:
                 if not bool(config.get(f"{platform_key}_enabled", False)):
                     continue
-                url = f"https://piaofang.maoyan.com/dashboard/webHeatData?seriesType={series_type}&platformType={platform_value}&showDate=2"
-                payload = (await client.get(url)).json()
+                query = {"seriesType": series_type, "showDate": request_board_date()}
+                if platform_value:
+                    query["platformType"] = platform_value
+                payload = await board_payload(
+                    client, "/dashboard/webHeatData", f"{platform_label}{type_label}榜", query
+                )
                 limit = self._count(config.get(f"{platform_key}_num"))
                 entries = list((payload.get("dataList") or {}).get("list") or [])
                 rows.extend(

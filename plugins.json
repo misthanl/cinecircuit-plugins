@@ -828,7 +828,7 @@
       "manifest": {
         "id": "maoyan-rank",
         "name": "猫眼榜单追踪",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "跟踪猫眼影视榜单，筛选作品并自动添加订阅。",
         "icon": "mdi-movie-search-outline",
         "api_version": 1,
@@ -1171,8 +1171,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.1-dd439711e28b65bf.zip",
-      "sha256": "dd439711e28b65bfced8e0cd276b4f760821abb5611caa4e2043dca84c2c3efb"
+      "package_url": "packages/maoyan-rank-1.0.2-d2e3ec74b48dca71.zip",
+      "sha256": "d2e3ec74b48dca711687df11bd7dbf87f629d370eb6f00dde3455d4b6cb577f7"
     },
     {
       "manifest": {
