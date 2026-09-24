@@ -89,25 +89,28 @@ class ArtworkGenerationRun:
             }
         font_path = await self.plugin._ensure_cjk_font(self.context)
         self.plugin.renderer = CoverRenderer(font_path)
-        for identity, chosen in plans:
-            self.server_id = identity
-            for library in chosen:
-                await self._process_library(library)
-        generated = [item for item in self.results if item.get("status") in {"preview", "updated"}]
-        if (
-            self.errors
-            and not generated
-            and not any(item.get("status") == "unchanged" for item in self.results)
-        ):
-            raise RuntimeError(self.errors[0]["error"])
-        self.context.logger.info(
-            "Emby 封面生成完成：媒体库 %s，生成 %s，失败 %s，预览模式 %s",
-            len(libraries),
-            len(generated),
-            len(self.errors),
-            self.dry_run,
-        )
-        return {**self._summary(libraries, generated), "server_ids": requested}
+        try:
+            for identity, chosen in plans:
+                self.server_id = identity
+                for library in chosen:
+                    await self._process_library(library)
+            generated = [item for item in self.results if item.get("status") in {"preview", "updated"}]
+            if (
+                self.errors
+                and not generated
+                and not any(item.get("status") == "unchanged" for item in self.results)
+            ):
+                raise RuntimeError(self.errors[0]["error"])
+            self.context.logger.info(
+                "Emby 封面生成完成：媒体库 %s，生成 %s，失败 %s，预览模式 %s",
+                len(libraries),
+                len(generated),
+                len(self.errors),
+                self.dry_run,
+            )
+            return {**self._summary(libraries, generated), "server_ids": requested}
+        finally:
+            self.plugin.renderer = None
 
     def _selected_libraries(self, response: dict[str, Any]) -> list[dict[str, Any]]:
         selected_ids = self.plugin._string_set(self.config.get("library_ids"))

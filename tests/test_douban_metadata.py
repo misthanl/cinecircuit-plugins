@@ -106,11 +106,11 @@ def test_no_unchecked_fallback_on_older_host():
     ctx.subscriptions.create_unprocessed.assert_not_awaited()
 
 
-def test_preflight_permission_declared_without_version_change():
+def test_preflight_permission_declared_in_release():
     from app.modules.plugins.permissions import PluginPermission
 
     assert PluginPermission.MEDIA_SERVER_READ in DoubanWatchlistPlugin.manifest.permissions
-    assert DoubanWatchlistPlugin.manifest.version == "1.0.0"
+    assert DoubanWatchlistPlugin.manifest.version == "1.0.2"
 
 
 @pytest.mark.parametrize(

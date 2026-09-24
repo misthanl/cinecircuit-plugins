@@ -69,7 +69,7 @@ async def _board_payload(
 
 
 async def _get_response(client, path, board, query, headers):
-    for attempt in range(4):
+    for attempt in range(2):
         try:
             response = await client.get(
                 BASE_URL + path,
@@ -77,10 +77,10 @@ async def _get_response(client, path, board, query, headers):
                 headers=headers,
             )
         except httpx.HTTPError as error:
-            if attempt == 3:
+            if attempt == 1:
                 raise BoardRequestError(f"{board}请求失败（{type(error).__name__}），请稍后重试") from None
         else:
-            if response.status_code not in {403, 429, 502, 503, 504} or attempt == 3:
+            if response.status_code not in {403, 429, 502, 503, 504} or attempt == 1:
                 return response
         await asyncio.sleep(attempt + 1)
     raise AssertionError("unreachable")
@@ -94,12 +94,24 @@ class BoardClient:
         self.errors: list[str] = []
         self.succeeded = 0
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *_):
+        # The outer http_client context owns and closes the HTTP transport.
+        cookies = getattr(self.client, "cookies", None)
+        if cookies is not None:
+            cookies.clear()
+
+    def transport_for(self, path):
+        return self.client
+
 
 async def board_payload(client, path, board, query=None):
     if not isinstance(client, BoardClient):
         return await _board_payload(client, path, board, query)
     try:
-        payload = await _board_payload(client.client, path, board, query)
+        payload = await _board_payload(client.transport_for(path), path, board, query)
     except BoardRequestError as error:
         client.errors.append(str(error))
         return {}

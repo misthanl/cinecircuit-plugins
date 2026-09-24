@@ -8,63 +8,94 @@ const { JSDOM } = require("jsdom");
 const dom = new JSDOM("<!doctype html><html><body></body></html>");
 for (const key of ["window", "document", "Element", "HTMLElement", "SVGElement", "Node"]) globalThis[key] = dom.window[key];
 const vue = require("vue");
-globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = vue;
+// Match the host bridge instead of masking missing exports with the entire Vue module.
+const hostSource = readFileSync(new URL('../../../cinecircuit/frontend/src/extensions/runtime.ts', import.meta.url), 'utf8');
+const exportedNames = hostSource.match(/value: Object\.freeze\(\{([\s\S]*?)\}\)/)[1].match(/\b\w+\b/g);
+globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = Object.fromEntries(exportedNames.map(key => [key, vue[key]]));
 const { mount, flushPromises } = require("@vue/test-utils");
 const { install } = await import("../../.build/cinecircuit_plugins/maoyan_rank/frontend.js");
 const Fields = { name: "Fields", props: ["fields", "modelValue"], emits: ["update:modelValue"], render: () => vue.h("div") };
-const Switch = { name: "Switch", props: ["label", "modelValue"], emits: ["update:modelValue"], render: () => vue.h("div") };
-function editor(type = ["movie"], includeSchedule = false) {
+function editor(modelValue = {}, includeSchedule = false, request) {
   let component;
-  install({ vue, ui: { components: { SchemaFields: Fields } }, registerContribution() {}, registerEditor(entry) { assert.equal(entry.key, "maoyan-rank"); component = entry.component; } });
+  install({ vue, request, ui: { components: { SchemaFields: Fields } }, registerContribution() {}, registerEditor(entry) { assert.equal(entry.key, "maoyan-rank"); component = entry.component; } });
   const fields = [
-    ...(includeSchedule ? [{ key: "clear", input_type: "switch", label: "清理历史记录" }, { key: "cron", input_type: "cron", label: "执行周期" }] : []),
-    { key: "type", options: ["movie", "web-movie", "web-heat", "web-tv", "zongyi"].map(value => ({ value, label: value })), required: true },
-    { key: "num" }, { key: "web_movie_num" },
-    ...["all", "tx", "iqy", "mg", "yk"].flatMap(key => [{ key: key + "_enabled" }, { key: key + "_num" }]),
+    ...(includeSchedule ? [{ key: "clear" }, { key: "cron" }] : []),
+    { key: "movie_enabled" }, { key: "num" },
+    { key: "platform_types", label: "媒体分类", multiple: true, options: ["movie", "tv", "anime", "variety", "documentary"].map(value => ({ value, label: value })) },
+    ...["tx", "iqy", "mg", "yk"].flatMap(key => [{ key: key + "_enabled" }, { key: key + "_num" }]),
   ];
-  return mount(component, { props: { modelValue: { type, num: "3", all_enabled: true } }, attrs: { fields }, global: { stubs: { VSwitch: Switch } } });
+  return mount(component, { props: { modelValue }, attrs: { fields }, global: { stubs: { VTextField: { props: ["rules", "modelValue"], render: () => vue.h("div") } } } });
 }
-test("rank editor groups movies and platforms, retains legacy counts and disables irrelevant inputs", () => {
+function field(wrapper, key) { return wrapper.findAllComponents(Fields).find(group => group.props("fields")[0].key === key); }
+
+test("editor preserves category order and removes all-network and network-movie controls", () => {
   const wrapper = editor();
-  assert.deepEqual(wrapper.findAll("h3").map(node => node.text()), ["电影榜单", "电视剧与综艺", "播出平台"]);
-  const groups = wrapper.findAllComponents(Fields);
-  assert.equal(groups[1].props("modelValue").web_movie_num, "3");
-  assert.equal(groups[0].props("fields")[0].disabled, false);
-  assert.equal(groups[1].props("fields")[0].disabled, true);
-  assert(groups.slice(3).every(group => group.props("fields")[0].disabled));
+  assert.deepEqual(wrapper.findAll("h3").map(node => node.text()), ["猫眼电影榜单", "平台影视榜单", "播出平台"]);
+  const categories = field(wrapper, "platform_types").props("fields")[0];
+  assert.equal(categories.multiple, true);
+  assert.equal(categories.label, "媒体分类");
+  assert.deepEqual(categories.options.map(option => option.value), ["movie", "tv", "anime", "variety", "documentary"]);
+  assert.equal(field(wrapper, "num").props("fields")[0].disabled, false);
+  assert.equal(field(wrapper, "tx_enabled").props("fields")[0].disabled, true);
   wrapper.unmount();
 });
-test("TV selection preserves film selection and platform values", async () => {
-  const wrapper = editor();
-  const tv = wrapper.findAllComponents(Fields)[2];
-  tv.vm.$emit("update:modelValue", { type: ["zongyi"] });
+test("legacy categories and all-network migrate without losing movie or count settings", async () => {
+  const wrapper = editor({ type: ["movie", "web-tv", "web-heat", "zongyi"], num: "3", all_enabled: true });
+  const types = field(wrapper, "platform_types");
+  assert.deepEqual(types.props("modelValue").platform_types, ["tv", "variety"]);
+  types.vm.$emit("update:modelValue", { platform_types: ["documentary"] });
   const next = wrapper.emitted("update:modelValue").at(-1)[0];
-  assert.deepEqual(next.type, ["movie", "zongyi"]);
+  assert.equal(next.movie_enabled, true);
   assert.equal(next.num, "3");
+  assert.equal(next.tx_enabled, true);
   await wrapper.setProps({ modelValue: next });
-  await flushPromises();
-  const groups = wrapper.findAllComponents(Fields);
-  assert.equal(groups[3].props("fields")[0].disabled, false);
-  assert.equal(groups[4].props("fields")[0].disabled, false);
-  assert.equal(groups[6].props("fields")[0].disabled, true);
+  assert.equal(field(wrapper, "tx_num").props("fields")[0].disabled, false);
+  assert.equal(field(wrapper, "mg_enabled").props("fields")[0].disabled, true);
+  assert.equal(field(wrapper, "mg_num").props("fields")[0].disabled, true);
   wrapper.unmount();
 });
-test("turning off final movie leaves explicit empty selection and requires a board", async () => {
-  const wrapper = editor();
-  wrapper.findAllComponents(Switch)[0].vm.$emit("update:modelValue", false);
-  const next = wrapper.emitted("update:modelValue").at(-1)[0];
-  assert.deepEqual(next.type, []);
-  await wrapper.setProps({ modelValue: next });
-  assert.equal(wrapper.findAllComponents(Fields)[2].props("fields")[0].required, true);
+test("explicit empty categories and disabled box office survive reopening", () => {
+  const wrapper = editor({ type: ["movie", "web-heat"], all_enabled: true, platform_types: [], movie_enabled: false, tx_enabled: false });
+  assert.deepEqual(field(wrapper, "platform_types").props("modelValue").platform_types, []);
+  assert.equal(field(wrapper, "num").props("fields")[0].disabled, true);
+  assert.equal(field(wrapper, "tx_enabled").props("modelValue").tx_enabled, false);
+  wrapper.unmount();
+});
+test("schedule remains first without adding tabs", () => {
+  const wrapper = editor({}, true);
+  assert.deepEqual(wrapper.findAllComponents(Fields).slice(0, 2).map(field => field.props("fields")[0].key), ["clear", "cron"]);
+  assert.equal(wrapper.find('[role="tablist"]').exists(), false);
   wrapper.unmount();
 });
 
-test("single-page editor places schedule before ranking controls without tabs", () => {
-  const wrapper = editor(["movie"], true);
-  assert.deepEqual(wrapper.findAllComponents(Fields).slice(0, 2).map(field => field.props("fields")[0].key), ["clear", "cron"]);
-  assert.equal(wrapper.find(".maoyan-rank-settings").element.firstElementChild.classList.contains("rank-schedule"), true);
-  assert.equal(wrapper.find('[role="tablist"]').exists(), false);
+test("saved legacy configuration survives host-injected defaults even while the plugin is disabled", async () => {
+  let done;
+  const wrapper = editor({ movie_enabled: true, platform_types: [] }, false, (path) => {
+    assert.equal(path, "/plugins/");
+    return new Promise(resolve => { done = resolve; });
+  });
+  assert(wrapper.text().includes("正在读取"));
+  done({ items: [{ id: "maoyan-rank", enabled: false, config: { type: ["web-heat"], tx_enabled: true, tx_num: "7" } }] });
+  await flushPromises();
+  const next = wrapper.emitted("update:modelValue").at(-1)[0];
+  assert.equal(next.movie_enabled, false);
+  assert.deepEqual(next.platform_types, ["tv"]);
+  assert.equal(next.tx_num, "7");
+  assert(!wrapper.text().includes("正在读取"));
   wrapper.unmount();
+});
+
+test("unmount aborts configuration loading without late updates", async () => {
+  let done, signal;
+  const wrapper = editor({}, false, (_path, init) => {
+    signal = init.signal;
+    return new Promise(resolve => { done = resolve; });
+  });
+  wrapper.unmount();
+  assert.equal(signal.aborted, true);
+  done({ items: [{ id: "maoyan-rank", config: {} }] });
+  await flushPromises();
+  assert.equal(wrapper.emitted("update:modelValue"), undefined);
 });
 
 async function statistics(latest = true, records = [], requestOverride) {
@@ -188,5 +219,25 @@ test("statistics delegates protected posters to the host authenticated image com
   image.vm.$emit("error", new Error("fixture"));
   await flushPromises();
   assert.equal(wrapper.findComponent(Image).exists(), false);
+  wrapper.unmount();
+});
+
+
+test("legacy fields are migrated but never submitted when opening or editing settings", async () => {
+  const legacy = { type: ["web-tv", "zongyi"], all_enabled: true, all_num: "20", web_movie_num: "10", tx_num: "7", cron: "0 6 * * *" };
+  const wrapper = editor({}, true, async () => ({ items: [{ id: "maoyan-rank", config: legacy }] }));
+  await flushPromises();
+  const opened = wrapper.emitted("update:modelValue").at(-1)[0];
+  for (const key of ["type", "all_enabled", "all_num", "web_movie_num"]) assert.equal(key in opened, false);
+  assert.deepEqual(opened.platform_types, ["tv", "variety"]);
+  assert.equal(opened.movie_enabled, false);
+  assert.equal(opened.tx_enabled, true);
+  assert.equal(opened.tx_num, "7");
+  assert.equal(opened.cron, legacy.cron);
+  await wrapper.setProps({ modelValue: opened });
+  field(wrapper, "platform_types").vm.$emit("update:modelValue", { ...legacy, platform_types: ["anime"] });
+  const saved = wrapper.emitted("update:modelValue").at(-1)[0];
+  for (const key of ["type", "all_enabled", "all_num", "web_movie_num"]) assert.equal(key in saved, false);
+  assert.deepEqual(saved.platform_types, ["anime"]);
   wrapper.unmount();
 });

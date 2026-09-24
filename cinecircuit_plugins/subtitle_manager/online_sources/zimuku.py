@@ -12,7 +12,7 @@ from pathlib import PurePosixPath
 from typing import Any
 from urllib.parse import quote_plus, unquote, urljoin, urlsplit
 
-from bs4 import BeautifulSoup
+from .html_page import parsed_page
 
 from ..subtitle_download import fetch, fetch_links
 from .base import (
@@ -74,28 +74,28 @@ class ZimukuSource:
 
     def _captcha_challenge(self, content: bytes, url: str, *, resume_url: str) -> CaptchaChallenge:
         text = content.decode("utf-8", "ignore")
-        soup = BeautifulSoup(content, "html.parser")
-        image = soup.select_one("img.verifyimg, img[src*='data:image/bmp;base64,']")
-        image_src = str(image.get("src") or "") if image is not None else ""
-        if not image_src:
-            start = text.find("data:image/bmp;base64,")
-            if start >= 0:
-                end = text.find('"', start)
-                end = len(text) if end < 0 else end
-                image_src = text[start:end]
-        return CaptchaChallenge(
-            provider=self.name,
-            site="zimuku",
-            image=bmp_data_url(image_src),
-            instruction="请输入页面中显示的 5 位数字验证码",
-            verification_url=url,
-            submit_url=url,
-            method="GET",
-            payload={"param": "security_verify_img"},
-            code_encoding="hex",
-            resume_url=resume_url or url,
-            cookies=cookie_snapshot(self.client),
-        )
+        with parsed_page(content) as soup:
+            image = soup.select_one("img.verifyimg, img[src*='data:image/bmp;base64,']")
+            image_src = str(image.get("src") or "") if image is not None else ""
+            if not image_src:
+                start = text.find("data:image/bmp;base64,")
+                if start >= 0:
+                    end = text.find('"', start)
+                    end = len(text) if end < 0 else end
+                    image_src = text[start:end]
+            return CaptchaChallenge(
+                provider=self.name,
+                site="zimuku",
+                image=bmp_data_url(image_src),
+                instruction="请输入页面中显示的 5 位数字验证码",
+                verification_url=url,
+                submit_url=url,
+                method="GET",
+                payload={"param": "security_verify_img"},
+                code_encoding="hex",
+                resume_url=resume_url or url,
+                cookies=cookie_snapshot(self.client),
+            )
 
     async def _page(self, url: str, *, resume_url: str = "") -> tuple[bytes, str]:
         try:
@@ -110,48 +110,48 @@ class ZimukuSource:
         search_url = f"{self.root}/search?q={quote_plus(request.query)}"
         content, final_url = await self._page(search_url, resume_url=search_url)
         self._restricted(content, final_url, resume_url=search_url)
-        soup = BeautifulSoup(content, "html.parser")
-        found: dict[str, SourceCandidate] = {}
-        for anchor in soup.select(_SEARCH_SELECTOR):
-            href = urljoin(final_url, str(anchor.get("href") or ""))
-            if not same_origin(final_url, href):
-                continue
-            card = anchor.find_parent(class_=("item", "search-result", "media"))
-            title = (
-                card.get_text(" ", strip=True)
-                if card is not None
-                else anchor.get_text(" ", strip=True)
-            ) or str(anchor.get("title") or "")
-            if not title or href in found:
-                continue
-            found[href] = SourceCandidate(
-                self.name,
-                href.rstrip("/").rsplit("/", 1)[-1],
-                title,
-                href,
-                downloadable=True,
-                download_ref=href,
-            )
-            if len(found) >= _MAX_CANDIDATES:
-                break
-        return SourceSearchResult(self.name, SourceState.READY, tuple(found.values()))
+        with parsed_page(content) as soup:
+            found: dict[str, SourceCandidate] = {}
+            for anchor in soup.select(_SEARCH_SELECTOR):
+                href = urljoin(final_url, str(anchor.get("href") or ""))
+                if not same_origin(final_url, href):
+                    continue
+                card = anchor.find_parent(class_=("item", "search-result", "media"))
+                title = (
+                    card.get_text(" ", strip=True)
+                    if card is not None
+                    else anchor.get_text(" ", strip=True)
+                ) or str(anchor.get("title") or "")
+                if not title or href in found:
+                    continue
+                found[href] = SourceCandidate(
+                    self.name,
+                    href.rstrip("/").rsplit("/", 1)[-1],
+                    title,
+                    href,
+                    downloadable=True,
+                    download_ref=href,
+                )
+                if len(found) >= _MAX_CANDIDATES:
+                    break
+            return SourceSearchResult(self.name, SourceState.READY, tuple(found.values()))
 
     async def details(self, candidate: SourceCandidate) -> SourceCandidate:
         content, final_url = await self._page(candidate.detail_url, resume_url=candidate.detail_url)
         self._restricted(content, final_url, resume_url=candidate.detail_url)
-        soup = BeautifulSoup(content, "html.parser")
-        links: list[tuple[str, str]] = []
-        # Accept only explicit download controls, never every anchor.
-        for anchor in soup.select(_DOWNLOAD_SELECTOR):
-            href = urljoin(final_url, str(anchor.get("href") or ""))
-            if _unsupported_archive(href):
-                continue
-            links.append((href, _file_name(href) or f"{candidate.result_id}.zip"))
-        return replace(
-            candidate,
-            downloadable=bool(links),
-            download_ref=tuple(dict.fromkeys(links)),
-        )
+        with parsed_page(content) as soup:
+            links: list[tuple[str, str]] = []
+            # Accept only explicit download controls, never every anchor.
+            for anchor in soup.select(_DOWNLOAD_SELECTOR):
+                href = urljoin(final_url, str(anchor.get("href") or ""))
+                if _unsupported_archive(href):
+                    continue
+                links.append((href, _file_name(href) or f"{candidate.result_id}.zip"))
+            return replace(
+                candidate,
+                downloadable=bool(links),
+                download_ref=tuple(dict.fromkeys(links)),
+            )
 
     async def download(self, candidate: SourceCandidate) -> DownloadResult:
         detailed = await self.details(candidate)

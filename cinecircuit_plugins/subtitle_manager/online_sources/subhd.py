@@ -9,6 +9,7 @@ from typing import Any
 from urllib.parse import quote_plus, unquote, urljoin, urlsplit
 
 from bs4 import BeautifulSoup
+from .html_page import parsed_page
 
 from ..subtitle_download import api_json, fetch, fetch_links
 from .base import (
@@ -75,9 +76,9 @@ class SubHDSource:
             # Normal SubHD pages also load Cloudflare's challenge bootstrap.
             # Actual result/download controls are stronger evidence than that
             # passive script reference.
-            page = BeautifulSoup(content, "html.parser")
-            if page.select_one(_SEARCH_SELECTOR) or page.select_one(_DOWNLOAD_SELECTOR):
-                return
+            with parsed_page(content) as page:
+                if page.select_one(_SEARCH_SELECTOR) or page.select_one(_DOWNLOAD_SELECTOR):
+                    return
         if kind:
             requirement = "验证码" if kind is SourceErrorKind.CAPTCHA else "登录或解除限制"
             raise SourceFailure(
@@ -126,58 +127,58 @@ class SubHDSource:
     def _candidate_cards(content: bytes, final_url: str) -> dict[str, SourceCandidate]:
         """Parse current SubHD result cards, including their language/format labels."""
 
-        soup = BeautifulSoup(content, "html.parser")
-        found: dict[str, SourceCandidate] = {}
-        for anchor in soup.select(".view-text a[href*='/a/']")[:_MAX_CANDIDATES]:
-            href = urljoin(final_url, str(anchor.get("href") or ""))
-            if not same_origin(final_url, href):
-                continue
-            container = anchor.find_parent("div", class_="bg-white")
-            if container is None:
-                container = anchor.find_parent("div", class_="px-3")
-            item_text = (
-                container.get_text(" ", strip=True)
-                if container is not None
-                else (anchor.parent or anchor).get_text(" ", strip=True)
-            )
-            title = anchor.get_text(" ", strip=True)
-            if not title:
-                continue
-            tags = tuple(tag for tag in _SUBTITLE_TAGS if tag in item_text)
-            found[href] = SourceCandidate(
-                "SubHD",
-                href.rstrip("/").rsplit("/", 1)[-1],
-                title,
-                href,
-                downloadable=True,
-                download_ref=href,
-                tags=tags,
-            )
-        return found
+        with parsed_page(content) as soup:
+            found: dict[str, SourceCandidate] = {}
+            for anchor in soup.select(".view-text a[href*='/a/']")[:_MAX_CANDIDATES]:
+                href = urljoin(final_url, str(anchor.get("href") or ""))
+                if not same_origin(final_url, href):
+                    continue
+                container = anchor.find_parent("div", class_="bg-white")
+                if container is None:
+                    container = anchor.find_parent("div", class_="px-3")
+                item_text = (
+                    container.get_text(" ", strip=True)
+                    if container is not None
+                    else (anchor.parent or anchor).get_text(" ", strip=True)
+                )
+                title = anchor.get_text(" ", strip=True)
+                if not title:
+                    continue
+                tags = tuple(tag for tag in _SUBTITLE_TAGS if tag in item_text)
+                found[href] = SourceCandidate(
+                    "SubHD",
+                    href.rstrip("/").rsplit("/", 1)[-1],
+                    title,
+                    href,
+                    downloadable=True,
+                    download_ref=href,
+                    tags=tags,
+                )
+            return found
 
     @staticmethod
     def _search_works(content: bytes, final_url: str) -> dict[str, str]:
-        soup = BeautifulSoup(content, "html.parser")
-        works: dict[str, str] = {}
-        # Search-result cards only; navigation and unrelated anchors are ignored.
-        for anchor in soup.select(_SEARCH_SELECTOR):
-            href = urljoin(final_url, str(anchor.get("href") or ""))
-            if not same_origin(final_url, href):
-                continue
-            card = anchor.find_parent(class_=("search-result", "media", "movie-list"))
-            if card is None:
-                card = anchor.find_parent("div", class_="row")
-            title = (
-                card.get_text(" ", strip=True)
-                if card is not None
-                else anchor.get_text(" ", strip=True)
-            ) or str(anchor.get("title") or "")
-            if not title or href in works:
-                continue
-            works[href] = title
-            if len(works) >= _MAX_WORKS:
-                break
-        return works
+        with parsed_page(content) as soup:
+            works: dict[str, str] = {}
+            # Search-result cards only; navigation and unrelated anchors are ignored.
+            for anchor in soup.select(_SEARCH_SELECTOR):
+                href = urljoin(final_url, str(anchor.get("href") or ""))
+                if not same_origin(final_url, href):
+                    continue
+                card = anchor.find_parent(class_=("search-result", "media", "movie-list"))
+                if card is None:
+                    card = anchor.find_parent("div", class_="row")
+                title = (
+                    card.get_text(" ", strip=True)
+                    if card is not None
+                    else anchor.get_text(" ", strip=True)
+                ) or str(anchor.get("title") or "")
+                if not title or href in works:
+                    continue
+                works[href] = title
+                if len(works) >= _MAX_WORKS:
+                    break
+            return works
 
     async def _work_candidates(
         self, work_url: str, work_title: str
@@ -195,21 +196,21 @@ class SubHDSource:
                 True,
                 work_url,
             )
-        work_page = BeautifulSoup(body, "html.parser")
-        anchors = work_page.select(
-            ".subtitle-list a[href], .sub-list a[href], .view-text a[href*='/a/']"
-        )
-        if not anchors:
-            fallback = SourceCandidate(
-                self.name,
-                work_url.rstrip("/").rsplit("/", 1)[-1],
-                work_title,
-                work_url,
-                downloadable=True,
-                download_ref=work_url,
+        with parsed_page(body) as work_page:
+            anchors = work_page.select(
+                ".subtitle-list a[href], .sub-list a[href], .view-text a[href*='/a/']"
             )
-            return {work_url: fallback}, None
-        return self._subtitle_anchor_candidates(anchors, work_final_url, work_title), None
+            if not anchors:
+                fallback = SourceCandidate(
+                    self.name,
+                    work_url.rstrip("/").rsplit("/", 1)[-1],
+                    work_title,
+                    work_url,
+                    downloadable=True,
+                    download_ref=work_url,
+                )
+                return {work_url: fallback}, None
+            return self._subtitle_anchor_candidates(anchors, work_final_url, work_title), None
 
     def _subtitle_anchor_candidates(
         self, anchors: Any, work_final_url: str, work_title: str
@@ -421,34 +422,34 @@ class SubHDSource:
     async def details(self, candidate: SourceCandidate) -> SourceCandidate:
         content, final_url = await self._page(candidate.detail_url)
         self._restricted(content, final_url)
-        soup = BeautifulSoup(content, "html.parser")
-        links, subtitle_pages = self._detail_targets(soup, final_url)
-        restriction: SourceFailure | None = None
-        if not links:
-            try:
-                links.extend(
-                    await self._dynamic_download_links(soup, final_url, candidate.result_id)
-                )
-            except SourceFailure as error:
-                restriction = error
-        # A work page can list multiple subtitle detail pages; parse each separately.
-        for page in list(dict.fromkeys(subtitle_pages))[:_MAX_CANDIDATES]:
-            try:
-                links.extend(await self._detail_page_links(page, candidate.result_id))
-            except SourceFailure as error:
-                restriction = error
-                continue
-            except Exception:
-                # One stale result must not discard public links
-                # already found on the same work page.
-                continue
-        if not links and restriction is not None:
-            raise restriction
-        return replace(
-            candidate,
-            downloadable=bool(links),
-            download_ref=tuple(dict.fromkeys(links)),
-        )
+        with parsed_page(content) as soup:
+            links, subtitle_pages = self._detail_targets(soup, final_url)
+            restriction: SourceFailure | None = None
+            if not links:
+                try:
+                    links.extend(
+                        await self._dynamic_download_links(soup, final_url, candidate.result_id)
+                    )
+                except SourceFailure as error:
+                    restriction = error
+            # A work page can list multiple subtitle detail pages; parse each separately.
+            for page in list(dict.fromkeys(subtitle_pages))[:_MAX_CANDIDATES]:
+                try:
+                    links.extend(await self._detail_page_links(page, candidate.result_id))
+                except SourceFailure as error:
+                    restriction = error
+                    continue
+                except Exception:
+                    # One stale result must not discard public links
+                    # already found on the same work page.
+                    continue
+            if not links and restriction is not None:
+                raise restriction
+            return replace(
+                candidate,
+                downloadable=bool(links),
+                download_ref=tuple(dict.fromkeys(links)),
+            )
 
     @staticmethod
     def _detail_targets(
@@ -470,15 +471,15 @@ class SubHDSource:
     async def _detail_page_links(self, page: str, result_id: str) -> list[tuple[str, str]]:
         body, page_url = await self._page(page)
         self._restricted(body, page_url)
-        detail = BeautifulSoup(body, "html.parser")
-        links: list[tuple[str, str]] = []
-        for anchor in detail.select(_DETAIL_DOWNLOAD_SELECTOR):
-            href = urljoin(page_url, str(anchor.get("href") or ""))
-            if not _unsupported_archive(href):
-                links.append((href, _file_name(href) or f"{result_id}.zip"))
-        if not links:
-            links.extend(await self._dynamic_download_links(detail, page_url, result_id))
-        return links
+        with parsed_page(body) as detail:
+            links: list[tuple[str, str]] = []
+            for anchor in detail.select(_DETAIL_DOWNLOAD_SELECTOR):
+                href = urljoin(page_url, str(anchor.get("href") or ""))
+                if not _unsupported_archive(href):
+                    links.append((href, _file_name(href) or f"{result_id}.zip"))
+            if not links:
+                links.extend(await self._dynamic_download_links(detail, page_url, result_id))
+            return links
 
     async def download(self, candidate: SourceCandidate) -> DownloadResult:
         detailed = await self.details(candidate)

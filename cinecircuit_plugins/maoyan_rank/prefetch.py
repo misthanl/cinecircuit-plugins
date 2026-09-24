@@ -37,3 +37,5 @@ async def identity_prefetch(context: Any, rows: list[dict], resolver: Any, cache
         for _, task in pending:
             task.cancel()
         await asyncio.gather(*(task for _, task in pending), return_exceptions=True)
+        pending.clear()
+        cache.clear()

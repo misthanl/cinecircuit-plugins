@@ -4,7 +4,7 @@
       "manifest": {
         "id": "auto-signin",
         "name": "站点签到助手",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "自动登录并签到指定 PT 站点。",
         "icon": "mdi-calendar-check-outline",
         "api_version": 1,
@@ -102,8 +102,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/auto-signin-1.0.1-54e0070387a42514.zip",
-      "sha256": "54e0070387a42514f5befa259f9cb2186f17ee31473b0811a72b6ec02163db07"
+      "package_url": "packages/auto-signin-1.0.2-db61400a29cfe75e.zip",
+      "sha256": "db61400a29cfe75ee1c767caa296b80cbe6ceebb3a34a2596288efea41b96e98"
     },
     {
       "manifest": {
@@ -246,7 +246,7 @@
       "manifest": {
         "id": "cast-profile-enricher",
         "name": "演职员资料完善",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "补充影视人物的中文姓名、简介、角色信息与头像。",
         "icon": "mdi-account-star-outline",
         "api_version": 1,
@@ -391,8 +391,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.2-93c976170a09c171.zip",
-      "sha256": "93c976170a09c171e7e269da30b4f3902d52e45d4f2f8fecc05dbb66ab1b2398"
+      "package_url": "packages/cast-profile-enricher-1.0.3-9ffb719611b614a5.zip",
+      "sha256": "9ffb719611b614a5df52154b1e5c6bb1778209f9fe23973eee29ce048e8bf9fd"
     },
     {
       "manifest": {
@@ -692,7 +692,7 @@
       "manifest": {
         "id": "douban-hot",
         "name": "豆瓣榜单追踪",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "跟踪豆瓣热门榜单，筛选作品并自动添加订阅。",
         "icon": "mdi-movie-search-outline",
         "api_version": 1,
@@ -821,15 +821,15 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/douban-hot-1.0.1-b87400c50c93620b.zip",
-      "sha256": "b87400c50c93620b331af2b31a3e044f34eea0d5ffeaf1671ad8a50bc082a899"
+      "package_url": "packages/douban-hot-1.0.2-78111c1aa655a486.zip",
+      "sha256": "78111c1aa655a486106f48d0c352be06d6c3279931ab69ea0206ade213b19332"
     },
     {
       "manifest": {
         "id": "maoyan-rank",
-        "name": "猫眼榜单追踪",
-        "version": "1.0.2",
-        "description": "跟踪猫眼影视榜单，筛选作品并自动添加订阅。",
+        "name": "影视榜单订阅",
+        "version": "1.0.3",
+        "description": "订阅猫眼电影票房榜及腾讯、爱奇艺、芒果、优酷分类榜单。",
         "icon": "mdi-movie-search-outline",
         "api_version": 1,
         "entrypoint": "plugin:MaoyanWatchlistPlugin",
@@ -865,48 +865,19 @@
               "input_type": "cron",
               "label": "执行周期",
               "default": "",
-              "placeholder": "5位cron表达式，留空自动",
-              "description": "留空时每 6 小时刷新一次；已处理作品自动去重。"
+              "placeholder": "5位cron表达式，留空自动"
             },
             {
-              "key": "type",
-              "input_type": "select",
-              "multiple": true,
-              "label": "订阅类型",
-              "default": [
-                "movie"
-              ],
-              "required": true,
-              "description": "电影与剧集榜可同时选择，重复作品只订阅一次。",
-              "options": [
-                {
-                  "value": "movie",
-                  "label": "电影票房榜单"
-                },
-                {
-                  "value": "web-heat",
-                  "label": "电视剧热度榜单"
-                },
-                {
-                  "value": "web-tv",
-                  "label": "网剧热度榜单"
-                },
-                {
-                  "value": "zongyi",
-                  "label": "综艺热度榜单"
-                },
-                {
-                  "value": "web-movie",
-                  "label": "网络电影榜单"
-                }
-              ]
+              "key": "movie_enabled",
+              "input_type": "switch",
+              "label": "猫眼电影票房榜",
+              "default": true
             },
             {
               "key": "num",
               "input_type": "select",
               "label": "电影票房榜条数",
               "default": "10",
-              "description": "每次从所选电影类榜单顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -935,90 +906,46 @@
               ]
             },
             {
-              "key": "web_movie_num",
+              "key": "platform_types",
               "input_type": "select",
-              "label": "网络电影榜条数",
-              "default": "10",
+              "multiple": true,
+              "label": "媒体分类",
+              "default": [],
+              "description": "芒果 TV 的搜索榜不提供纪录片分类。",
               "options": [
                 {
-                  "value": "1",
-                  "label": "1"
+                  "value": "movie",
+                  "label": "电影"
                 },
                 {
-                  "value": "2",
-                  "label": "2"
+                  "value": "tv",
+                  "label": "电视剧"
                 },
                 {
-                  "value": "3",
-                  "label": "3"
+                  "value": "anime",
+                  "label": "动漫"
                 },
                 {
-                  "value": "5",
-                  "label": "5"
+                  "value": "variety",
+                  "label": "综艺"
                 },
                 {
-                  "value": "7",
-                  "label": "7"
-                },
-                {
-                  "value": "10",
-                  "label": "10"
-                }
-              ]
-            },
-            {
-              "key": "all_enabled",
-              "input_type": "switch",
-              "label": "全网热门订阅",
-              "default": false,
-              "description": "开启后读取全网的电视剧、网剧和综艺热度榜。"
-            },
-            {
-              "key": "all_num",
-              "input_type": "select",
-              "label": "全网榜单条数",
-              "default": "10",
-              "description": "每次从全网热度榜顶部读取的作品数量。",
-              "options": [
-                {
-                  "value": "1",
-                  "label": "1"
-                },
-                {
-                  "value": "2",
-                  "label": "2"
-                },
-                {
-                  "value": "3",
-                  "label": "3"
-                },
-                {
-                  "value": "5",
-                  "label": "5"
-                },
-                {
-                  "value": "7",
-                  "label": "7"
-                },
-                {
-                  "value": "10",
-                  "label": "10"
+                  "value": "documentary",
+                  "label": "纪录片"
                 }
               ]
             },
             {
               "key": "tx_enabled",
               "input_type": "switch",
-              "label": "腾讯视频热门订阅",
-              "default": false,
-              "description": "开启后读取腾讯视频的电视剧、网剧和综艺热度榜。"
+              "label": "腾讯视频热搜榜",
+              "default": false
             },
             {
               "key": "tx_num",
               "input_type": "select",
-              "label": "腾讯视频榜单条数",
+              "label": "腾讯视频每类条数",
               "default": "10",
-              "description": "每次从腾讯视频热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -1049,16 +976,14 @@
             {
               "key": "iqy_enabled",
               "input_type": "switch",
-              "label": "爱奇艺热门订阅",
-              "default": false,
-              "description": "开启后读取爱奇艺的电视剧、网剧和综艺热度榜。"
+              "label": "爱奇艺热搜榜",
+              "default": false
             },
             {
               "key": "iqy_num",
               "input_type": "select",
-              "label": "爱奇艺榜单条数",
+              "label": "爱奇艺每类条数",
               "default": "10",
-              "description": "每次从爱奇艺热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -1089,16 +1014,14 @@
             {
               "key": "mg_enabled",
               "input_type": "switch",
-              "label": "芒果 TV热门订阅",
-              "default": false,
-              "description": "开启后读取芒果 TV的电视剧、网剧和综艺热度榜。"
+              "label": "芒果 TV热搜榜",
+              "default": false
             },
             {
               "key": "mg_num",
               "input_type": "select",
-              "label": "芒果 TV榜单条数",
+              "label": "芒果 TV每类条数",
               "default": "10",
-              "description": "每次从芒果 TV热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -1129,16 +1052,14 @@
             {
               "key": "yk_enabled",
               "input_type": "switch",
-              "label": "优酷热门订阅",
-              "default": false,
-              "description": "开启后读取优酷的电视剧、网剧和综艺热度榜。"
+              "label": "优酷热搜榜",
+              "default": false
             },
             {
               "key": "yk_num",
               "input_type": "select",
-              "label": "优酷榜单条数",
+              "label": "优酷每类条数",
               "default": "10",
-              "description": "每次从优酷热度榜顶部读取的作品数量。",
               "options": [
                 {
                   "value": "1",
@@ -1171,14 +1092,14 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.2-d2e3ec74b48dca71.zip",
-      "sha256": "d2e3ec74b48dca711687df11bd7dbf87f629d370eb6f00dde3455d4b6cb577f7"
+      "package_url": "packages/maoyan-rank-1.0.3-55bc8783b8699f4e.zip",
+      "sha256": "55bc8783b8699f4ea5393237504c274fe3994591439129e092c659aef8d1b7e3"
     },
     {
       "manifest": {
         "id": "emby-cover-generator",
         "name": "媒体库视觉封面",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "为媒体库生成并上传静态或动态风格封面。",
         "icon": "mdi-image-multiple-outline",
         "api_version": 1,
@@ -1942,8 +1863,491 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/emby-cover-generator-1.0.1-23e4684bdcc9fb8b.zip",
-      "sha256": "23e4684bdcc9fb8b09d21990cbd0675040cf099f9d8c71b723969fb0ff2e6ebc"
+      "package_url": "packages/emby-cover-generator-1.0.2-33782be61f1f6682.zip",
+      "sha256": "33782be61f1f668233619039ca138838cacebf35e08138e58a4d7e3aee74d9c7"
+    },
+    {
+      "manifest": {
+        "id": "overseas-tv",
+        "name": "TMDB 剧集追踪",
+        "version": "1.0.0",
+        "description": "按播出平台追踪近期新剧与新季，自动创建订阅。",
+        "icon": "mdi-television-classic",
+        "api_version": 1,
+        "entrypoint": "plugin:OverseasTVPlugin",
+        "permissions": [
+          "media:discover",
+          "subscription:create",
+          "media_server:read"
+        ],
+        "capabilities": [
+          "media_source",
+          "scheduled_task",
+          "rank_history",
+          "statistics_page"
+        ],
+        "events": [],
+        "schedule_seconds": 21600,
+        "config_schema": {
+          "description_display": "hidden",
+          "layout": {
+            "columns": 2,
+            "row_gap": 14,
+            "column_gap": 16
+          },
+          "fields": [
+            {
+              "key": "clear",
+              "label": "清理历史记录",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "cron",
+              "label": "执行周期",
+              "input_type": "cron",
+              "default": "",
+              "description": "留空每 6 小时执行；按剧集和季号去重。"
+            },
+            {
+              "key": "max_new",
+              "label": "每轮新增季数",
+              "input_type": "select",
+              "default": "10",
+              "options": [
+                {
+                  "value": "1",
+                  "label": "1"
+                },
+                {
+                  "value": "3",
+                  "label": "3"
+                },
+                {
+                  "value": "5",
+                  "label": "5"
+                },
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "20",
+                  "label": "20"
+                }
+              ]
+            },
+            {
+              "key": "modes",
+              "label": "订阅类型",
+              "input_type": "select",
+              "default": [
+                "new",
+                "returning"
+              ],
+              "multiple": true,
+              "required": true,
+              "options": [
+                {
+                  "value": "new",
+                  "label": "新剧首播"
+                },
+                {
+                  "value": "returning",
+                  "label": "老剧新季"
+                },
+                {
+                  "value": "popular",
+                  "label": "近期热门（TMDB 热度）"
+                }
+              ]
+            },
+            {
+              "key": "past_days",
+              "label": "回溯天数",
+              "input_type": "select",
+              "default": "30",
+              "options": [
+                {
+                  "value": "7",
+                  "label": "7"
+                },
+                {
+                  "value": "14",
+                  "label": "14"
+                },
+                {
+                  "value": "30",
+                  "label": "30"
+                },
+                {
+                  "value": "60",
+                  "label": "60"
+                },
+                {
+                  "value": "90",
+                  "label": "90"
+                }
+              ]
+            },
+            {
+              "key": "future_days",
+              "label": "提前订阅天数",
+              "input_type": "select",
+              "default": "14",
+              "options": [
+                {
+                  "value": "0",
+                  "label": "0"
+                },
+                {
+                  "value": "7",
+                  "label": "7"
+                },
+                {
+                  "value": "14",
+                  "label": "14"
+                },
+                {
+                  "value": "30",
+                  "label": "30"
+                }
+              ]
+            },
+            {
+              "key": "min_rating",
+              "label": "最低评分",
+              "input_type": "select",
+              "default": "7",
+              "options": [
+                {
+                  "value": "0",
+                  "label": "0"
+                },
+                {
+                  "value": "6",
+                  "label": "6"
+                },
+                {
+                  "value": "7",
+                  "label": "7"
+                },
+                {
+                  "value": "7.5",
+                  "label": "7.5"
+                },
+                {
+                  "value": "8",
+                  "label": "8"
+                },
+                {
+                  "value": "8.5",
+                  "label": "8.5"
+                },
+                {
+                  "value": "9",
+                  "label": "9"
+                }
+              ]
+            },
+            {
+              "key": "min_votes",
+              "label": "最低评价人数",
+              "input_type": "select",
+              "default": "50",
+              "options": [
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "30",
+                  "label": "30"
+                },
+                {
+                  "value": "50",
+                  "label": "50"
+                },
+                {
+                  "value": "100",
+                  "label": "100"
+                },
+                {
+                  "value": "300",
+                  "label": "300"
+                }
+              ]
+            },
+            {
+              "key": "allow_unrated",
+              "label": "允许评价不足的新剧／新季",
+              "input_type": "switch",
+              "default": true
+            },
+            {
+              "key": "country",
+              "label": "出品国家",
+              "input_type": "select",
+              "default": "",
+              "options": [
+                {
+                  "value": "",
+                  "label": "全部国家"
+                },
+                {
+                  "value": "US",
+                  "label": "美国"
+                },
+                {
+                  "value": "GB",
+                  "label": "英国"
+                },
+                {
+                  "value": "KR",
+                  "label": "韩国"
+                },
+                {
+                  "value": "JP",
+                  "label": "日本"
+                }
+              ]
+            },
+            {
+              "key": "language",
+              "label": "原始语言",
+              "input_type": "select",
+              "default": "",
+              "options": [
+                {
+                  "value": "",
+                  "label": "全部语言"
+                },
+                {
+                  "value": "en",
+                  "label": "英语"
+                },
+                {
+                  "value": "ko",
+                  "label": "韩语"
+                },
+                {
+                  "value": "ja",
+                  "label": "日语"
+                },
+                {
+                  "value": "es",
+                  "label": "西班牙语"
+                }
+              ]
+            },
+            {
+              "key": "include_types",
+              "label": "包含类型",
+              "input_type": "select",
+              "default": [],
+              "multiple": true,
+              "options": [
+                {
+                  "value": "animation",
+                  "label": "动画"
+                },
+                {
+                  "value": "documentary",
+                  "label": "纪录片"
+                },
+                {
+                  "value": "reality",
+                  "label": "真人秀／脱口秀"
+                }
+              ]
+            },
+            {
+              "key": "netflix_enabled",
+              "label": "Netflix 自动订阅",
+              "input_type": "switch",
+              "default": true
+            },
+            {
+              "key": "netflix_num",
+              "label": "Netflix 候选剧集上限",
+              "input_type": "select",
+              "default": "10",
+              "options": [
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "20",
+                  "label": "20"
+                },
+                {
+                  "value": "40",
+                  "label": "40"
+                },
+                {
+                  "value": "60",
+                  "label": "60"
+                }
+              ]
+            },
+            {
+              "key": "hbo_enabled",
+              "label": "HBO 自动订阅",
+              "input_type": "switch",
+              "default": true
+            },
+            {
+              "key": "hbo_num",
+              "label": "HBO 候选剧集上限",
+              "input_type": "select",
+              "default": "10",
+              "options": [
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "20",
+                  "label": "20"
+                },
+                {
+                  "value": "40",
+                  "label": "40"
+                },
+                {
+                  "value": "60",
+                  "label": "60"
+                }
+              ]
+            },
+            {
+              "key": "disney_enabled",
+              "label": "Disney+ 自动订阅",
+              "input_type": "switch",
+              "default": true
+            },
+            {
+              "key": "disney_num",
+              "label": "Disney+ 候选剧集上限",
+              "input_type": "select",
+              "default": "10",
+              "options": [
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "20",
+                  "label": "20"
+                },
+                {
+                  "value": "40",
+                  "label": "40"
+                },
+                {
+                  "value": "60",
+                  "label": "60"
+                }
+              ]
+            },
+            {
+              "key": "apple_enabled",
+              "label": "Apple TV 自动订阅",
+              "input_type": "switch",
+              "default": true
+            },
+            {
+              "key": "apple_num",
+              "label": "Apple TV 候选剧集上限",
+              "input_type": "select",
+              "default": "10",
+              "options": [
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "20",
+                  "label": "20"
+                },
+                {
+                  "value": "40",
+                  "label": "40"
+                },
+                {
+                  "value": "60",
+                  "label": "60"
+                }
+              ]
+            },
+            {
+              "key": "amazon_enabled",
+              "label": "Prime Video 自动订阅",
+              "input_type": "switch",
+              "default": true
+            },
+            {
+              "key": "amazon_num",
+              "label": "Prime Video 候选剧集上限",
+              "input_type": "select",
+              "default": "10",
+              "options": [
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "20",
+                  "label": "20"
+                },
+                {
+                  "value": "40",
+                  "label": "40"
+                },
+                {
+                  "value": "60",
+                  "label": "60"
+                }
+              ]
+            },
+            {
+              "key": "hulu_enabled",
+              "label": "Hulu 自动订阅",
+              "input_type": "switch",
+              "default": true
+            },
+            {
+              "key": "hulu_num",
+              "label": "Hulu 候选剧集上限",
+              "input_type": "select",
+              "default": "10",
+              "options": [
+                {
+                  "value": "10",
+                  "label": "10"
+                },
+                {
+                  "value": "20",
+                  "label": "20"
+                },
+                {
+                  "value": "40",
+                  "label": "40"
+                },
+                {
+                  "value": "60",
+                  "label": "60"
+                }
+              ]
+            }
+          ]
+        },
+        "frontend_module": "frontend.js",
+        "navigation": {}
+      },
+      "package_url": "packages/overseas-tv-1.0.0-9ec44b7bf8b26947.zip",
+      "sha256": "9ec44b7bf8b269475bd5fce91027bbba6d597900f947b9a1b95e8932792bb1bc"
     },
     {
       "manifest": {
@@ -2028,7 +2432,7 @@
       "manifest": {
         "id": "subtitle-manager",
         "name": "字幕管理助手",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "在线搜索、自动匹配并管理媒体外挂字幕。",
         "icon": "mdi-subtitles-outline",
         "api_version": 1,
@@ -2397,8 +2801,8 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.1-887b2d20707bcda1.zip",
-      "sha256": "887b2d20707bcda1ded177d4c1035530c26dbec1748fb593bd5e9c9d1df6a8c1"
+      "package_url": "packages/subtitle-manager-1.0.2-ff7cfce82e4cab78.zip",
+      "sha256": "ff7cfce82e4cab7879755b3f354a750dcaa3b5489151bb861d8662dfc5a0c761"
     }
   ]
 }

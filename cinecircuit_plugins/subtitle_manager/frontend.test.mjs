@@ -541,8 +541,8 @@ test("Subtitle Manager uses structured identity for real download, preview and c
   assert.equal(wrapper.find(".subtitle-candidate-tag").exists(), false);
   assert.doesNotMatch(wrapper.text(), /片名和季集匹配/);
   assert.match(wrapper.text(), /需要验证码/);
-  assert.match(wrapper.get(".subtitle-host-notice").text(), /搜索完成找到 1 条在线字幕/);
-  assert.equal(wrapper.get(".subtitle-host-notice").classes().includes("text-info"), true);
+  assert.match(wrapper.get(".subtitle-host-notice").text(), /搜索完成.*找到 1 条在线字幕/);
+  assert.ok(wrapper.get(".subtitle-host-notice").classes().includes("subtitle-host-notice--notification-only"));
   assert.equal(wrapper.get(".subtitle-provider-mark").text(), "O");
   assert.equal(wrapper.find(".subtitle-source b").exists(), false);
   assert.equal(
@@ -597,7 +597,7 @@ test("Subtitle Manager uses structured identity for real download, preview and c
     "_blank",
   );
   await wrapper.get(".subtitle-online-file .subtitle-download-action").trigger("click");
-  assert.doesNotMatch(wrapper.find(".subtitle-host-notice").text(), /搜索完成|找到 1 条在线字幕/);
+  assert.doesNotMatch((wrapper.find(".subtitle-host-notice").exists() ? wrapper.find(".subtitle-host-notice").text() : ""), /搜索完成|找到 1 条在线字幕/);
   await flushPromises();
   assert.equal(paths.at(-1), "/plugins/subtitle-manager/api/online-preview");
   assert.equal(wrapper.get(".subtitle-preview-dialog").attributes("aria-modal"), "true");

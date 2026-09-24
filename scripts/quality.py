@@ -73,7 +73,12 @@ def main():
         check=False,
     ).returncode
     boundary = dependency_boundaries()
-    return int(bool(violations or lint or types or boundary))
+    shared_boundary = subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "repository_boundary.py")],
+        cwd=ROOT,
+        check=False,
+    ).returncode
+    return int(bool(violations or lint or types or boundary or shared_boundary))
 
 
 if __name__ == "__main__":

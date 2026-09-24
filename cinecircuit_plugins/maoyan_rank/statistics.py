@@ -1,5 +1,7 @@
 from typing import Any
 
+from .release_info import release_info
+
 from .._shared.rank_statistics import (
     cumulative_statistics as cumulative_statistics,
     save_run_snapshot as save_run_snapshot,
@@ -22,7 +24,7 @@ def _record(row: dict[str, Any]) -> dict[str, Any]:
         "media_type": kind,
         "media_label": media_label(kind, str(source.get("board") or "")),
         "platform": platform or "未知",
-        "release_info": str(source.get("release_info") or ""),
+        "release_info": release_info(media),
         "subscribed_at": row["updated_at"],
     }
 

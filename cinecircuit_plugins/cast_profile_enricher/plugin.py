@@ -89,31 +89,41 @@ class CastProfileEnricherPlugin(PluginBase):
         state.maintenance = Maintenance(context, state, targets)
         context.media = SourceRequests(context.media, state.maintenance)
         try:
-            server_ids = await self._server_ids(context)
-            for server_id in server_ids:
-                await self._process_server(context, state, server_id, targets=targets)
-        except BaseException:
-            state.maintenance.finish("interrupted")
-            raise
-        status = (
-            "partial"
-            if state.failures or state.no_chinese_role or state.unmatched_people
-            else "completed"
-        )
-        state.maintenance.finish(status)
-        result = state.result()
-        result["status"] = status
-        context.logger.info(
-            "演职员维护完成：媒体 %s，人物 %s，中文姓名 %s，中文角色 %s，简介 %s，头像 %s，失败 %s",
-            state.scanned_media,
-            state.scanned_people,
-            state.updated_names,
-            state.updated_roles,
-            state.updated_biographies,
-            state.updated_images,
-            state.failures,
-        )
-        return result
+            try:
+                server_ids = await self._server_ids(context)
+                for server_id in server_ids:
+                    await self._process_server(context, state, server_id, targets=targets)
+            except BaseException:
+                state.maintenance.finish("interrupted")
+                raise
+            status = (
+                "partial"
+                if state.failures or state.no_chinese_role or state.unmatched_people
+                else "completed"
+            )
+            state.maintenance.finish(status)
+            result = state.result()
+            result["status"] = status
+            context.logger.info(
+                "演职员维护完成：媒体 %s，人物 %s，中文姓名 %s，中文角色 %s，简介 %s，头像 %s，失败 %s",
+                state.scanned_media,
+                state.scanned_people,
+                state.updated_names,
+                state.updated_roles,
+                state.updated_biographies,
+                state.updated_images,
+                state.failures,
+            )
+            return result
+        finally:
+            context.media.cache.clear()
+            context.media.cache_bytes = 0
+            context.media = context.media.original
+            state.maintenance = None
+            for value in (state.profiles, state.casts, state.person_locks,
+                          state.updated_people, state.changed_people, state.media_written,
+                          state.retry_media):
+                value.clear()
 
     def _event_targets(self, data: dict[str, Any]) -> list[dict[str, Any]]:
         targets: list[dict[str, Any]] = []

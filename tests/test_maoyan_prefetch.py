@@ -20,7 +20,8 @@ def test_prefetch_is_bounded_ordered_and_canceled_on_exit():
                 canceled.append(row["title"])
 
         rows = [{"title": title} for title in ["one", "two", "three"]]
-        async with identity_prefetch(SimpleNamespace(), rows, resolve, {}) as prepared:
+        cache = {"large_response": bytearray(1024 * 1024)}
+        async with identity_prefetch(SimpleNamespace(), rows, resolve, cache) as prepared:
             async for row, task in prepared:
                 assert row["title"] == "one"
                 assert (await task)["title"] == "one"
@@ -28,6 +29,7 @@ def test_prefetch_is_bounded_ordered_and_canceled_on_exit():
                 assert started == ["one", "two"]
                 break
         assert canceled == ["two"]
+        assert cache == {}
 
     asyncio.run(run())
 

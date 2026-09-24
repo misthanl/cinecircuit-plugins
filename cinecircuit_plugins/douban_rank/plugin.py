@@ -17,6 +17,7 @@ from .media import rating
 from .metadata import merge_detail, needs_metadata, supplement
 from .rss import read_rss
 from .statistics import subscription_history, cumulative_statistics, save_run_snapshot
+from .._shared.rank_logging import result_text
 
 
 RANK_OPTIONS = (
@@ -38,7 +39,7 @@ class DoubanWatchlistPlugin(PluginBase):
         entrypoint="plugin:DoubanWatchlistPlugin",
         id="douban-hot",
         name="豆瓣榜单追踪",
-        version="1.0.1",
+        version="1.0.2",
         description="跟踪豆瓣热门榜单，筛选作品并自动添加订阅。",
         icon="mdi-movie-search-outline",
         permissions=(
@@ -220,6 +221,11 @@ class DoubanWatchlistPlugin(PluginBase):
                 result = await DoubanWatchlistPlugin._create_candidate(context, key, prepared)
                 del pending[index]
                 actions.append({**candidate, "item_key": key, **result})
+                logger = getattr(context, "logger", None)
+                if logger is not None:
+                    title = str(prepared.get("title") or candidate.get("title") or "未命名作品")
+                    season = str(prepared.get("season") or "")
+                    logger.info("%s：%s", " ".join(part for part in (title, season) if part), result_text(result))
         finally:
             for task in pending.values():
                 task.cancel()

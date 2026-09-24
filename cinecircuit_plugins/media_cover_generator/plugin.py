@@ -45,7 +45,7 @@ class LibraryArtworkPlugin(PluginBase):
         entrypoint="plugin:LibraryArtworkPlugin",
         id="emby-cover-generator",
         name="媒体库视觉封面",
-        version="1.0.1",
+        version="1.0.2",
         description="为媒体库生成并上传静态或动态风格封面。",
         icon="mdi-image-multiple-outline",
         permissions=(
@@ -594,6 +594,14 @@ class LibraryArtworkPlugin(PluginBase):
     def __init__(self) -> None:
         self.renderer: Any | None = None
         self._font_lock = asyncio.Lock()
+
+    async def on_lifecycle(self, event, context, previous_version=""):
+        if event in {"disable", "uninstall"}:
+            from .runtime_state import state
+            for identity, task in tuple(state.jobs.items()):
+                if task.done():
+                    state.jobs.pop(identity, None)
+            self.renderer = None
 
     async def run(self, context: PluginContext) -> dict[str, Any]:
         if getattr(context, "trigger", "manual") == "scheduled" and not bool(

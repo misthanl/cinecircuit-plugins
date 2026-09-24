@@ -19,6 +19,13 @@ export function install(sdk: CineCircuitPluginSdk) {
       setup(props, { attrs, emit }) {
         return () => h(RankEditor, {
           ...attrs, modelValue: props.modelValue, disabled: props.disabled, schemaFieldsComponent: fields,
+          loadConfig: sdk.request ? async (signal: AbortSignal) => {
+            // Read installation metadata: unlike plugin APIs, this also works while disabled.
+            const result = await sdk.request<{ items: { id: string; config: Record<string, unknown> }[] }>("/plugins/", { signal });
+            const item = result.items.find(item => item.id === ID);
+            if (!item) throw new Error("插件配置不存在");
+            return item.config;
+          } : undefined,
           "onUpdate:modelValue": (value: Record<string, unknown>) => emit("update:modelValue", value),
         });
       },

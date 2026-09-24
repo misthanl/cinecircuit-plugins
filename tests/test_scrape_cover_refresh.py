@@ -20,6 +20,7 @@ from cinecircuit_plugins.media_cover_generator import event_refresh
 from app.modules.plugins.contracts import PluginEvent
 from app.modules.plugins import delayed_events
 from app.modules.plugins.runner import PluginRunner
+from app.modules.plugins.registry import PluginRegistry
 from app.modules.plugins.service import PluginService
 from app.persistence.job_models import AutomationTask
 from app.persistence.organizer_models import ManualMediaTask
@@ -77,11 +78,14 @@ def publish(config, *, generated_files=3):
 def deliver_next(config, plugins, queue):
     task = queue.claim_next("plugin")
     assert task is not None
-    runner = PluginRunner(config, plugins)
+    registry = PluginRegistry()
+    registry.register_builtin(LibraryArtworkPlugin)
+    runner = PluginRunner(config, plugins, registry=registry)
 
     class Runtime:
         async def publish_plugin_event(self, event_type, data):
             await runner._handle_event(PluginEvent(event_type, data))
+            await asyncio.gather(*tuple(runner._events.tasks.values()))
 
     result = asyncio.run(
         _automation_executors(Runtime())["plugin_event"](json.loads(task.payload), task)
@@ -268,7 +272,9 @@ def test_switch_or_plugin_disabled_during_delay_prevents_generation(
 
     monkeypatch.setattr(cover_plugin_module.ArtworkGenerationRun, "run", unexpected_generation)
     payload = json.loads(refresh_tasks(factory)[0].payload)
-    runner = PluginRunner(config, plugins)
+    registry = PluginRegistry()
+    registry.register_builtin(LibraryArtworkPlugin)
+    runner = PluginRunner(config, plugins, registry=registry)
     asyncio.run(runner._handle_event(PluginEvent(payload["event_type"], payload["data"])))
     runs = plugins.list_runs("emby-cover-generator")
     assert runs == []  # Receiving and deferring the source event is not a real run.

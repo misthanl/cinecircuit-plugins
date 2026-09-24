@@ -11,11 +11,12 @@ def exact_candidates(items, title, media_type):
         )).casefold()
     result = {}
     for item in items:
-        if item.get("media_type") not in {media_type, "series" if media_type == "tv" else "movie"}:
+        if item.get("media_type") not in ({"movie", "tv", "series"} if media_type == "mixed" else {media_type, "series" if media_type == "tv" else "movie"}):
             continue
         if normalize(item.get("title") or "") != normalize(title):
             continue
-        key = (str(item.get("source_key") or ""), str(item.get("source_id") or ""))
+        key = (str(item.get("source_key") or ""), str(item.get("source_id") or ""),
+               "tv" if item.get("media_type") == "series" else item.get("media_type"))
         if key[1]:
             result[key] = item
     return list(result.values())

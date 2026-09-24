@@ -5,7 +5,6 @@ import array
 import sys
 import uuid
 from dataclasses import replace
-from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -43,7 +42,6 @@ def preview_status(identity: str) -> dict:
     return {"status": "complete", **task.result()}
 
 
-@lru_cache(maxsize=1)
 def _wedge_sample() -> bytes:
     # Reuse bundled source photos instead of adding another large animation ZIP asset.
     sources = [

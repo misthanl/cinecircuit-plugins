@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from functools import lru_cache
 from typing import TypeAlias
 from PIL import Image, ImageDraw, ImageFont
 
@@ -37,10 +36,17 @@ class CoverFonts:
         return self._font(4, bold=bold, preset=preset)
 
     def _font(self, size: int, *, bold: bool, preset: str = "modern") -> Font:
-        return self._load_font(str(self.font_path or ""), size, bold, preset)
+        cache = getattr(self, "_font_cache", None)
+        if cache is None:
+            self._font_cache = cache = {}
+        key = (str(self.font_path or ""), size, bold, preset)
+        if key not in cache:
+            if len(cache) >= 32:
+                cache.pop(next(iter(cache)))
+            cache[key] = self._load_font(*key)
+        return cache[key]
 
     @staticmethod
-    @lru_cache(maxsize=128)
     def _load_font(font_path: str, size: int, bold: bool, preset: str) -> Font:
         named = CoverFonts._named_font(size, bold, preset)
         if named is not None:

@@ -49,15 +49,19 @@ async def _collection(client: Any, collection: str, media_type: str) -> list[dic
 def chart_rows(content: bytes, rank: str) -> list[dict[str, Any]]:
     marker = {"movie-ustop": "mv_us_week", "movie-weekly": "mv_week"}[rank]
     soup = BeautifulSoup(content, "html.parser", from_encoding="utf-8")
-    output: dict[str, dict[str, Any]] = {}
-    for anchor in soup.select(f'.movie_top a[onclick*="{marker}"]'):
-        identity = subject_id(anchor.get("href"))
-        item = normalized_media({"id": identity, "title": anchor.get_text(strip=True)}, "movie")
-        if item:
-            output.setdefault(identity, item)
-    if not output:
-        raise ValueError("豆瓣榜单暂不可用或页面结构已改变")
-    return list(output.values())[:10]
+    try:
+        output: dict[str, dict[str, Any]] = {}
+        for anchor in soup.select(f'.movie_top a[onclick*="{marker}"]'):
+            identity = subject_id(anchor.get("href"))
+            item = normalized_media({"id": identity, "title": anchor.get_text(strip=True)}, "movie")
+            if item:
+                output.setdefault(identity, item)
+        if not output:
+            raise ValueError("豆瓣榜单暂不可用或页面结构已改变")
+        return list(output.values())[:10]
+    finally:
+        soup.clear(decompose=True)
+        soup.decompose()
 
 
 async def _top_movies(client: Any, limit: int) -> list[dict[str, Any]]:
@@ -79,27 +83,31 @@ async def _top_movies(client: Any, limit: int) -> list[dict[str, Any]]:
 
 def top_rows(content: bytes) -> list[dict[str, Any]]:
     soup = BeautifulSoup(content, "html.parser", from_encoding="utf-8")
-    result = []
-    for row in soup.select("ol.grid_view > li"):
-        anchor, title = row.select_one(".hd a"), row.select_one(".title")
-        if anchor is None or title is None:
-            continue
-        image, score, details = (
-            row.select_one("img"),
-            row.select_one(".rating_num"),
-            row.select_one(".bd p"),
-        )
-        year = re.search(r"\b(?:19|20)\d{2}\b", details.get_text() if details else "")
-        item = normalized_media(
-            {
-                "url": anchor.get("href"),
-                "title": title.get_text(strip=True),
-                "rating": score.get_text() if score else 0,
-                "poster": image.get("src") if image else "",
-                "year": year[0] if year else "",
-            },
-            "movie",
-        )
-        if item:
-            result.append(item)
-    return result
+    try:
+        result = []
+        for row in soup.select("ol.grid_view > li"):
+            anchor, title = row.select_one(".hd a"), row.select_one(".title")
+            if anchor is None or title is None:
+                continue
+            image, score, details = (
+                row.select_one("img"),
+                row.select_one(".rating_num"),
+                row.select_one(".bd p"),
+            )
+            year = re.search(r"\b(?:19|20)\d{2}\b", details.get_text() if details else "")
+            item = normalized_media(
+                {
+                    "url": anchor.get("href"),
+                    "title": title.get_text(strip=True),
+                    "rating": score.get_text() if score else 0,
+                    "poster": image.get("src") if image else "",
+                    "year": year[0] if year else "",
+                },
+                "movie",
+            )
+            if item:
+                result.append(item)
+        return result
+    finally:
+        soup.clear(decompose=True)
+        soup.decompose()

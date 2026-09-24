@@ -86,13 +86,13 @@ onMounted(() => load());
   <UiDialog :model-value="true" :max-width="1000" width="calc(100vw - 32px)" @update:model-value="(open: boolean) => { if (!open) context.close(); }">
     <UiCard class="maoyan-dialog">
       <header class="maoyan-dialog__header">
-        <h2>猫眼榜单追踪 · 数据统计</h2>
+        <h2>影视榜单订阅 · 数据统计</h2>
         <UiButton class="app-dialog-close" icon="mdi-close" variant="text" aria-label="关闭" @click="context.close" />
       </header>
       <div class="maoyan-dialog__content">
         <p v-if="loading && !loaded" class="maoyan-dialog__message" role="status">正在读取订阅统计…</p>
         <UiAlert v-if="error" type="error" variant="tonal" role="alert">{{ error }}</UiAlert>
-        <section v-if="loaded" class="maoyan-statistics" aria-label="猫眼榜单订阅统计">
+        <section v-if="loaded" class="maoyan-statistics" aria-label="影视榜单订阅统计">
           <dl class="maoyan-statistics__metrics">
             <div><dt>累计检查</dt><dd>{{ cumulative?.checked ?? '—' }}</dd></div>
             <div><dt>累计新增订阅</dt><dd>{{ cumulative?.subscribed ?? '—' }}</dd></div>

@@ -7,25 +7,8 @@ import pytest
 from cinecircuit_plugins.maoyan_rank.plugin import MaoyanWatchlistPlugin
 
 
-@pytest.mark.parametrize("config,expected", [
-    ({"num": "3", "web_movie_num": "7"}, (3, 7)),
-    ({"num": "3"}, (3, 3)),
-    ({"num": "3", "web_movie_num": None}, (3, 3)),
-])
-def test_movie_limits_are_independent_and_preserve_legacy_settings(config, expected):
-    def response(url, **kwargs):
-        if "dashboard-ajax/movie" in url:
-            payload = {"movieList": {"list": [{"movieInfo": {"movieName": str(index)}} for index in range(10)]}}
-        else:
-            payload = {"data": {"list": [{"name": str(index)} for index in range(10)]}}
-        return SimpleNamespace(status_code=200, json=lambda: payload)
-    client = SimpleNamespace(get=AsyncMock(side_effect=response))
-    rows = asyncio.run(MaoyanWatchlistPlugin()._movie_candidates(client, config, ["movie", "web-movie"]))
-    assert tuple(sum(row["board"] == board for row in rows) for board in ["电影票房榜", "网络电影榜"]) == expected
-
-
 def test_explicit_empty_selection_never_fetches_or_subscribes():
-    with pytest.raises(ValueError, match="至少选择一个榜单"):
+    with pytest.raises(ValueError, match="请开启电影票房榜"):
         asyncio.run(MaoyanWatchlistPlugin().run(SimpleNamespace(config={"type": []})))
 
 
@@ -68,12 +51,17 @@ def test_failed_clear_leaves_switch_on_and_does_not_fetch(monkeypatch):
     http.assert_not_called()
 
 
-def test_platform_defaults_off_but_saved_selection_still_works():
-    plugin = MaoyanWatchlistPlugin()
-    fields = {field["key"]: field for field in plugin.manifest.config_schema["fields"]}
-    assert fields["all_enabled"]["default"] is False
-    client = SimpleNamespace(get=AsyncMock(return_value=SimpleNamespace(status_code=200, json=lambda: {"dataList": {"list": []}})))
-    assert asyncio.run(plugin._television_candidates(client, {}, ["web-heat"])) == []
-    client.get.assert_not_awaited()
-    asyncio.run(plugin._television_candidates(client, {"all_enabled": True}, ["web-heat"]))
-    client.get.assert_awaited_once()
+def test_category_migration_and_explicit_new_choices():
+    from cinecircuit_plugins.maoyan_rank.settings import normalized, CATEGORIES
+    assert list(CATEGORIES.values()) == ["电影", "电视剧", "动漫", "综艺", "纪录片"]
+    old = normalized({"type": ["movie", "web-heat", "web-tv", "zongyi"], "all_enabled": True})
+    assert old["movie_enabled"] and old["platform_types"] == ["tv", "variety"]
+    assert all(old[key + "_enabled"] for key in ("tx", "iqy", "mg", "yk"))
+    new = normalized({**old, "platform_types": [], "movie_enabled": False, "tx_enabled": False})
+    assert new["platform_types"] == [] and not new["tx_enabled"] and not new["movie_enabled"]
+
+
+@pytest.mark.parametrize("platform", ["mg"])
+def test_unsupported_only_category_never_fetches(platform):
+    with pytest.raises(ValueError, match="支持该分类"):
+        asyncio.run(MaoyanWatchlistPlugin().run(SimpleNamespace(config={"movie_enabled": False, "platform_types": ["documentary"], f"{platform}_enabled": True})))

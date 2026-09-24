@@ -59,6 +59,10 @@ class SubtitleWorkspacePlugin(PluginBase):
     def __init__(self) -> None:
         self._sessions = SubtitleSessions()
 
+    async def on_lifecycle(self, event, context, previous_version=""):
+        if event in {"disable", "uninstall"}:
+            self._sessions.clear()
+
     async def on_event(self, event: PluginEvent, context: PluginContext) -> dict[str, Any]:
         selected = str(context.config.get("trigger_event") or "")
         if event.type not in self.manifest.events or event.type != selected:

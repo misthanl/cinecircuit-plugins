@@ -26,7 +26,7 @@ def test_temporary_results_and_legacy_ignored_history_are_retried(status):
         assert actions[0]["status"] == status
     assert ctx.subscriptions.create_checked.await_count == 2
     assert ctx.subscriptions.create_checked.call_args.args[1]["season"] == "S02"
-    assert ctx.subscriptions.create_checked.call_args.args[1]["subscription_origin"] == "猫眼榜单"
+    assert ctx.subscriptions.create_checked.call_args.args[1]["subscription_origin"] == "影视榜单"
     ctx.items.record.assert_not_called()
 
 

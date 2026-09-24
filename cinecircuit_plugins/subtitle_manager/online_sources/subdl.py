@@ -2,7 +2,6 @@
 
 import asyncio
 from collections import OrderedDict
-import time
 
 from urllib.parse import urljoin, urlsplit
 
@@ -15,32 +14,17 @@ from .base import (
 from ..video_hash import identity_value
 
 
-_DOWNLOAD_CACHE_TTL = 6 * 60 * 60
 _DOWNLOAD_CACHE_LIMIT = 16 * 1024 * 1024
-_download_cache: OrderedDict[tuple[tuple[str, str], ...], tuple[float, tuple[tuple[str, bytes], ...]]] = OrderedDict()
 
 
-def _cached_download(links):
-    key = tuple((str(url), str(name or "")) for url, name in (links or ()))
-    now = time.monotonic()
-    stale = [item for item, (created, _) in _download_cache.items() if now - created > _DOWNLOAD_CACHE_TTL]
-    for item in stale:
-        _download_cache.pop(item, None)
-    cached = _download_cache.get(key)
-    if cached:
-        _download_cache.move_to_end(key)
-        return key, cached[1]
-    return key, None
-
-
-def _remember_download(key, files):
+def _remember_download(cache, key, files):
     value = tuple(files)
-    _download_cache[key] = (time.monotonic(), value)
-    _download_cache.move_to_end(key)
-    while _download_cache and sum(
-        len(content) for _, cached in _download_cache.values() for _, content in cached
-    ) > _DOWNLOAD_CACHE_LIMIT:
-        _download_cache.popitem(last=False)
+    cache[key] = value
+    cache.move_to_end(key)
+    while cache and (len(cache) > 256 or sum(
+        len(content) for items in cache.values() for _, content in items
+    ) > _DOWNLOAD_CACHE_LIMIT):
+        cache.popitem(last=False)
     return value
 
 
@@ -74,6 +58,7 @@ class SubDLSource:
         self.key = str(config.get("subdl_api_key") or "").strip()
         self.base = str(config.get("subdl_api_url") or "https://api.subdl.com/api/v1").rstrip("/")
         self._cache = {}
+        self._downloads = OrderedDict()
 
     async def status(self):
         return SourceState.READY if self.key else SourceState.DISABLED
@@ -204,7 +189,8 @@ class SubDLSource:
         return tuple(files)
 
     async def download(self, candidate):
-        key, cached = _cached_download(candidate.download_ref)
+        key = tuple((str(url), str(name or "")) for url, name in (candidate.download_ref or ()))
+        cached = self._downloads.get(key)
         if cached is not None:
             return DownloadResult(self.name, files=cached)
         try:
@@ -220,7 +206,7 @@ class SubDLSource:
                     candidate.download_ref or (),
                     headers={"x-api-key": self.key},
                 )
-            return DownloadResult(self.name, files=_remember_download(key, files))
+            return DownloadResult(self.name, files=_remember_download(self._downloads, key, files))
         except Exception as exc:
             failure = http_failure(self.name, exc, "https://subdl.com")
             return DownloadResult(self.name, error=failure.error if failure else SourceError(

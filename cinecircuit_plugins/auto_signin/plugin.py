@@ -21,7 +21,7 @@ class SiteCheckinPlugin(PluginBase):
         entrypoint="plugin:SiteCheckinPlugin",
         id="auto-signin",
         name="站点签到助手",
-        version="1.0.1",
+        version="1.0.2",
         description="自动登录并签到指定 PT 站点。",
         icon="mdi-calendar-check-outline",
         permissions=(
@@ -112,16 +112,15 @@ class SiteCheckinPlugin(PluginBase):
             }
         site_ids = self._list(context.config.get("sign_sites"))
         login_ids = self._list(context.config.get("login_sites"))
-        semaphore = asyncio.Semaphore(
-            min(20, max(1, int(context.config.get("queue_cnt") or 5)))
-        )
+        semaphore = asyncio.Semaphore(min(20, max(1, int(context.config.get("queue_cnt") or 5))))
         site_names = await self._site_names(context)
         results: list[dict[str, Any]] = []
         today = datetime.now().astimezone().date().isoformat()
         skipped_count = 0
         for mode, selected_ids in (("login", login_ids), ("sign", site_ids)):
             pending_ids = [
-                site_id for site_id in selected_ids
+                site_id
+                for site_id in selected_ids
                 if not self._completed_today(context, today, mode, site_id)
             ]
             skipped_count += len(selected_ids) - len(pending_ids)
@@ -134,23 +133,7 @@ class SiteCheckinPlugin(PluginBase):
                 )
             )
             batch = await self._retry_failed_sites(context, semaphore, batch)
-            for row in batch:
-                row.setdefault("status", "checked" if row.get("ok") else "failed")
-                row["site_name"] = site_names.get(
-                    str(row["site_id"]), str(row["site_id"])
-                )
-                # Keep one result per site, mode and server-local day so the statistics
-                # view can render an actual seven-day history matrix.
-                context.items.record(
-                    f"{today}:{row['mode']}:{row['site_id']}",
-                    "signed" if row.get("ok") else "failed",
-                    payload={
-                        "site_id": row["site_id"],
-                        "site_name": row["site_name"],
-                        "mode": row["mode"],
-                    },
-                    result=row,
-                )
+            self._record_results(context, today, site_names, batch)
             await self._notify_site_results(context, batch)
             results.extend(batch)
         return {
@@ -159,6 +142,24 @@ class SiteCheckinPlugin(PluginBase):
             "updated_count": sum(1 for row in results if row.get("ok")),
             "results": results,
         }
+
+    @staticmethod
+    def _record_results(context, today, site_names, batch):
+        for row in batch:
+            row.setdefault("status", "checked" if row.get("ok") else "failed")
+            row["site_name"] = site_names.get(str(row["site_id"]), str(row["site_id"]))
+            # Keep one result per site, mode and server-local day so the statistics
+            # view can render an actual seven-day history matrix.
+            context.items.record(
+                f"{today}:{row['mode']}:{row['site_id']}",
+                "signed" if row.get("ok") else "failed",
+                payload={
+                    "site_id": row["site_id"],
+                    "site_name": row["site_name"],
+                    "mode": row["mode"],
+                },
+                result=row,
+            )
 
     @staticmethod
     def _completed_today(context: PluginContext, today: str, mode: str, site_id: str) -> bool:
@@ -224,13 +225,8 @@ class SiteCheckinPlugin(PluginBase):
                     for row in retry_rows
                 )
             )
-            by_key = {
-                (str(row["site_id"]), str(row["mode"])): row for row in replacements
-            }
-            results = [
-                by_key.get((str(row["site_id"]), str(row["mode"])), row)
-                for row in results
-            ]
+            by_key = {(str(row["site_id"]), str(row["mode"])): row for row in replacements}
+            results = [by_key.get((str(row["site_id"]), str(row["mode"])), row) for row in results]
         return results
 
     @staticmethod
@@ -243,9 +239,7 @@ class SiteCheckinPlugin(PluginBase):
         return {"day": today, "keys": list(keys) if isinstance(keys, list) else []}
 
     @staticmethod
-    async def _notify_site_results(
-        context: PluginContext, results: list[dict[str, Any]]
-    ) -> None:
+    async def _notify_site_results(context: PluginContext, results: list[dict[str, Any]]) -> None:
         if bool(context.config.get("notification_enabled")) and results:
             sign_rows = [row for row in results if row.get("mode") == "sign"]
             login_rows = [row for row in results if row.get("mode") == "login"]
@@ -258,9 +252,7 @@ class SiteCheckinPlugin(PluginBase):
                 summaries.append(
                     f"登录 {sum(1 for row in login_rows if row.get('ok'))}/{len(login_rows)}"
                 )
-            details = "\n".join(
-                SiteCheckinPlugin._notification_line(row) for row in results
-            )
+            details = "\n".join(SiteCheckinPlugin._notification_line(row) for row in results)
             await context.notifications.send(
                 f"站点任务完成：{'，'.join(summaries)}",
                 details,
@@ -291,9 +283,7 @@ class SiteCheckinPlugin(PluginBase):
             if item.get("id")
         }
 
-    async def handle_api(
-        self, request: PluginApiRequest, context: PluginContext
-    ) -> dict[str, Any]:
+    async def handle_api(self, request: PluginApiRequest, context: PluginContext) -> dict[str, Any]:
         if request.action == "inventory" and request.method == "GET":
             sites = await context.sites.configurations()
             return {
@@ -311,23 +301,15 @@ class SiteCheckinPlugin(PluginBase):
             if not site_id:
                 raise ValueError("未选择站点")
             return await (
-                context.sites.check(site_id)
-                if mode == "login"
-                else context.sites.sign_in(site_id)
+                context.sites.check(site_id) if mode == "login" else context.sites.sign_in(site_id)
             )
         raise KeyError("自动签到页面操作不存在")
 
     @staticmethod
     def _list(value: object) -> list[str]:
         if isinstance(value, list):
-            return list(
-                dict.fromkeys(str(item).strip() for item in value if str(item).strip())
-            )
-        return list(
-            dict.fromkeys(
-                item for item in re.split(r"[\s,，]+", str(value or "")) if item
-            )
-        )
+            return list(dict.fromkeys(str(item).strip() for item in value if str(item).strip()))
+        return list(dict.fromkeys(item for item in re.split(r"[\s,，]+", str(value or "")) if item))
 
 
 Plugin = SiteCheckinPlugin

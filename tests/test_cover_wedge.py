@@ -42,17 +42,13 @@ def test_wedge_dissolves_background_and_photos_but_not_lettering(monkeypatch):
     assert max(abs(a-b) for a,b in zip(frames[-1].getpixel((300,90)), frames[0].getpixel((300,90)))) < 5
 
 
-def test_wedge_sample_is_cached_at_720p(monkeypatch):
-    calls=[]
+def test_wedge_sample_is_not_retained_in_module_cache(monkeypatch):
+    calls = []
     def render(self, sources, **kwargs):
         calls.append(kwargs)
-        return b'webp-sample'
-    preview._wedge_sample.cache_clear()
-    monkeypatch.setattr(CoverRenderer, 'render_animated', render)
-    try:
-        first=preview.read_sample('animated_wedge','1')
-        assert first == preview.read_sample('animated_wedge','1')
-        assert first['width']==1280 and first['height']==720
-        assert len(calls)==1 and calls[0]['options'].style=='wedge'
-    finally:
-        preview._wedge_sample.cache_clear()
+        return b"webp-sample"
+    monkeypatch.setattr(CoverRenderer, "render_animated", render)
+    first = preview.read_sample("animated_wedge", "1")
+    assert first == preview.read_sample("animated_wedge", "1")
+    assert first["width"] == 1280 and first["height"] == 720
+    assert len(calls) == 2 and calls[0]["options"].style == "wedge"

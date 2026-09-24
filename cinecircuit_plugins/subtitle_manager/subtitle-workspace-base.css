@@ -1,3 +1,5 @@
+.subtitle-host-notice--notification-only { display: none !important; }
+
 .subtitle-workspace {
   --subtitle-provider-assrt: 124, 58, 237;
   width: 100%;
@@ -652,3 +654,6 @@
   color: var(--app-text-secondary);
   font-size: var(--app-font-size-label, 11px);
 }
+
+/* Notices must never consume the workspace remainder in the flex column. */
+.subtitle-host-notice { flex: 0 0 auto; min-height: 0; }

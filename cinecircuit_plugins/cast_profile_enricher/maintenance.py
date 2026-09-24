@@ -148,7 +148,7 @@ class SourceRequests:
             self.cache_bytes -= old_size
         self.cache[key] = (record, encoded_size)
         self.cache_bytes += encoded_size
-        if persist and self.has_data(result) and self.maintenance.cache_ready:
+        if persist and self.has_data(result) and self.maintenance.cache_ready and self.maintenance.store is not None:
             try:
                 self.maintenance.store.set_cache(
                     key,
