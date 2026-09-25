@@ -18,6 +18,7 @@ def detail(**overrides):
         "year": "2015",
         "rating": 8,
         "vote_count": 100,
+        "overview": "A detective returns home to investigate a disappearance.",
         "seasons": [
             {"season_number": 1, "air_date": "2015-01-01", "episode_count": 10},
             {"season_number": 2, "air_date": "2026-09-24", "episode_count": 8},
@@ -153,6 +154,7 @@ def test_full_run_merges_platform_duplicates_and_keeps_distinct_seasons(monkeypa
     call = ctx.subscriptions.create_checked.call_args
     assert call.args[0] == "tmdb:tv:42:S02"
     assert call.args[1]["season"] == "S02"
+    assert call.args[1]["overview"] == detail()["overview"]
     assert ctx.state.get("latest_run_statistics")["subscribed"] == 1
 
 

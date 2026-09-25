@@ -1870,7 +1870,7 @@
       "manifest": {
         "id": "overseas-tv",
         "name": "TMDB 剧集追踪",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "按播出平台追踪近期新剧与新季，自动创建订阅。",
         "icon": "mdi-television-classic",
         "api_version": 1,
@@ -2346,8 +2346,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/overseas-tv-1.0.0-9ec44b7bf8b26947.zip",
-      "sha256": "9ec44b7bf8b269475bd5fce91027bbba6d597900f947b9a1b95e8932792bb1bc"
+      "package_url": "packages/overseas-tv-1.0.1-7c774bbde8e54c2a.zip",
+      "sha256": "7c774bbde8e54c2ac70e7a6a02e3bde092e3790796a2064e291da4154b37ad6f"
     },
     {
       "manifest": {

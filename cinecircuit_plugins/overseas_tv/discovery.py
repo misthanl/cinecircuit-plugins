@@ -69,6 +69,7 @@ def candidates(detail, config, today, platform):
                 "season": f"S{number:02d}",
                 "total_episode": int(season.get("episode_count") or 0),
                 "poster": detail.get("poster") or "",
+                "overview": str(detail.get("overview") or "").strip(),
                 "subscription_origin": "TMDB",
                 "rank_source": {
                     "platform": platform,
