@@ -142,11 +142,14 @@
     background: var(--app-surface);
   }
   .subtitle-content-tab-list {
+    --v-tabs-height: 46px;
     width: 100%;
     min-height: 46px;
+  }
+  .subtitle-content-tab-list .v-slide-group__content {
     gap: 0;
   }
-  .subtitle-content-tab-list > button {
+  .subtitle-content-tab-list .v-tab {
     min-height: 46px;
     flex: 1 1 50%;
     justify-content: center;

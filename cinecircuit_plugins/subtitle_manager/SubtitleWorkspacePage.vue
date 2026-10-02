@@ -640,26 +640,10 @@ onMounted(() => {
               { 'has-online-tools': activePanel === 'online' },
             ]"
           >
-            <div class="subtitle-content-tab-list" role="tablist" aria-label="字幕类型">
-              <button
-                type="button"
-                role="tab"
-                :aria-selected="activePanel === 'local'"
-                :class="{ 'is-active': activePanel === 'local' }"
-                @click="activePanel = 'local'"
-              >
-                本地字幕
-              </button>
-              <button
-                type="button"
-                role="tab"
-                :aria-selected="activePanel === 'online'"
-                :class="{ 'is-active': activePanel === 'online' }"
-                @click="activePanel = 'online'"
-              >
-                在线字幕
-              </button>
-            </div>
+            <VTabs v-model="activePanel" class="subtitle-content-tab-list app-section-tabs app-section-tabs--line" color="primary" align-tabs="start" mandatory aria-label="字幕类型">
+              <VTab value="local">本地字幕</VTab>
+              <VTab value="online">在线字幕</VTab>
+            </VTabs>
             <button
               v-if="activePanel === 'local'"
               type="button"

@@ -2432,7 +2432,7 @@
       "manifest": {
         "id": "subtitle-manager",
         "name": "字幕管理助手",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "在线搜索、自动匹配并管理媒体外挂字幕。",
         "icon": "mdi-subtitles-outline",
         "api_version": 1,
@@ -2801,8 +2801,8 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.2-ff7cfce82e4cab78.zip",
-      "sha256": "ff7cfce82e4cab7879755b3f354a750dcaa3b5489151bb861d8662dfc5a0c761"
+      "package_url": "packages/subtitle-manager-1.0.3-e30526e73b0f59ca.zip",
+      "sha256": "e30526e73b0f59ca0e48d3afa4f40e717fa52709e13a6ed0463e0ec706a858c0"
     }
   ]
 }

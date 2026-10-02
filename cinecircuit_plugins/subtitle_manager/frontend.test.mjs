@@ -27,6 +27,30 @@ const { install: installPlugin } = await import(
 );
 const { mount, flushPromises, config } = require("@vue/test-utils");
 config.global.stubs.VIcon = true;
+const tabsContext = Symbol("tabs");
+config.global.components.VTabs = vue.defineComponent({
+  props: { modelValue: String },
+  emits: ["update:modelValue"],
+  setup(props, { slots, emit, attrs }) {
+    vue.provide(tabsContext, {
+      selected: vue.computed(() => props.modelValue),
+      select: (value) => emit("update:modelValue", value),
+    });
+    return () => vue.h("div", { ...attrs, role: "tablist" }, slots.default?.());
+  },
+});
+config.global.components.VTab = vue.defineComponent({
+  props: { value: String },
+  setup(props, { slots }) {
+    const tabs = vue.inject(tabsContext);
+    return () => vue.h("button", {
+      type: "button",
+      role: "tab",
+      "aria-selected": tabs.selected.value === props.value,
+      onClick: () => tabs.select(props.value),
+    }, slots.default?.());
+  },
+});
 config.global.components.VBtn = vue.defineComponent({
   props: { disabled: Boolean, loading: Boolean, variant: String, color: String },
   setup(props, { slots, attrs }) {
