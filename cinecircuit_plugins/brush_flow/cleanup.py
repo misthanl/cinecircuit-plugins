@@ -8,6 +8,7 @@ import logging
 
 from .ownership import same_generation
 from .deletion_rules import configured, matches, value, promotion_expired
+from .task_labels import brush_tagged, tagged_downloads
 
 logger = logging.getLogger(__name__)
 
@@ -16,13 +17,19 @@ def number(raw: Any) -> float:
     return value(raw) or 0
 
 
-def eligible(rule: dict[str, Any], task: dict[str, Any], payload: dict[str, Any] | None = None) -> bool:
+def eligible(
+    rule: dict[str, Any], task: dict[str, Any], payload: dict[str, Any] | None = None
+) -> bool:
+    if not brush_tagged(task):
+        return False
     if tag_set(rule.get("exclude_tags", "CineCircuit,H&R")) & tag_set(task.get("tags")):
         return False
     progress, remaining = value(task.get("progress")), value(task.get("amount_left"))
     if (progress is not None and progress < 100) or (remaining is not None and remaining > 0):
-        return (rule.get("delete_expired_promotion") is True and promotion_expired(payload or {})) or matches(
-            {key: rule.get(key) for key in ("delete_download_hours", "delete_inactive_hours", "delete_avg_upload_kib")}, task
+        return (
+            rule.get("delete_expired_promotion") is True and promotion_expired(payload or {})
+        ) or matches(
+            {key: rule.get(key) for key in ("delete_download_hours", "delete_inactive_hours")}, task
         )
     if progress is None:
         return False
@@ -31,8 +38,12 @@ def eligible(rule: dict[str, Any], task: dict[str, Any], payload: dict[str, Any]
 
 def tag_set(raw: Any) -> set[str]:
     values = raw if isinstance(raw, (list, tuple, set)) else [raw]
-    return {tag.strip().casefold() for value in values
-            for tag in re.split(r"[,，\n]", str(value or "")) if tag.strip()}
+    return {
+        tag.strip().casefold()
+        for value in values
+        for tag in re.split(r"[,，\n]", str(value or ""))
+        if tag.strip()
+    }
 
 
 def added_records(context: Any) -> list[dict[str, Any]]:
@@ -53,18 +64,27 @@ async def check_downloads(context: Any, rules: list[dict[str, Any]]) -> dict[str
         "skipped": 0,
         "errors": [],
     }
-    rules = [rule for rule in rules if rule.get("cleanup_enabled", context.config.get("cleanup_enabled", False))]
+    rules = [
+        rule
+        for rule in rules
+        if rule.get("cleanup_enabled", context.config.get("cleanup_enabled", False))
+    ]
     if not context.config.get("enabled", True) or not rules:
         return {**summary, "status": "disabled"}
     if not callable(getattr(context.downloads, "task", None)):
         return {**summary, "status": "unsupported", "errors": ["请更新主程序以安全检查刷流任务"]}
     active = {str(rule["id"]): rule for rule in rules if rule.get("enabled", True)}
+    current = await tagged_downloads(context)
     seen: set[tuple[str, str]] = set()
     for record in added_records(context):
         receipt = record.get("result") or {}
         rule = active.get(str(receipt.get("brush_task_id") or ""))
         pair = (str(receipt.get("downloader_id") or ""), str(receipt.get("hash") or ""))
         if not rule or not receipt.get("ownership_verified") or not all(pair) or pair in seen:
+            summary["skipped"] += 1
+            continue
+        candidate = current.get((pair[0], pair[1].casefold()))
+        if candidate is None or not same_generation(receipt, candidate):
             summary["skipped"] += 1
             continue
         seen.add(pair)
@@ -85,7 +105,7 @@ async def check_record(
     pair: tuple[str, str],
     summary: dict[str, Any],
 ) -> None:
-    task = await context.downloads.task(*pair, ownership_tag=str(receipt.get("ownership_tag") or ""))
+    task = await context.downloads.task(*pair, task_added_on=int(receipt.get("task_added_on") or 0))
     summary["checked"] += 1
     key = str(record.get("item_key") or "")
     if not key:
@@ -102,6 +122,7 @@ async def check_record(
         summary["skipped"] += 1
         return
     from .statistics import capture
+
     try:
         capture(context, receipt, task)
     except Exception:
@@ -111,7 +132,10 @@ async def check_record(
         return
     if rule.get("delete_task", False):
         await context.downloads.delete(
-            *pair, delete_files=bool(rule.get("allow_delete_files", context.config.get("allow_delete_files", False)))
+            *pair,
+            delete_files=bool(
+                rule.get("allow_delete_files", context.config.get("allow_delete_files", False))
+            ),
         )
         status = "deleted"
     else:
@@ -121,4 +145,5 @@ async def check_record(
     context.items.record(key, status, payload=record.get("payload"), result=receipt)
     summary[status] += 1
     from .statistics import record_execution
+
     record_execution(context, rule, cleaned=1, reason="已清理" if status == "deleted" else "已暂停")

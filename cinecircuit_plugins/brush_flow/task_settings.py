@@ -1,4 +1,5 @@
 """Task-local settings and cadence; persistence is accessed only through the SDK."""
+
 from datetime import datetime
 from time import time
 from zoneinfo import ZoneInfo
@@ -6,14 +7,33 @@ from typing import Any
 import re
 
 from .cleanup import added_records, same_generation
+from .task_labels import brush_tagged
 
 
 def task_defaults(task: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
-    inherited = {key: config.get(key, False) for key in (
-        "cleanup_enabled", "notification_enabled", "allow_delete_files",
-    )}
-    return {**inherited, "exclude_tags": "CineCircuit,H&R", "promotion": "free", "exclude_hr": True, "cron": config.get("cron", ""), "interval_minutes": 10,
-            "task_limit": 0, "check_interval_minutes": 5, "intake_time_range": "", **task, "cleanup_enabled": True, "allow_delete_files": True, "delete_task": True}
+    inherited = {
+        key: config.get(key, False)
+        for key in (
+            "cleanup_enabled",
+            "notification_enabled",
+            "allow_delete_files",
+        )
+    }
+    return {
+        **inherited,
+        "exclude_tags": "CineCircuit,H&R",
+        "promotion": "free",
+        "exclude_hr": True,
+        "cron": config.get("cron", ""),
+        "interval_minutes": 10,
+        "task_limit": 0,
+        "check_interval_minutes": 5,
+        "intake_time_range": "",
+        **task,
+        "cleanup_enabled": True,
+        "allow_delete_files": True,
+        "delete_task": True,
+    }
 
 
 def intake_allowed(task: dict[str, Any], timestamp: float | None = None) -> bool:
@@ -27,7 +47,9 @@ def intake_allowed(task: dict[str, Any], timestamp: float | None = None) -> bool
     start, end = start_hour * 60 + start_minute, end_hour * 60 + end_minute
     if start == end:
         raise ValueError("进种时间段的开始与结束时间不能相同；全天进种请留空")
-    current = datetime.fromtimestamp(time() if timestamp is None else timestamp, ZoneInfo("Asia/Shanghai"))
+    current = datetime.fromtimestamp(
+        time() if timestamp is None else timestamp, ZoneInfo("Asia/Shanghai")
+    )
     minute = current.hour * 60 + current.minute
     return start <= minute < end if start < end else minute >= start or minute < end
 
@@ -57,17 +79,24 @@ def cron_matches(expression: str, timestamp: float) -> bool:
     if len(fields) != 5:
         raise ValueError("执行周期必须是 5 位 Cron 表达式")
     current = datetime.fromtimestamp(timestamp, ZoneInfo("Asia/Shanghai"))
-    values = [cron_values(field, *limits) for field, limits in zip(
-        fields, ((0, 59), (0, 23), (1, 31), (1, 12), (0, 7))
-    )]
+    values = [
+        cron_values(field, *limits)
+        for field, limits in zip(fields, ((0, 59), (0, 23), (1, 31), (1, 12), (0, 7)))
+    ]
     if 7 in values[4]:
         values[4].add(0)
-    return all(value in allowed for value, allowed in zip(
-        (current.minute, current.hour, current.day, current.month, (current.weekday() + 1) % 7), values
-    ))
+    return all(
+        value in allowed
+        for value, allowed in zip(
+            (current.minute, current.hour, current.day, current.month, (current.weekday() + 1) % 7),
+            values,
+        )
+    )
 
 
-def due_tasks(context: Any, tasks: list[dict[str, Any]], *, check: bool = False) -> list[dict[str, Any]]:
+def due_tasks(
+    context: Any, tasks: list[dict[str, Any]], *, check: bool = False
+) -> list[dict[str, Any]]:
     if getattr(context, "trigger", "manual") != "scheduled":
         return tasks
     state = context.state.scoped("brush-task-check-schedule" if check else "brush-task-schedule")
@@ -78,8 +107,20 @@ def due_tasks(context: Any, tasks: list[dict[str, Any]], *, check: bool = False)
             continue
         previous = float(state.get(str(task["id"]), 0) or 0)
         cron = "" if check else str(task.get("cron") or "").strip()
-        due = (int(previous // 60) != int(now // 60) and cron_matches(cron, now)) if cron else (
-            now - previous >= max(1, int(task.get("check_interval_minutes" if check else "interval_minutes") or (5 if check else 10))) * 60
+        due = (
+            (int(previous // 60) != int(now // 60) and cron_matches(cron, now))
+            if cron
+            else (
+                now - previous
+                >= max(
+                    1,
+                    int(
+                        task.get("check_interval_minutes" if check else "interval_minutes")
+                        or (5 if check else 10)
+                    ),
+                )
+                * 60
+            )
         )
         if due:
             selected.append(task)
@@ -91,11 +132,17 @@ def task_capacity(context: Any, rule: dict[str, Any], downloads: list[dict[str, 
     limit = max(0, int(rule.get("task_limit") or 0))
     if not limit:
         return max(1, int(rule.get("max_add") or 3))
-    owned = {(str(receipt.get("downloader_id")), str(receipt.get("hash"))): receipt
-             for row in added_records(context)
-             if (receipt := row.get("result") or {}).get("ownership_verified")
-             and str(receipt.get("brush_task_id")) == str(rule["id"])}
-    active = sum(1 for task in downloads
-                 if (receipt := owned.get((str(task.get("downloader_id")), str(task.get("hash")))))
-                 and same_generation(receipt, task))
+    owned = {
+        (str(receipt.get("downloader_id")), str(receipt.get("hash"))): receipt
+        for row in added_records(context)
+        if (receipt := row.get("result") or {}).get("ownership_verified")
+        and str(receipt.get("brush_task_id")) == str(rule["id"])
+    }
+    active = sum(
+        1
+        for task in downloads
+        if (receipt := owned.get((str(task.get("downloader_id")), str(task.get("hash")))))
+        and brush_tagged(task)
+        and same_generation(receipt, task)
+    )
     return max(0, limit - active)

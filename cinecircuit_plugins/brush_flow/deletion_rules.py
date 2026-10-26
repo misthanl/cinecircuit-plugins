@@ -1,6 +1,7 @@
 """Deletion thresholds and unit conversions shared by automatic checks."""
 
 import math
+from time import time
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from typing import Any
@@ -25,7 +26,9 @@ def value(raw: Any) -> float | None:
 
 
 def configured(rule: dict[str, Any]) -> bool:
-    return rule.get("delete_expired_promotion") is True or any(value(rule.get(key)) for key, _, _ in LIMITS)
+    return rule.get("delete_expired_promotion") is True or any(
+        value(rule.get(key)) for key, _, _ in LIMITS
+    )
 
 
 def promotion_expired(payload: dict[str, Any]) -> bool:
@@ -44,6 +47,21 @@ def promotion_expired(payload: dict[str, Any]) -> bool:
 def matches(rule: dict[str, Any], task: dict[str, Any]) -> bool:
     for key, metric, multiplier in LIMITS:
         threshold, measured = value(rule.get(key)), value(task.get(metric))
+        if key == "delete_avg_upload_kib":
+            # Lifetime average includes bytes uploaded while downloading. Only
+            # completed torrents may be removed for a low average upload rate.
+            progress, remaining = value(task.get("progress")), value(task.get("amount_left"))
+            uploaded, added = value(task.get("uploaded_bytes")), value(task.get("added_on"))
+            elapsed = time() - added if added else 0
+            if (
+                progress is None
+                or progress < 100
+                or (remaining is not None and remaining > 0)
+                or uploaded is None
+                or elapsed <= 0
+            ):
+                continue
+            measured = uploaded / elapsed / 1024
         if not threshold or measured is None:
             continue
         if key == "delete_avg_upload_kib":

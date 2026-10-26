@@ -24,7 +24,7 @@ jobs:
           python-version: '3.12'
       - uses: actions/setup-node@v4
         with:
-          node-version: '22.18.0'
+          node-version: '22'
       - uses: pnpm/action-setup@v4
         with:
           version: 11.19.0
@@ -44,6 +44,14 @@ jobs:
       - name: Frontend budgets, types and regression tests
         working-directory: cinecircuit-plugins
         run: pnpm run quality:frontend
+      - name: Frontend dependency audit
+        working-directory: cinecircuit-plugins
+        run: pnpm audit --audit-level=high
+      - name: Host component integration
+        working-directory: cinecircuit-plugins
+        run: pnpm run test:host-integration
       - name: Verify reproducible packages and packaged SDK boundary
         working-directory: cinecircuit-plugins
-        run: python build.py --content-addressed
+        run: |
+          python build.py --content-addressed --published-ref "$(git rev-parse HEAD)"
+          git diff --exit-code -- plugins.json

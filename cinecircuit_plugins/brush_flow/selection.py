@@ -1,4 +1,5 @@
 """Local candidate filters; no metadata requests are needed per torrent."""
+
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 import math
@@ -52,7 +53,7 @@ def _matches_text(item, task):
 
 
 def _matches_promotion(item, task):
-    promotion = str(item.get("promotion") or "").upper()
+    promotion = re.sub(r"\s+", "", str(item.get("promotion") or "").upper())
     requested = task.get("promotion", "free")
     if requested == "free" and not (item.get("free") is True or promotion in {"FREE", "2XFREE"}):
         return False
@@ -76,7 +77,9 @@ def matches(item, task, *, now=None):
     size_rule = task.get("size_range")
     if size_rule is None:
         minimum, maximum = float(task.get("min_size") or 0), float(task.get("max_size") or 0)
-        if (minimum or maximum) and (size is None or size < minimum or (maximum and size > maximum)):
+        if (minimum or maximum) and (
+            size is None or size < minimum or (maximum and size > maximum)
+        ):
             return False
     if not in_range(size, size_rule):
         return False
@@ -84,7 +87,9 @@ def matches(item, task, *, now=None):
     if not in_range(seeders, task.get("seeders_range")):
         return False
     if bounds(task.get("publish_range")) is not None:
-        age = published_minutes(item, task.get("timezone_offset"), now or datetime.now(timezone.utc))
+        age = published_minutes(
+            item, task.get("timezone_offset"), now or datetime.now(timezone.utc)
+        )
         if not in_range(age, task["publish_range"]):
             return False
     return True

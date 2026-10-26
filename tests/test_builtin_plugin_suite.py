@@ -223,8 +223,8 @@ def test_brush_flow_adds_matching_torrents_once() -> None:
             )
         ),
         downloads=SimpleNamespace(
-            list_tasks=AsyncMock(return_value={"items": []}),
-            add=AsyncMock(return_value={"task_id": "hash-1"}),
+            list_tagged_tasks=AsyncMock(return_value={"items": []}),
+            add_torrent=AsyncMock(return_value={"task_id": "hash-1"}),
         ),
         items=SimpleNamespace(
             get=lambda key: recorded.get(key), record=remember,
@@ -240,7 +240,7 @@ def test_brush_flow_adds_matching_torrents_once() -> None:
 
     assert first["added"] == 1
     assert second["added"] == 0
-    context.downloads.add.assert_awaited_once()
+    context.downloads.add_torrent.assert_awaited_once()
 
 
 def test_auto_signin_retries_only_matching_transient_failures() -> None:

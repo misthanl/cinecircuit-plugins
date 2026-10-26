@@ -7,11 +7,11 @@ ROOT = Path(__file__).resolve().parents[1]
 HOST = ROOT.parent / "cinecircuit"
 sys.path.insert(0, str(HOST))
 
-from scripts.dependency_graph import collect_imports, cycles, python_modules, runtime_edges
-from scripts.plugin_dependency_guard import PUBLIC_HOST_MODULES
-
 
 def check_repository(root: Path) -> list[str]:
+    from scripts.dependency_graph import collect_imports, cycles, python_modules, runtime_edges
+    from scripts.plugin_dependency_guard import PUBLIC_HOST_MODULES
+
     modules = python_modules(root, ("cinecircuit_plugins",))
     modules = {
         name: module

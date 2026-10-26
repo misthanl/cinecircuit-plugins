@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import inspect
 from typing import Any
 
 from app.modules.plugins.contracts import (
@@ -18,6 +17,7 @@ from .selection import matches
 from .subscription_matching import load_index
 from .task_settings import task_defaults, due_tasks, task_capacity, intake_allowed
 from .task_limits import transfer_limits, volume_remaining, size_bytes, owned_downloads
+from .intake_retry import ready as retry_ready, failure as intake_failure
 
 
 class SiteTrafficPlugin(PluginBase):
@@ -27,7 +27,7 @@ class SiteTrafficPlugin(PluginBase):
         entrypoint="plugin:SiteTrafficPlugin",
         id="brush-flow",
         name="站点刷流",
-        version="1.0.0",
+        version="1.0.1",
         description="按站点和规则自动选种、下载与删种。",
         icon="mdi-swap-vertical",
         permissions=(
@@ -158,10 +158,17 @@ class SiteTrafficPlugin(PluginBase):
             task = self._tasks({**context.config, "tasks": [request.payload]})[0]
             sites = self._site_actions(context)
             site_id = str(task.get("site_id") or "")
-            feed = await sites.feed(site_id, limit=100) if task.get("use_rss") else await self._latest(sites, site_id, limit=100)
+            feed = (
+                await sites.feed(site_id, limit=100)
+                if task.get("use_rss")
+                else await self._latest(sites, site_id, limit=100)
+            )
             index = await load_index(context, [task])
-            matches = [item for item in feed.get("items", []) if self._matches(item, task)
-                       and not (index and index.matches(item))]
+            matches = [
+                item
+                for item in feed.get("items", [])
+                if self._matches(item, task) and not (index and index.matches(item))
+            ]
             return {"items": matches[:50], "count": len(matches)}
         if request.action == "run" and request.method == "POST":
             task_id = str(request.payload.get("task_id") or "")
@@ -179,51 +186,28 @@ class SiteTrafficPlugin(PluginBase):
         tasks = [task for task in tasks if intake_allowed(task)]
         if not tasks:
             return {"status": "completed", "tasks": 0, "added": 0, "results": []}
-        index = await load_index(context, tasks)
         existing_items = await owned_downloads(context)
+        index = await load_index(context, tasks)
         remaining = max(0, int(context.config.get("max_tasks") or 30) - len(existing_items))
         added = 0
         results: list[dict[str, Any]] = []
         for task in tasks:
-            if not task.get("enabled", True):
-                continue
-            if remaining <= 0:
-                record_execution(context, task, reason="达到全局数量上限")
-                continue
-            capacity = task_capacity(context, task, existing_items)
-            volume = await volume_remaining(context, task, existing_items, complete=True)
-            if capacity <= 0 or volume == 0:
-                record_execution(context, task, reason="达到体积上限" if volume == 0 else "达到任务数量上限")
-                continue
-            sites = self._site_actions(context)
-            site_id = str(task.get("site_id") or "")
-            feed = await self._task_feed(context, task, sites, site_id)
-            candidates = [item for item in feed.get("items", []) if self._matches(item, task)
-                          and not (task.get("exclude_subscriptions") and index and index.matches(item))]
-            task_added, task_failed = await self._submit_candidates(
-                context, sites, site_id, task, candidates,
-                min(remaining, capacity, int(task.get("max_add") or 3)), volume,
-            )
-            added += task_added
-            remaining -= task_added
-            record_execution(context, task, added=task_added, matched=len(candidates),
-                             skipped=max(0, len(feed.get("items", [])) - task_added - task_failed),
-                             failed=task_failed, reason="部分失败" if task_failed else "成功")
-            results.append(
-                {
-                    "task_id": task["id"],
-                    "name": task["name"],
-                    "matched": len(candidates),
-                    "added": task_added,
-                }
-            )
+            outcome = await self._run_task(context, task, existing_items, index, remaining)
+            if outcome is not None:
+                results.append(outcome)
+                added += outcome["added"]
+                remaining -= outcome["added"]
         summary = {"status": "completed", "tasks": len(tasks), "added": added, "results": results}
         await self._notify_tasks(context, tasks, results)
         return summary
 
     async def _task_feed(self, context, task, sites, site_id):
         try:
-            return await sites.feed(site_id, limit=200) if task.get("use_rss") else await self._latest(sites, site_id, limit=200)
+            return (
+                await sites.feed(site_id, limit=200)
+                if task.get("use_rss")
+                else await self._latest(sites, site_id, limit=200)
+            )
         except Exception:
             record_execution(context, task, failed=1, reason="站点读取失败")
             raise
@@ -240,7 +224,7 @@ class SiteTrafficPlugin(PluginBase):
             if volume is not None and (size is None or size > volume):
                 continue
             key = self._item_key(task, item)
-            if context.items.get(key):
+            if not retry_ready(context.items.get(key)):
                 continue
             if not await self._add_candidate(context, sites, site_id, task, item, key):
                 recorded = context.items.get(key) or {}
@@ -252,11 +236,15 @@ class SiteTrafficPlugin(PluginBase):
         return task_added, task_failed
 
     @staticmethod
-    async def _notify_tasks(context: PluginContext, tasks: list[dict[str, Any]], results: list[dict[str, Any]]) -> None:
+    async def _notify_tasks(
+        context: PluginContext, tasks: list[dict[str, Any]], results: list[dict[str, Any]]
+    ) -> None:
         configured = {task["id"]: task for task in tasks}
         for outcome in results:
             task = configured[outcome["task_id"]]
-            if task.get("notification_enabled", context.config.get("notification_enabled", False)):
+            if context.config.get("notification_enabled", False) and task.get(
+                "notification_enabled", True
+            ):
                 await context.notifications.send(
                     f"刷流任务：{task['name']}",
                     f"匹配 {outcome['matched']} 个，新增下载 {outcome['added']} 个。",
@@ -273,41 +261,29 @@ class SiteTrafficPlugin(PluginBase):
         key: str,
     ) -> bool:
         try:
-            if hasattr(sites, "dispatch"):
-                result = await sites.dispatch(
-                    site_id,
-                    str(item.get("id") or ""),
-                    str(task.get("downloader_id") or ""),
-                    save_path=str(task.get("save_path") or ""),
-                    tags=["刷流"],
-                    include_default_tag=False,
-                    **transfer_limits(task),
-                    **(
-                        {"track_ownership": True}
-                        if "track_ownership" in inspect.signature(sites.dispatch).parameters
-                        else {}
-                    ),
-                )
-            else:
-                result = await context.downloads.add(
-                    {
-                        "downloader_id": str(task.get("downloader_id") or "") or None,
-                        "save_path": str(task.get("save_path") or "") or None,
-                        "item": item,
-                        "tags": ["刷流"],
-                        "include_default_tag": False,
-                        "track_ownership": True,
-                        **transfer_limits(task),
-                    }
-                )
+            result = await SiteTrafficPlugin._dispatch_candidate(
+                context, sites, site_id, task, item
+            )
         except Exception as error:
-            context.items.record(key, "failed", payload=item, result={"error": str(error)})
+            getter = getattr(context.items, "get", None)
+            previous = getter(key) if callable(getter) else None
+            context.items.record(
+                key, "failed", payload=item, result=intake_failure(error, previous)
+            )
             return False
         if result.get("status") == "already_exists":
             context.items.record(key, "duplicate", payload=item, result=dict(result))
             return False
         context.items.record(
-            key, "added", payload=item, result={**result, "brush_task_id": str(task["id"]), "brush_task_name": task.get("name") or "未命名刷流任务", "brush_site_id": task.get("site_id", "")}
+            key,
+            "added",
+            payload=item,
+            result={
+                **result,
+                "brush_task_id": str(task["id"]),
+                "brush_task_name": task.get("name") or "未命名刷流任务",
+                "brush_site_id": task.get("site_id", ""),
+            },
         )
         return True
 
@@ -341,7 +317,7 @@ class SiteTrafficPlugin(PluginBase):
     @staticmethod
     def _site_actions(context: PluginContext) -> Any:
         sdk = getattr(context, "sdk", None)
-        return sdk.require("sites", min_version=2) if sdk is not None else context.sites
+        return sdk.require("sites", min_version=5) if sdk is not None else context.sites
 
     @staticmethod
     async def _latest(sites: Any, site_id: str, *, limit: int) -> dict[str, Any]:
@@ -357,6 +333,80 @@ class SiteTrafficPlugin(PluginBase):
     def _item_key(task: dict[str, Any], item: dict[str, Any]) -> str:
         raw = f"{task.get('id')}:{item.get('id') or item.get('download_url') or item.get('title')}"
         return f"brush:{hashlib.sha256(raw.encode()).hexdigest()}"
+
+    async def _run_task(self, context, task, existing_items, index, remaining):
+        if not task.get("enabled", True):
+            return None
+        if remaining <= 0:
+            record_execution(context, task, reason="达到全局数量上限")
+            return None
+        capacity = task_capacity(context, task, existing_items)
+        volume = await volume_remaining(context, task, existing_items, complete=True)
+        if capacity <= 0 or volume == 0:
+            record_execution(
+                context, task, reason="达到体积上限" if volume == 0 else "达到任务数量上限"
+            )
+            return None
+        sites = self._site_actions(context)
+        site_id = str(task.get("site_id") or "")
+        feed = await self._task_feed(context, task, sites, site_id)
+        candidates = [
+            item
+            for item in feed.get("items", [])
+            if self._matches(item, task)
+            and not (task.get("exclude_subscriptions") and index and index.matches(item))
+        ]
+        task_added, task_failed = await self._submit_candidates(
+            context,
+            sites,
+            site_id,
+            task,
+            candidates,
+            min(remaining, capacity, int(task.get("max_add") or 3)),
+            volume,
+        )
+        record_execution(
+            context,
+            task,
+            added=task_added,
+            matched=len(candidates),
+            skipped=max(0, len(feed.get("items", [])) - task_added - task_failed),
+            failed=task_failed,
+            reason="部分失败" if task_failed else "成功",
+        )
+        return {
+            "task_id": task["id"],
+            "name": task["name"],
+            "matched": len(candidates),
+            "added": task_added,
+        }
+
+    @staticmethod
+    async def _dispatch_candidate(context, sites, site_id, task, item):
+        if hasattr(sites, "dispatch_torrent"):
+            return await sites.dispatch_torrent(
+                site_id,
+                str(item.get("id") or ""),
+                str(task.get("downloader_id") or ""),
+                save_path=str(task.get("save_path") or ""),
+                tags=["刷流"],
+                track_ownership=True,
+                **transfer_limits(task),
+            )
+        elif callable(getattr(context.downloads, "add_torrent", None)):
+            return await context.downloads.add_torrent(
+                {
+                    "downloader_id": str(task.get("downloader_id") or "") or None,
+                    "save_path": str(task.get("save_path") or "") or None,
+                    "item": item,
+                    "tags": ["刷流"],
+                    "include_default_tag": False,
+                    "track_ownership": True,
+                    **transfer_limits(task),
+                }
+            )
+        else:
+            raise RuntimeError("主项目尚不支持直接种子提交，请更新主项目")
 
 
 Plugin = SiteTrafficPlugin

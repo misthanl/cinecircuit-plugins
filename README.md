@@ -8,6 +8,8 @@
 | --- | --- |
 | [站点签到管理](cinecircuit_plugins/auto_signin/README.md) | 自动登录并签到配置的 PT 站点 |
 | [站点刷流](cinecircuit_plugins/brush_flow/README.md) | 根据站点与规则选种、下载和删种 |
+| [转移做种](cinecircuit_plugins/torrent_transfer/README.md) | 将完整种子转移到其他下载器，校验后复用现有文件做种 |
+| [IYUU 辅种](cinecircuit_plugins/iyuu_autoseed/README.md) | 查找其他站点的同源种子，检查文件路径和体积后辅种 |
 | [演职员资料完善](cinecircuit_plugins/cast_profile_enricher/README.md) | 补全人物中文姓名、简介、角色与头像 |
 | [CookieCloud 站点同步](cinecircuit_plugins/cookiecloud/README.md) | 同步浏览器 Cookie，验证并更新站点 |
 | [豆瓣榜追更](cinecircuit_plugins/douban_rank/README.md) | 根据榜单与筛选条件添加影视订阅 |
@@ -71,6 +73,8 @@ Windows 使用 `../cinecircuit/.venv/Scripts/python.exe`。
 | `plugins.json` | GitHub 插件库索引 |
 
 `build.py --content-addressed` 使用内容摘要命名 ZIP，同时生成本地目录和 GitHub 索引。发布时应一起提交 `plugins.json` 与它引用的安装包，确保摘要一致。
+
+正式发布使用 `--published-ref <已核实的完整 GitHub 提交 SHA>`。未改动源码及其共享依赖的插件沿用原始 ZIP；已发布版本的源码或清单有变化时必须先更新版本号。构建只打包实际使用的共享 Python 模块及其传递依赖，避免无关插件代码进入安装包。
 
 默认 `build.py` 使用版本号文件名，会拒绝用不同内容覆盖已有同名版本包。内容摘要模式可区分同版本的不同构建；正式功能迭代仍应按发布策略维护版本号。保留正在使用的精确安装包，避免影响安装恢复。
 

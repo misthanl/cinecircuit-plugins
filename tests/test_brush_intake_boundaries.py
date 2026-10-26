@@ -23,17 +23,20 @@ def test_inventory_over_100_without_default_tag_and_shared_lookup():
         remote[key] = {**task, 'hash': key, 'size': 1024**3, 'tags': '刷流,owner-test'}
     ctx.items.rows = rows + [deepcopy(rows[0])]
     ctx.downloads.task = AsyncMock(side_effect=lambda d, h, **kw: remote[h])
+    async def listed(*args, offset=0, limit=200):
+        return {'items': list(remote.values())[offset:offset+limit]}
+    ctx.downloads.list_tagged_tasks = AsyncMock(side_effect=listed)
     current = asyncio.run(owned_downloads(ctx))
     assert len(current) == 501
-    assert ctx.downloads.task.await_count == 501
+    assert ctx.downloads.list_tagged_tasks.await_count == 3
     assert task_capacity(ctx, {**rule, 'task_limit': 301}, current) == 1
     assert asyncio.run(volume_remaining(ctx, {**rule, 'seeding_limit_gib': 301}, current, complete=True)) == 1024**3
-    assert ctx.downloads.task.await_count == 501
+    ctx.downloads.task.assert_not_awaited()
 
 
 def test_failed_lookup_aborts_intake_before_dispatch():
     ctx, rule, _ = fixture()
-    ctx.downloads.task.side_effect = RuntimeError('unavailable')
+    ctx.downloads.list_tagged_tasks.side_effect = RuntimeError('unavailable')
     host = SiteTrafficPlugin()
     host._add_candidate = AsyncMock()
     with pytest.raises(RuntimeError, match='unavailable'):
@@ -41,7 +44,7 @@ def test_failed_lookup_aborts_intake_before_dispatch():
     host._add_candidate.assert_not_awaited()
 
 
-@pytest.mark.parametrize('change', [{'added_on': 101}, {'hash': 'foreign'}, {'downloader_id': 'other'}, {'tags': '刷流'}])
+@pytest.mark.parametrize('change', [{'added_on': 101}, {'hash': 'foreign'}, {'downloader_id': 'other'}])
 def test_foreign_generation_not_counted(change):
     ctx, _, task = fixture()
     task.update(change)
@@ -60,7 +63,7 @@ def test_unfinished_thresholds_respect_protected_tags(key, metric, value, protec
     task.update(progress=50, **{metric: value})
     if protected:
         task['tags'] += ',H&R'
-    assert asyncio.run(check_downloads(ctx, [rule]))['deleted'] == int(not protected)
+    assert asyncio.run(check_downloads(ctx, [rule]))['deleted'] == int(not protected and key != 'delete_avg_upload_kib')
 
 
 @pytest.mark.parametrize('expression,expected', [
@@ -92,4 +95,4 @@ def test_global_capacity_reserves_success_across_rules(global_limit, expected):
     result = asyncio.run(host._run_tasks(ctx, [rule, {**rule, 'id': 'r2'}]))
     assert result['added'] == expected
     assert host._add_candidate.await_count == expected
-    ctx.downloads.task.assert_awaited_once()
+    ctx.downloads.list_tagged_tasks.assert_awaited_once()

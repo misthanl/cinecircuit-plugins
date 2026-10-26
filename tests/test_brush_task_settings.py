@@ -128,7 +128,7 @@ def test_task_capacity_counts_only_its_owned_download_generation():
 
 
 def test_notifications_follow_result_task_id_after_other_task_is_skipped():
-    ctx = SimpleNamespace(config={}, notifications=SimpleNamespace(send=AsyncMock()))
+    ctx = SimpleNamespace(config={"notification_enabled": True}, notifications=SimpleNamespace(send=AsyncMock()))
     tasks = [dict(id="full", name="Full", notification_enabled=True),
              dict(id="run", name="Running", notification_enabled=False)]
     results = [dict(task_id="run", matched=2, added=1)]

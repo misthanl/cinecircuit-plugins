@@ -1,9 +1,12 @@
 """Name/season matching for feed titles, entirely local to this plugin."""
+
 import re
 import unicodedata
 
 SEASON = re.compile(r"(?i)(?<![a-z0-9])S(\d{1,3})(?:E\d+)?|第\s*([一二三四五六七八九十\d]+)\s*季")
-TECH = re.compile(r"(?i)(?:[ ._\-\[]+)(?:19\d{2}|20\d{2}|2160p|1080[pi]|720p|4k|web[- .]?dl|webrip|bluray|bdrip|hdtv|remux|x26[45]|h[ .]?26[45])\b")
+TECH = re.compile(
+    r"(?i)(?:[ ._\-\[]+)(?:19\d{2}|20\d{2}|2160p|1080[pi]|720p|4k|web[- .]?dl|webrip|bluray|bdrip|hdtv|remux|x26[45]|h[ .]?26[45])\b"
+)
 
 
 def number(value):
@@ -26,10 +29,10 @@ def title_parts(value):
     seasons = {number(match[1] or match[2]) for match in SEASON.finditer(title)}
     match = SEASON.search(title)
     if match:
-        title = title[:match.start()]
+        title = title[: match.start()]
     technical = TECH.search(title)
     if technical:
-        title = title[:technical.start()]
+        title = title[: technical.start()]
     return normalized(title), seasons
 
 

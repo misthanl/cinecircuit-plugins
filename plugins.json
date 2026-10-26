@@ -109,7 +109,7 @@
       "manifest": {
         "id": "brush-flow",
         "name": "站点刷流",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "按站点和规则自动选种、下载与删种。",
         "icon": "mdi-swap-vertical",
         "api_version": 2,
@@ -239,8 +239,11 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.0-dcf331683700dce4.zip",
-      "sha256": "dcf331683700dce4cf702956d6ed8b4f34ec76c9efebfd4bbfd8b3b6cb133bfa"
+      "package_url": "packages/brush-flow-1.0.1-ad15a695ce755594.zip",
+      "sha256": "ad15a695ce755594b9764495c3ee0d78d6cce9f5538444023da50fa5dbe42663",
+      "supersedes_sha256": [
+        "7e70ab2da5094e105d88c110d29d53293f108d8871cc4890f38d6fbb7559c434"
+      ]
     },
     {
       "manifest": {
@@ -823,6 +826,191 @@
       },
       "package_url": "packages/douban-hot-1.0.2-78111c1aa655a486.zip",
       "sha256": "78111c1aa655a486106f48d0c352be06d6c3279931ab69ea0206ade213b19332"
+    },
+    {
+      "manifest": {
+        "id": "iyuu-autoseed",
+        "name": "IYUU 辅种",
+        "version": "1.0.0",
+        "description": "通过 IYUU 查找其他站点的同源种子，复用已有数据校验做种。",
+        "icon": "mdi-source-branch",
+        "api_version": 2,
+        "entrypoint": "plugin:IyuuAutoSeedPlugin",
+        "permissions": [
+          "downloader:read",
+          "downloader:add",
+          "downloader:recheck",
+          "downloader:resume",
+          "site:read",
+          "notification:send"
+        ],
+        "capabilities": [
+          "scheduled_task",
+          "statistics_page"
+        ],
+        "events": [],
+        "schedule_seconds": 0,
+        "config_schema": {
+          "editor_width": 920,
+          "description_display": "hidden",
+          "layout": {
+            "columns": 2,
+            "row_gap": 14,
+            "column_gap": 16
+          },
+          "fields": [
+            {
+              "key": "enabled",
+              "label": "启用自动辅种",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "onlyonce",
+              "label": "立即执行一次",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "notification_enabled",
+              "label": "发送通知",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "cron",
+              "label": "执行周期",
+              "input_type": "cron",
+              "default": ""
+            },
+            {
+              "key": "token",
+              "label": "IYUU Token",
+              "input_type": "password",
+              "default": "",
+              "secret": true,
+              "encrypted": true
+            },
+            {
+              "key": "downloaders",
+              "label": "来源下载器",
+              "input_type": "resource_multi_select",
+              "default": [],
+              "resource_kind": "downloader",
+              "required_capabilities": [
+                "read"
+              ]
+            },
+            {
+              "key": "auto_downloader",
+              "label": "独立辅种下载器",
+              "input_type": "resource_select",
+              "default": "",
+              "resource_kind": "downloader",
+              "required_capabilities": [
+                "add"
+              ],
+              "description": "留空在原下载器辅种；选择时不能与来源下载器重复。"
+            },
+            {
+              "key": "sites",
+              "label": "辅种站点",
+              "input_type": "resource_multi_select",
+              "default": [],
+              "resource_kind": "site",
+              "required_capabilities": []
+            },
+            {
+              "key": "nolabels",
+              "label": "不辅种标签",
+              "input_type": "text",
+              "default": ""
+            },
+            {
+              "key": "nopaths",
+              "label": "不辅种数据目录",
+              "input_type": "textarea",
+              "default": ""
+            },
+            {
+              "key": "size",
+              "label": "最小辅种体积（GiB）",
+              "input_type": "number",
+              "default": 0,
+              "validation": {
+                "minimum": 0
+              }
+            },
+            {
+              "key": "labelsafterseed",
+              "label": "辅种后增加标签",
+              "input_type": "text",
+              "default": "辅种"
+            },
+            {
+              "key": "categoryafterseed",
+              "label": "辅种分类",
+              "input_type": "text",
+              "default": ""
+            },
+            {
+              "key": "addhosttotag",
+              "label": "将站点名加入标签",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "auto_category",
+              "label": "复用原分类（仅 qB）",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "reuse_save_path",
+              "label": "沿用原种保存路径（仅 qB）",
+              "input_type": "switch",
+              "default": true
+            },
+            {
+              "key": "skipverify",
+              "label": "跳过校验（仅 qB）",
+              "input_type": "switch",
+              "default": false,
+              "description": "默认校验现有数据；跳过校验需自行确认文件完整。"
+            },
+            {
+              "key": "auto_start",
+              "label": "跳过校验后自动开始",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "clearcache",
+              "label": "清除成功和失败缓存",
+              "input_type": "switch",
+              "default": false
+            }
+          ]
+        },
+        "frontend_module": "frontend.js",
+        "navigation": {},
+        "jobs": [
+          {
+            "name": "reseed",
+            "interval_seconds": 60,
+            "cron": "",
+            "events": [],
+            "manual": true,
+            "timeout_seconds": 3600,
+            "coalesce": true
+          }
+        ]
+      },
+      "package_url": "packages/iyuu-autoseed-1.0.0-a6d0291debc929d0.zip",
+      "sha256": "a6d0291debc929d00264fbf09cf9f0ee1618f05009ee9797246fc6509d23085c",
+      "supersedes_sha256": [
+        "9deaec47861592e3d2208546c1be74c82c2dc61864cce98805162b813541f9d6"
+      ]
     },
     {
       "manifest": {
@@ -2803,6 +2991,203 @@
       },
       "package_url": "packages/subtitle-manager-1.0.3-e30526e73b0f59ca.zip",
       "sha256": "e30526e73b0f59ca0e48d3afa4f40e717fa52709e13a6ed0463e0ec706a858c0"
+    },
+    {
+      "manifest": {
+        "id": "torrent-transfer",
+        "name": "转移做种",
+        "version": "1.0.0",
+        "description": "将已完成的种子转移到其他下载器，复用原有数据做种。",
+        "icon": "mdi-file-move-outline",
+        "api_version": 2,
+        "entrypoint": "plugin:TorrentTransferPlugin",
+        "permissions": [
+          "downloader:read",
+          "downloader:export_torrent",
+          "downloader:add",
+          "downloader:recheck",
+          "downloader:resume",
+          "downloader:delete_task",
+          "notification:send"
+        ],
+        "capabilities": [
+          "scheduled_task",
+          "statistics_page"
+        ],
+        "events": [],
+        "schedule_seconds": 0,
+        "config_schema": {
+          "editor_width": 920,
+          "description_display": "hidden",
+          "layout": {
+            "columns": 2,
+            "row_gap": 14,
+            "column_gap": 16
+          },
+          "fields": [
+            {
+              "key": "enabled",
+              "label": "启用自动转移",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "onlyonce",
+              "label": "立即执行一次",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "notification_enabled",
+              "label": "发送通知",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "cron",
+              "label": "执行周期",
+              "input_type": "cron",
+              "default": ""
+            },
+            {
+              "key": "fromdownloader",
+              "label": "源下载器",
+              "input_type": "resource_select",
+              "default": "",
+              "resource_kind": "downloader",
+              "required_capabilities": [
+                "read"
+              ]
+            },
+            {
+              "key": "todownloader",
+              "label": "目标下载器",
+              "input_type": "resource_select",
+              "default": "",
+              "resource_kind": "downloader",
+              "required_capabilities": [
+                "add"
+              ]
+            },
+            {
+              "key": "fromtorrentpath",
+              "label": "源种子文件目录",
+              "input_type": "text",
+              "default": "",
+              "description": "优先使用下载器导出接口；不支持导出时需填写 CC 可读的种子目录。"
+            },
+            {
+              "key": "frompath",
+              "label": "源保存目录映射",
+              "input_type": "textarea",
+              "default": "",
+              "description": "每行一个目录，与目标目录逐行对应；留空沿用原路径。"
+            },
+            {
+              "key": "topath",
+              "label": "目标保存目录映射",
+              "input_type": "textarea",
+              "default": ""
+            },
+            {
+              "key": "includelabels",
+              "label": "转移做种标签",
+              "input_type": "text",
+              "default": "",
+              "description": "逗号分隔，必须包含全部指定标签。"
+            },
+            {
+              "key": "nolabels",
+              "label": "不转移做种标签",
+              "input_type": "text",
+              "default": "",
+              "description": "任一标签匹配即排除。"
+            },
+            {
+              "key": "transferemptylabel",
+              "label": "转移无标签种子",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "includecategory",
+              "label": "转移分类",
+              "input_type": "text",
+              "default": ""
+            },
+            {
+              "key": "nopaths",
+              "label": "不转移数据目录",
+              "input_type": "textarea",
+              "default": ""
+            },
+            {
+              "key": "remainoldcat",
+              "label": "保留源分类",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "remainoldtag",
+              "label": "保留源标签",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "add_torrent_tags",
+              "label": "目标新增标签",
+              "input_type": "text",
+              "default": "转移做种"
+            },
+            {
+              "key": "skipverify",
+              "label": "跳过校验（仅 qB）",
+              "input_type": "switch",
+              "default": false,
+              "description": "默认校验现有数据；跳过校验需自行确认文件完整。"
+            },
+            {
+              "key": "autostart",
+              "label": "校验完成后自动开始",
+              "input_type": "switch",
+              "default": false
+            },
+            {
+              "key": "deletesource",
+              "label": "转移成功后删除源任务",
+              "input_type": "switch",
+              "default": false,
+              "description": "目标确认完整后仅删除源任务，始终保留数据文件。"
+            },
+            {
+              "key": "deleteduplicate",
+              "label": "目标重复时删除源任务",
+              "input_type": "switch",
+              "default": false,
+              "description": "仅在目标完整且无错误时删除源任务，保留数据文件。"
+            }
+          ]
+        },
+        "frontend_module": "frontend.js",
+        "navigation": {},
+        "jobs": [
+          {
+            "name": "transfer",
+            "interval_seconds": 60,
+            "cron": "",
+            "events": [],
+            "manual": true,
+            "timeout_seconds": 3600,
+            "coalesce": true
+          }
+        ]
+      },
+      "package_url": "packages/torrent-transfer-1.0.0-0a3edcbe71d73cc5.zip",
+      "sha256": "0a3edcbe71d73cc59570e27f09aa34ffae2c2c37ff8c6e66d9e7b3870cc36abd",
+      "supersedes_sha256": [
+        "ccd847cdae37d2dd83d20af8e1b39fa72153a0f4a2a61d43ef6f75dc7c0f5642",
+        "77405b3b7db1db300d8b53447a8b0a8ff8fc5910b1ee24d661866d187ffadf1b"
+      ]
     }
   ]
 }

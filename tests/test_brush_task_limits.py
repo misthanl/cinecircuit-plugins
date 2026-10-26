@@ -23,13 +23,21 @@ def test_unlimited_needs_no_history():
     assert transfer_limits({}) == {}
 
 
-def test_volume_reserves_each_add_and_skips_oversized(monkeypatch):
+@pytest.mark.parametrize("size_format", ["rss", "site", "bytes_only"])
+def test_volume_reserves_each_add_and_skips_oversized(monkeypatch, size_format):
     from cinecircuit_plugins.brush_flow import plugin
     monkeypatch.setattr(plugin, "load_index", AsyncMock(return_value=None))
     sizes = [12, 6, 5, 4]
     candidates = [{"id": str(n), "size": size * 1024**3} for n, size in enumerate(sizes)]
+    if size_format != "rss":
+        for item, size in zip(candidates, sizes):
+            item["size_bytes"] = size * 1024**3
+            if size_format == "site":
+                item["size"] = f"{size:.2f} GB"
+            else:
+                item.pop("size")
     sites = SimpleNamespace(latest=AsyncMock(return_value={"items": candidates}))
-    ctx = SimpleNamespace(config={}, downloads=SimpleNamespace(list_tasks=AsyncMock(return_value={"items": []})), items=SimpleNamespace(list=lambda *a, **kw: [], get=lambda _: None))
+    ctx = SimpleNamespace(config={}, downloads=SimpleNamespace(list_tagged_tasks=AsyncMock(return_value={"items": []})), items=SimpleNamespace(list=lambda *a, **kw: [], get=lambda _: None))
     host = SiteTrafficPlugin()
     monkeypatch.setattr(host, "_site_actions", lambda _: sites)
     monkeypatch.setattr(host, "_matches", lambda *a: True)
@@ -39,14 +47,14 @@ def test_volume_reserves_each_add_and_skips_oversized(monkeypatch):
     rule = {"id": "r", "name": "r", "site_id": "s", "seeding_limit_gib": 10, "max_add": 3}
     result = asyncio.run(host._run_tasks(ctx, [rule]))
     assert result["added"] == 2
-    assert [call.args[4]["size"] for call in add.await_args_list] == [6 * 1024**3, 4 * 1024**3]
+    assert [call.args[4].get("size_bytes", call.args[4].get("size")) for call in add.await_args_list] == [6 * 1024**3, 4 * 1024**3]
 
 
 @pytest.mark.parametrize("secure", [True, False])
 def test_limits_forwarded_to_dispatch(secure):
     dispatch = AsyncMock(return_value={"status": "queued"})
-    ctx = SimpleNamespace(downloads=SimpleNamespace(add=dispatch), items=SimpleNamespace(record=Mock()))
-    sites = SimpleNamespace(dispatch=dispatch) if secure else SimpleNamespace()
+    ctx = SimpleNamespace(downloads=SimpleNamespace(add_torrent=dispatch), items=SimpleNamespace(record=Mock()))
+    sites = SimpleNamespace(dispatch_torrent=dispatch) if secure else SimpleNamespace()
     task = {"id": "r", "upload_limit_kib": 100, "download_limit_kib": 200}
     assert asyncio.run(SiteTrafficPlugin._add_candidate(ctx, sites, "s", task, {"id": "i"}, "key"))
     values = dispatch.call_args.kwargs if secure else dispatch.call_args.args[0]

@@ -13,6 +13,8 @@ HOST = ROOT.parent / "cinecircuit"
 
 
 def sources():
+    yield ROOT / "build.py"
+    yield from sorted((ROOT / "scripts").glob("*.py"))
     for path in sorted(SOURCE.rglob("*.py")):
         if "_vendor" in path.parts or path.name.startswith("test_"):
             continue

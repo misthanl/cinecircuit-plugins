@@ -555,7 +555,8 @@ def test_all_shipped_sample_styles_disable_count_badges(tmp_path,monkeypatch):
     monkeypatch.setitem(globals_,'ASSETS',tmp_path)
     monkeypatch.setitem(globals_,'CACHE',tmp_path/'cache')
     monkeypatch.setitem(globals_,'source',lambda movie:jpeg((20,30,40)))
-    monkeypatch.setitem(globals_,'CoverRenderer',SampleRenderer)
+    from cinecircuit_plugins.media_cover_generator import renderer
+    monkeypatch.setattr(renderer, 'CoverRenderer', SampleRenderer)
     main()
     assert len(seen)==17
     assert all(not options.show_count for options in seen)

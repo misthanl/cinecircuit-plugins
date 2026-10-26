@@ -19,6 +19,12 @@ def test_defaults_and_promotions():
     assert not matches(item(), {"promotion": "2xfree"})
 
 
+def test_double_free_matches_host_promotion_label():
+    assert matches(item(promotion="2X FREE"), {"promotion": "2xfree"})
+    assert matches(item(promotion="2X FREE"), {"promotion": "free"})
+    assert not matches(item(promotion="2X 50%"), {"promotion": "2xfree"})
+
+
 def test_ranges_and_missing_values():
     assert matches(item(), {"size_range": "0-10", "seeders_range": "10"})
     assert not matches(item(), {"size_range": "0-9"})

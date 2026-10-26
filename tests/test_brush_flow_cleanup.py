@@ -24,14 +24,47 @@ from cinecircuit_plugins.brush_flow.plugin import SiteTrafficPlugin
     ("delete_avg_upload_kib", "avg_upload_kib_s", 10, float("nan"), False),
     ("delete_avg_upload_kib", "avg_upload_kib_s", 10, -1, False),
 ])
-def test_new_rules_work_without_original_thresholds(key, metric, limit, actual, expected):
+def test_new_rules_work_without_original_thresholds(key, metric, limit, actual, expected, monkeypatch):
     ctx, rule, task = fixture()
     rule.pop("delete_ratio")
     rule[key] = limit
     task[metric] = actual
+    if key == "delete_avg_upload_kib":
+        monkeypatch.setattr("cinecircuit_plugins.brush_flow.deletion_rules.time", lambda: 200)
+        task["uploaded_bytes"] = actual * 100 * 1024 if actual is not None else None
     summary = asyncio.run(check_downloads(ctx, [rule]))
     assert summary["deleted"] == int(expected)
     assert ctx.downloads.delete.await_count == int(expected)
+
+
+@pytest.mark.parametrize("progress,remaining", [(0, 1024), (99, 1), (99.999, 0), (100, 1), (None, 0)])
+def test_low_average_never_deletes_unfinished_torrent(progress, remaining, monkeypatch):
+    monkeypatch.setattr("cinecircuit_plugins.brush_flow.deletion_rules.time", lambda: 3700)
+    ctx, rule, task = fixture()
+    rule.update(delete_ratio=0, delete_avg_upload_kib=30)
+    task.update(progress=progress, amount_left=remaining, uploaded_bytes=0, avg_upload_kib_s=0)
+    assert asyncio.run(check_downloads(ctx, [rule]))["deleted"] == 0
+    ctx.downloads.delete.assert_not_awaited()
+
+
+@pytest.mark.parametrize("uploaded_kib,expected", [(29 * 3600, 1), (30 * 3600, 0), (31 * 3600, 0)])
+def test_completed_average_includes_entire_download_period(uploaded_kib, expected, monkeypatch):
+    # Added at 100, downloaded for 3500 seconds, seeded for 100 seconds.
+    # Deliberately misleading host average proves we use cumulative bytes/time.
+    monkeypatch.setattr("cinecircuit_plugins.brush_flow.deletion_rules.time", lambda: 3700)
+    ctx, rule, task = fixture()
+    rule.update(delete_ratio=0, delete_avg_upload_kib=30)
+    task.update(progress=100, amount_left=0, uploaded_bytes=uploaded_kib * 1024,
+                seed_hours=100 / 3600, avg_upload_kib_s=99999)
+    assert asyncio.run(check_downloads(ctx, [rule]))["deleted"] == expected
+
+
+@pytest.mark.parametrize("uploaded,added", [(None, 100), (-1, 100), (float("nan"), 100), (0, 0), (0, 3700), (0, 3800)])
+def test_invalid_lifetime_average_does_not_match(uploaded, added, monkeypatch):
+    from cinecircuit_plugins.brush_flow.deletion_rules import matches
+    monkeypatch.setattr("cinecircuit_plugins.brush_flow.deletion_rules.time", lambda: 3700)
+    assert not matches({"delete_avg_upload_kib": 30},
+                       {"progress": 100, "amount_left": 0, "uploaded_bytes": uploaded, "added_on": added})
 
 
 class Items:
@@ -54,12 +87,16 @@ def fixture():
     receipt = dict(hash="a" * 40, downloader_id="d1", ownership_verified=True,
                    ownership_tag="owner-test", task_added_on=100, brush_task_id="r1")
     row = dict(item_key="one", status="added", result=receipt, payload={"title": "example"})
-    task = dict(hash="a" * 40, downloader_id="d1", added_on=100, tags="app, owner-test",
+    task = dict(hash="a" * 40, downloader_id="d1", added_on=100, tags="刷流,app, owner-test",
                 progress=100, ratio=2, seed_hours=48, paused=False)
     context = SimpleNamespace(config={"cleanup_enabled": True}, items=Items([row]),
         downloads=SimpleNamespace(task=AsyncMock(return_value=task),
                                   delete=AsyncMock(), pause=AsyncMock()))
     rule = dict(id="r1", enabled=True, delete_task=True, delete_ratio=2)
+    async def listed(*args, **kwargs):
+        current = context.downloads.task.return_value
+        return {"items": [current] if isinstance(current, dict) else []}
+    context.downloads.list_tagged_tasks = AsyncMock(side_effect=listed)
     return context, rule, task
 
 
@@ -119,7 +156,7 @@ def test_default_off(config):
 
 @pytest.mark.parametrize("change", [
     {"progress": 99}, {"amount_left": 1}, {"ratio": None, "seed_hours": None}, {"hash": "b" * 40},
-    {"downloader_id": "d2"}, {"added_on": 101}, {"added_on": 0}, {"tags": "app"},
+    {"downloader_id": "d2"}, {"added_on": 101}, {"added_on": 0},
 ])
 def test_only_completed_matching_generation_is_actionable(change):
     ctx, rule, task = fixture()
@@ -130,7 +167,7 @@ def test_only_completed_matching_generation_is_actionable(change):
 
 
 @pytest.mark.parametrize("change", [{"ownership_verified": False}, {"brush_task_id": "other"},
-                                    {"ownership_tag": ""}, {"task_added_on": None}])
+                                    {"hash": "foreign"}, {"task_added_on": None}])
 def test_historical_or_foreign_receipts_are_not_adopted(change):
     ctx, rule, _ = fixture()
     ctx.items.rows[0]["result"].update(change)
@@ -179,6 +216,8 @@ def test_lookup_failure_is_recorded_and_next_task_continues():
     second["item_key"] = "two"
     second["result"]["hash"] = "b" * 40
     ctx.items.rows.append(second)
+    ctx.downloads.list_tagged_tasks.side_effect = None
+    ctx.downloads.list_tagged_tasks.return_value = {"items": [task, {**task, "hash": "b" * 40}]}
     ctx.downloads.task.side_effect = [TimeoutError("offline"), {**task, "hash": "b" * 40}]
     result = asyncio.run(check_downloads(ctx, [rule]))
     assert len(result["errors"]) == 1
@@ -190,7 +229,7 @@ def test_missing_task_marked_without_delete():
     ctx, rule, _ = fixture()
     ctx.downloads.task.return_value = None
     asyncio.run(check_downloads(ctx, [rule]))
-    assert ctx.items.rows[0]["status"] == "missing"
+    assert ctx.items.rows[0]["status"] == "added"
     ctx.downloads.delete.assert_not_awaited()
 
 
@@ -204,7 +243,7 @@ def test_scheduled_run_checks_cleanup_and_old_host_is_safe():
     assert asyncio.run(check_downloads(ctx, [rule]))["status"] == "unsupported"
     fields = {field["key"]: field for field in plugin.manifest.config_schema["fields"]}
     assert fields["cleanup_enabled"]["default"] is False
-    assert plugin.manifest.version == "1.0.0"
+    assert plugin.manifest.version == "1.0.1"
 
 
 def test_preview_uses_latest_and_inherits_default_site():
