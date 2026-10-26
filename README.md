@@ -43,7 +43,7 @@ https://你的服务地址/plugin-public/cookiecloud
 
 ## 开发环境
 
-需要 Python 3.12+、Node.js 22.18+、pnpm，以及同级的 CineCircuit 主项目作为 SDK 与测试环境：
+需要 Python 3.12+、Node.js 22.19+、pnpm，以及同级的 CineCircuit 主项目作为 SDK 与测试环境：
 
 ```text
 workspace/

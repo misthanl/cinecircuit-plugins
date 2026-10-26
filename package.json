@@ -5,7 +5,7 @@
   "license": "GPL-3.0-only",
   "type": "module",
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=22.19.0"
   },
   "scripts": {
     "test:host-integration": "node tests/run-host-integration.mjs",
