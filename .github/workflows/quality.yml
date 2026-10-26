@@ -35,6 +35,9 @@ jobs:
       - name: Install plugin frontend dependencies
         working-directory: cinecircuit-plugins
         run: pnpm install --frozen-lockfile
+      - name: Install host component test dependencies
+        working-directory: cinecircuit/frontend
+        run: npm ci
       - name: Python quality and SDK boundary
         working-directory: cinecircuit-plugins
         run: python scripts/quality.py
