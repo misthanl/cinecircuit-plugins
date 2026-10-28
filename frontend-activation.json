@@ -1,0 +1,122 @@
+{
+  "version": 1,
+  "plugins": {
+    "auto-signin": {
+      "on_demand": true,
+      "routes": [
+        "plugin-auto-signin"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "brush-flow": {
+      "on_demand": true,
+      "routes": [
+        "plugin-brush-flow"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "cast-profile-enricher": {
+      "on_demand": true,
+      "routes": [
+        "plugin-cast-profile-enricher"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "cloud-copy": {
+      "on_demand": true,
+      "routes": [
+        "plugin-cloud-copy"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "cookiecloud": {
+      "on_demand": true,
+      "routes": [
+        "plugin-cookiecloud"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "douban-hot": {
+      "on_demand": true,
+      "routes": [
+        "plugin-douban-hot"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "iyuu-autoseed": {
+      "on_demand": true,
+      "routes": [
+        "plugin-iyuu-autoseed"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "maoyan-rank": {
+      "on_demand": true,
+      "routes": [
+        "plugin-maoyan-rank"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "emby-cover-generator": {
+      "on_demand": true,
+      "routes": [
+        "plugin-emby-cover-generator"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "overseas-tv": {
+      "on_demand": true,
+      "routes": [
+        "plugin-overseas-tv"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "storage-recycle-cleaner": {
+      "on_demand": true,
+      "routes": [
+        "plugin-storage-recycle-cleaner"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "subtitle-manager": {
+      "on_demand": true,
+      "routes": [
+        "plugin-subtitle-manager"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    },
+    "torrent-transfer": {
+      "on_demand": true,
+      "routes": [
+        "plugin-torrent-transfer"
+      ],
+      "slots": [
+        "plugin.statistics"
+      ]
+    }
+  }
+}

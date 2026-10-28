@@ -48,24 +48,26 @@ def dependency_boundaries():
     return subprocess.run(command, cwd=HOST, check=False).returncode
 
 
-def stylesheet_lengths():
+def frontend_lengths():
     violations = []
-    for path in sorted(SOURCE.rglob("*.css")):
+    for path in sorted(SOURCE.rglob("*")):
+        if path.suffix not in {".css", ".vue", ".ts"} or "_vendor" in path.parts:
+            continue
         length = len(path.read_text(encoding="utf-8-sig").splitlines())
         if length > 1000:
-            violations.append(f"{path.relative_to(ROOT)}: stylesheet {length} > 1000 lines")
+            violations.append(f"{path.relative_to(ROOT)}: frontend source {length} > 1000 lines")
     return violations
 
 
 def main():
-    violations = function_lengths() + stylesheet_lengths()
+    violations = function_lengths() + frontend_lengths()
     print(
         "\n".join(violations)
         if violations
-        else "Source lengths: Python functions <= 50, Python/CSS files <= 1000 lines."
+        else "Source lengths: Python functions <= 50, Python/Vue/TS/CSS files <= 1000 lines."
     )
     lint = subprocess.run(
-        [sys.executable, "-m", "ruff", "check", *map(str, sources())],
+        [sys.executable, "-m", "ruff", "check", "--extend-select", "C901", *map(str, sources())],
         cwd=ROOT,
         check=False,
     ).returncode

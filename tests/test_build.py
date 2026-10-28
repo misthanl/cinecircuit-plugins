@@ -115,6 +115,7 @@ class Plugin(PluginBase):
     (directory / "plugin.py").write_text(source, encoding="utf-8")
     for notice in ("LICENSE", "LICENSE_SCOPE.md"):
         (tmp_path / notice).write_bytes((plugin_build.ROOT / notice).read_bytes())
+    (tmp_path / "frontend-activation.json").write_text('{"plugins":{}}', encoding="utf-8")
     monkeypatch.setattr(plugin_build, "ROOT", tmp_path)
     monkeypatch.setattr(plugin_build, "check_dependencies", lambda: None)
     monkeypatch.setattr(plugin_build, "build_frontends", lambda: None)

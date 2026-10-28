@@ -17,7 +17,7 @@ class CloudCopyPlugin(PluginBase):
     manifest = PluginManifest(
         id="cloud-copy",
         name="跨网盘复制",
-        version="1.0.0",
+        version="1.0.1",
         api_version=2,
         entrypoint="plugin:CloudCopyPlugin",
         icon="mdi-content-copy",

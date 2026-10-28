@@ -5,7 +5,6 @@ from .._shared.seeding import (
     complete,
     excluded,
     labels,
-    map_path,
     inventory,
     key_for,
     payload_for,
@@ -18,13 +17,14 @@ from .._shared.seeding import (
     notify,
 )
 from .schema import schema
+from .path_mapping import mapped_save_path
 
 
 class TorrentTransferPlugin(PluginBase):
     manifest = PluginManifest(
         id="torrent-transfer",
         name="转移做种",
-        version="1.0.0",
+        version="1.0.1",
         entrypoint="plugin:TorrentTransferPlugin",
         description="将已完成的种子转移到其他下载器，复用原有数据做种。",
         icon="mdi-file-move-outline",
@@ -38,7 +38,7 @@ class TorrentTransferPlugin(PluginBase):
             P.DOWNLOADER_DELETE_TASK,
             P.NOTIFICATION_SEND,
         ),
-        capabilities=("scheduled_task", "statistics_page"),
+        capabilities=("scheduled_task", "statistics_page", "site_automation"),
         jobs=(PluginJobSpec(name="transfer", interval_seconds=60, timeout_seconds=3600),),
         config_schema=schema(),
         frontend_module="frontend.js",
@@ -140,7 +140,7 @@ class TorrentTransferPlugin(PluginBase):
     async def submit_one(self, context, sdk, source, target_id, key, result):
         config = context.config
         source_id = source["downloader_id"]
-        target_path = map_path(source["save_path"], config.get("frompath"), config.get("topath"))
+        target_path = mapped_save_path(source["save_path"], config)
         exported = await sdk.export(
             source_id,
             source["hash"],

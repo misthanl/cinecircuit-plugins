@@ -4,10 +4,10 @@ def field(key, label, kind="text", default=None, **options):
 
 FIELDS = [
     field("enabled", "启用自动辅种", "switch", False),
-    field("onlyonce", "立即执行一次", "switch", False),
+    field("onlyonce", "立即执行一次", "switch", False, visible=False),
     field("notification_enabled", "发送通知", "switch", False),
     field("cron", "执行周期", "cron", ""),
-    field("token", "IYUU Token", "password", "", secret=True, encrypted=True),
+    field("token", "IYUU Token", "text", "", secret=True),
     field(
         "downloaders",
         "来源下载器",
@@ -23,7 +23,6 @@ FIELDS = [
         "",
         resource_kind="downloader",
         required_capabilities=["add"],
-        description="留空在原下载器辅种；选择时不能与来源下载器重复。",
     ),
     field(
         "sites",

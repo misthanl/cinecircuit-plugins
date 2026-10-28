@@ -27,7 +27,7 @@ class IyuuAutoSeedPlugin(PluginBase):
     manifest = PluginManifest(
         id="iyuu-autoseed",
         name="IYUU 辅种",
-        version="1.0.0",
+        version="1.0.1",
         entrypoint="plugin:IyuuAutoSeedPlugin",
         description="通过 IYUU 查找其他站点的同源种子，复用已有数据校验做种。",
         icon="mdi-source-branch",
@@ -40,7 +40,7 @@ class IyuuAutoSeedPlugin(PluginBase):
             P.SITE_READ,
             P.NOTIFICATION_SEND,
         ),
-        capabilities=("scheduled_task", "statistics_page"),
+        capabilities=("scheduled_task", "statistics_page", "site_automation"),
         jobs=(PluginJobSpec(name="reseed", interval_seconds=60, timeout_seconds=3600),),
         config_schema=schema(),
         frontend_module="frontend.js",

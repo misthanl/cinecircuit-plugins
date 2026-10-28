@@ -279,6 +279,7 @@ def test_declared_config_covers_all_upstream_settings():
         "fromtorrentpath",
         "frompath",
         "topath",
+        "path_mappings",
         "includelabels",
         "nolabels",
         "transferemptylabel",

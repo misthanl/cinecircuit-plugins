@@ -1,14 +1,24 @@
 {
   "brush-flow": {
-    "1.0.1": ["7e70ab2da5094e105d88c110d29d53293f108d8871cc4890f38d6fbb7559c434"]
+    "1.0.1": [
+      "7e70ab2da5094e105d88c110d29d53293f108d8871cc4890f38d6fbb7559c434"
+    ]
   },
   "torrent-transfer": {
     "1.0.0": [
       "ccd847cdae37d2dd83d20af8e1b39fa72153a0f4a2a61d43ef6f75dc7c0f5642",
       "77405b3b7db1db300d8b53447a8b0a8ff8fc5910b1ee24d661866d187ffadf1b"
+    ],
+    "1.0.1": [
+      "59069014d30d2565c2c685f023a3af80561cc60b26545ca64544ce59acb14e08"
     ]
   },
   "iyuu-autoseed": {
-    "1.0.0": ["9deaec47861592e3d2208546c1be74c82c2dc61864cce98805162b813541f9d6"]
+    "1.0.0": [
+      "9deaec47861592e3d2208546c1be74c82c2dc61864cce98805162b813541f9d6"
+    ],
+    "1.0.1": [
+      "4a165688279fa5cd4c31e8e77085b9e351c2d7e3cf677777787c6d156fc3b3ec"
+    ]
   }
 }

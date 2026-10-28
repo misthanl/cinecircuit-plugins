@@ -104,10 +104,20 @@ def build(*, content_addressed=False, published_ref=""):
             }
         )
         print(f"built={package.name} bytes={package.stat().st_size}")
+    apply_frontend_activation(entries)
     (output / "packages.json").write_text(
         json.dumps({"plugins": entries}, ensure_ascii=False, indent=2), encoding="utf-8"
     )
     publish_catalog(entries, output)
+
+
+def apply_frontend_activation(entries):
+    """Publish author-declared load conditions alongside immutable ZIP digests."""
+    policies = json.loads((ROOT / "frontend-activation.json").read_text(encoding="utf-8"))["plugins"]
+    for row in entries:
+        policy = policies.get(row["manifest"]["id"])
+        if policy is not None:
+            row["frontend_activation"] = policy
 
 
 def write_package(directory, manifest, package):
