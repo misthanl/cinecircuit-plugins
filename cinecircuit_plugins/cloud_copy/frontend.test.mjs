@@ -10,9 +10,9 @@ for(const key of ['window','document','Element','HTMLElement','SVGElement','Node
 globalThis.ResizeObserver=class {observe(){} disconnect(){}};
 globalThis.getComputedStyle=dom.window.getComputedStyle.bind(dom.window);
 const vue=require('vue');
-const hostSource=readFileSync('../cinecircuit/frontend/src/extensions/runtime.ts','utf8');
-const runtimeBody=hostSource.match(/value: Object\.freeze\(\{([\s\S]*?)\}\)/)[1];
-const runtimeNames=runtimeBody.split(',').map(name=>name.trim()).filter(Boolean);
+// Use the public builder's bridge contract; private host parity runs in host CI.
+const builderSource=readFileSync(new URL('../../scripts/build-frontends.mjs',import.meta.url),'utf8');
+const runtimeNames=JSON.parse('['+builderSource.match(/const runtimeExports = \[([\s\S]*?)\];/)[1].replace(/,\s*$/, '')+']');
 globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__=Object.freeze(Object.fromEntries(runtimeNames.map(name=>[name,vue[name]])));
 const {mount,flushPromises,config}=require('@vue/test-utils');
 const {install}=await import('../../.build/cinecircuit_plugins/cloud_copy/frontend.js');

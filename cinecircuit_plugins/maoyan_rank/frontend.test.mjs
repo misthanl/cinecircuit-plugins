@@ -8,10 +8,10 @@ const { JSDOM } = require("jsdom");
 const dom = new JSDOM("<!doctype html><html><body></body></html>");
 for (const key of ["window", "document", "Element", "HTMLElement", "SVGElement", "Node"]) globalThis[key] = dom.window[key];
 const vue = require("vue");
-// Match the host bridge instead of masking missing exports with the entire Vue module.
-const hostSource = readFileSync(new URL('../../../cinecircuit/frontend/src/extensions/runtime.ts', import.meta.url), 'utf8');
-const exportedNames = hostSource.match(/value: Object\.freeze\(\{([\s\S]*?)\}\)/)[1].match(/\b\w+\b/g);
-globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = Object.fromEntries(exportedNames.map(key => [key, vue[key]]));
+// Use the public builder's bridge contract; private host parity runs in host CI.
+const builderSource = readFileSync(new URL('../../scripts/build-frontends.mjs', import.meta.url), 'utf8');
+const exportedNames = JSON.parse('[' + builderSource.match(/const runtimeExports = \[([\s\S]*?)\];/)[1].replace(/,\s*$/, '') + ']');
+globalThis.__CINECIRCUIT_PLUGIN_VUE_RUNTIME__ = Object.freeze(Object.fromEntries(exportedNames.map(key => [key, vue[key]])));
 const { mount, flushPromises } = require("@vue/test-utils");
 const { install } = await import("../../.build/cinecircuit_plugins/maoyan_rank/frontend.js");
 const Fields = { name: "Fields", props: ["fields", "modelValue"], emits: ["update:modelValue"], render: () => vue.h("div") };
