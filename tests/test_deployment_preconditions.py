@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def load_update():
     spec = importlib.util.spec_from_file_location(
-        "reviewed_update", ROOT / "update_installed_package.py"
+        "reviewed_update", ROOT / "scripts" / "reviewed_package_update.py"
     )
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -47,7 +47,7 @@ sys.exit(5)
 """
     environment = dict(os.environ, PYTHONPATH=str(ROOT.parent / "cinecircuit"))
     result = subprocess.run(
-        [sys.executable, "-O", "-c", program, str(ROOT / "update_installed_package.py")],
+        [sys.executable, "-O", "-c", program, str(ROOT / "scripts" / "reviewed_package_update.py")],
         env=environment,
         capture_output=True,
         text=True,
@@ -57,7 +57,7 @@ sys.exit(5)
 
 
 def test_retired_migration_rejects_before_connecting():
-    spec = importlib.util.spec_from_file_location("retired_deploy", ROOT / "deploy_installed.py")
+    spec = importlib.util.spec_from_file_location("retired_deploy", ROOT / "scripts" / "retired_migration.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     with pytest.raises(RuntimeError, match="retired"):
