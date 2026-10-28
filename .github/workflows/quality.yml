@@ -8,53 +8,20 @@ on:
 permissions:
   contents: read
 
+# Backend SDK, package validation and actual-host integration are enforced by the
+# private host's independent-plugin-contracts job against its pinned plugin commit.
+# Public plugin CI requires only this repository and the public frontend SDK.
 jobs:
-  quality:
+  frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          path: cinecircuit-plugins
-      - uses: actions/checkout@v4
-        with:
-          repository: misthanl/cinecircuit
-          path: cinecircuit
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
         with:
           version: 11.19.0
-      - name: Install host SDK test runtime
-        run: |
-          python -m pip install -r cinecircuit/requirements.lock -r cinecircuit/requirements-dev.lock
-          python -m pip install -e ./cinecircuit --no-deps
-      - name: Install plugin frontend dependencies
-        working-directory: cinecircuit-plugins
-        run: pnpm install --frozen-lockfile
-      - name: Install host component test dependencies
-        working-directory: cinecircuit/frontend
-        run: npm ci
-      - name: Python quality and SDK boundary
-        working-directory: cinecircuit-plugins
-        run: python scripts/quality.py
-      - name: Backend regression tests
-        working-directory: cinecircuit-plugins
-        run: python -m pytest tests cinecircuit_plugins -q
-      - name: Frontend budgets, types and regression tests
-        working-directory: cinecircuit-plugins
-        run: pnpm run quality:frontend
-      - name: Frontend dependency audit
-        working-directory: cinecircuit-plugins
-        run: pnpm audit --audit-level=high
-      - name: Host component integration
-        working-directory: cinecircuit-plugins
-        run: pnpm run test:host-integration
-      - name: Verify reproducible packages and packaged SDK boundary
-        working-directory: cinecircuit-plugins
-        run: |
-          python build.py --content-addressed --published-ref "$(git rev-parse HEAD)"
-          git diff --exit-code -- plugins.json
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run quality:frontend
+      - run: pnpm audit --audit-level=high
