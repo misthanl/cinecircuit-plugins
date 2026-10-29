@@ -27,7 +27,7 @@ class IyuuAutoSeedPlugin(PluginBase):
     manifest = PluginManifest(
         id="iyuu-autoseed",
         name="IYUU 辅种",
-        version="1.0.1",
+        version="1.0.2",
         entrypoint="plugin:IyuuAutoSeedPlugin",
         description="通过 IYUU 查找其他站点的同源种子，复用已有数据校验做种。",
         icon="mdi-source-branch",

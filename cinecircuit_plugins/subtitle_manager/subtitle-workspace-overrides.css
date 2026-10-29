@@ -8,7 +8,7 @@
   .subtitle-compact-dialog-content > .subtitle-dialog {
     width: 100%;
     max-height: calc(100dvh - 40px);
-    border-radius: 16px;
+    border-radius: var(--app-dialog-radius, 16px);
   }
   .subtitle-compact-dialog-content .subtitle-dialog-heading {
     padding: 14px 46px 12px 16px;
@@ -159,13 +159,13 @@
   align-self: center;
   padding: 0 12px;
   border: 1px solid rgb(var(--v-theme-primary));
-  border-radius: 9px;
+  border-radius: var(--app-radius-action, 8px);
   background: rgb(var(--v-theme-primary));
   box-shadow: 0 2px 6px rgba(var(--v-theme-primary), 0.16);
   color: #fff;
   font: inherit;
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
 }
@@ -237,7 +237,7 @@
 .subtitle-compact-dialog-content .subtitle-dialog-heading { flex: 0 0 auto; gap: 14px; padding: 20px 54px 20px 24px; }
 .subtitle-compact-dialog-content .subtitle-dialog-symbol {
   display: grid; position: relative; flex: 0 0 40px; width: 40px; height: 40px; place-items: center;
-  border-radius: var(--app-control-radius, 11px); color: rgb(var(--v-theme-primary)); background: rgba(var(--v-theme-primary), .08);
+  border-radius: var(--app-control-radius, 12px); color: rgb(var(--v-theme-primary)); background: rgba(var(--v-theme-primary), .08);
 }
 .subtitle-compact-dialog-content .subtitle-dialog-symbol.is-danger { color: rgb(var(--v-theme-error)); background: rgba(var(--v-theme-error), .08); }
 .subtitle-compact-dialog-content .subtitle-dialog-symbol::before,
@@ -251,7 +251,7 @@
 .subtitle-compact-dialog-content .subtitle-field-heading { display: block; margin-bottom: 8px; color: var(--app-text); font-size: 12px; font-weight: 500; line-height: 1.5; }
 .subtitle-compact-dialog-content .subtitle-dialog-target {
   min-height: 44px; margin: 0 0 20px; padding: 10px 12px; gap: 12px;
-  border: 1px solid var(--app-border-subtle); border-radius: var(--app-control-radius, 11px); background: var(--app-surface-subtle);
+  border: 1px solid var(--app-border-subtle); border-radius: var(--app-control-radius, 12px); background: var(--app-surface-subtle);
 }
 .subtitle-dialog-target svg { width: 22px; height: 22px; flex: 0 0 22px; color: var(--app-text-muted); }
 .subtitle-compact-dialog-content .subtitle-dialog-target strong { min-width: 0; font-size: 13px; font-weight: 400; color: var(--app-text); }
@@ -259,10 +259,10 @@
 .subtitle-compact-dialog-content .subtitle-upload-file > span { font-size: 13px; font-weight: 500; border-radius: 9px; color: rgb(var(--v-theme-primary)); }
 .subtitle-compact-dialog-content .subtitle-upload-file > strong { font-size: 13px; font-weight: 400; }
 .subtitle-compact-dialog-content .subtitle-dialog-hint,
-.subtitle-compact-dialog-content .subtitle-dialog-body > small { margin: 8px 0 0; color: var(--app-text-muted); font-size: 12px; font-weight: 400; line-height: 1.7; }
+.subtitle-compact-dialog-content .subtitle-dialog-body > small { margin: 8px 0 0; color: var(--app-text-muted); font-size: 9px; font-weight: 400; line-height: 1.7; }
 .subtitle-compact-dialog-content .subtitle-upload-dialog-body > .subtitle-dialog-hint { margin-bottom: 20px; }
 .subtitle-compact-dialog-content .v-field {
-  border-radius: var(--app-control-radius, 11px); --v-input-control-height: 40px;
+  border-radius: var(--app-control-radius, 12px); --v-input-control-height: 40px;
   --v-field-input-padding-top: 8px; --v-field-input-padding-bottom: 8px; font-size: 13px; font-weight: 400;
 }
 .subtitle-compact-dialog-content .v-field__input { min-height: 40px !important; padding-block: 8px !important; }
@@ -275,7 +275,7 @@
 .subtitle-compact-dialog-content .subtitle-dialog-actions { flex: 0 0 auto; padding: 14px 24px; background: var(--app-surface-subtle); }
 .subtitle-compact-dialog-content .subtitle-dialog-actions .subtitle-action {
   flex: 0 0 auto; min-width: 88px; height: 36px; min-height: 36px; padding: 0 16px;
-  border-radius: 9px; font-family: inherit; font-size: 13px; font-weight: 500;
+  border-radius: var(--app-radius-action, 8px); font-family: inherit; font-size: 13px; font-weight: 500;
 }
 @media (max-width: 680px) {
   .subtitle-compact-dialog-content .subtitle-dialog-heading { padding: 18px 48px 18px 16px; gap: 12px; }

@@ -79,7 +79,7 @@ onMounted(async()=>{fitWorkspace();try{const options=await props.request<{items:
 .copy-workspace :deep(.v-field-label){color:var(--app-text-secondary)!important}
 .copy-workspace :deep(.v-field__input){color:var(--app-text)}
 .copy-workspace :deep(.v-field__append-inner){color:var(--app-text-secondary);opacity:1}
-.copy-submit{border-radius:var(--app-control-radius,11px)!important}
+.copy-submit{border-radius:var(--app-control-radius,12px)!important}
 @media(max-width:1000px){.copy-controls{grid-template-columns:1fr 1fr}}@media(max-width:700px){.copy-browsers{grid-template-columns:1fr;grid-template-rows:repeat(2,minmax(0,1fr))}.copy-browsers>:first-child{border-right:0;border-bottom:1px solid var(--app-border,#e2e8f0)}.copy-controls{grid-template-columns:1fr 1fr;padding:10px;gap:10px}.copy-workspace>header{align-items:flex-start;flex-wrap:wrap;gap:10px}.workspace-actions{margin-left:auto}th,td{padding:10px;white-space:nowrap}}
 
 </style>
@@ -89,7 +89,7 @@ onMounted(async()=>{fitWorkspace();try{const options=await props.request<{items:
 @media(max-width:700px){
  .copy-workspace>header>div:first-child{display:none}.copy-workspace>header{margin-bottom:10px;justify-content:flex-end}.workspace-actions{gap:0}
  .copy-browsers{grid-template-rows:minmax(0,1fr)}.copy-browsers>.is-mobile-hidden{display:none}.copy-browsers>:first-child{border:0}.copy-controls{display:none}
- .mobile-copy-tabs{display:flex;flex-shrink:0;border-bottom:1px solid var(--app-border);padding:0 12px;gap:20px}.mobile-copy-tabs button{position:relative;flex:1;padding:13px 4px;color:var(--app-text-secondary);font-size:14px;font-weight:600}.mobile-copy-tabs button[aria-selected=true]{color:var(--blue);box-shadow:inset 0 -2px var(--blue)}.mobile-copy-tabs span{margin-left:8px;font-size:12px}
+ .mobile-copy-tabs{display:flex;flex-shrink:0;border-bottom:1px solid var(--app-border);padding:0 12px;gap:20px}.mobile-copy-tabs button{position:relative;flex:1;padding:13px 4px;color:var(--app-text-secondary);font-size:14px;font-weight:500}.mobile-copy-tabs button[aria-selected=true]{color:var(--blue);box-shadow:inset 0 -2px var(--blue)}.mobile-copy-tabs span{margin-left:8px;font-size:12px}
  .mobile-copy-footer{display:block;flex-shrink:0;border-top:1px solid var(--app-border);padding:10px 12px}.mobile-copy-summary{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:12px;color:var(--app-text-secondary)}.mobile-copy-summary>span{flex-shrink:0}.mobile-copy-summary button{display:flex;align-items:center;justify-content:flex-end;gap:3px;min-width:0;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:right;color:var(--app-text)}.mobile-copy-actions{display:grid;grid-template-columns:1fr 1.3fr;gap:12px}.mobile-copy-actions .copy-submit{min-height:42px}
 }
 

@@ -87,7 +87,8 @@
     flex: 1 1 auto;
   }
   .subtitle-detail-heading h2 {
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 600;
   }
   .subtitle-detail-heading p {
     margin-top: 4px;
@@ -223,7 +224,7 @@
     flex: 1 1 auto;
     place-items: center;
     border: 1px dashed var(--app-border-subtle);
-    border-radius: var(--app-control-radius, 11px);
+    border-radius: var(--app-control-radius, 12px);
     color: var(--app-text-muted);
     font-size: var(--app-font-size-label, 11px);
   }

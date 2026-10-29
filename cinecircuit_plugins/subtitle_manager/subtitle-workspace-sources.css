@@ -12,7 +12,7 @@
   gap: 2px 8px;
   padding: 8px 10px;
   border: 1px solid var(--app-border-subtle);
-  border-radius: var(--app-control-radius, 11px);
+  border-radius: var(--app-control-radius, 12px);
   background: var(--app-surface);
   color: inherit;
   font: inherit;
@@ -137,8 +137,8 @@
 .subtitle-dialog-heading h2 {
   margin: 0;
   color: var(--app-text);
-  font-size: 17px;
-  font-weight: var(--app-font-weight-heading, 750);
+  font-size: 16px;
+  font-weight: 600;
 }
 .subtitle-dialog-heading p {
   margin: 3px 0 0;
@@ -234,7 +234,7 @@
   overflow: hidden;
   color: var(--app-text-secondary);
   font-size: 12px;
-  font-weight: var(--app-font-weight-medium, 650);
+  font-weight: var(--app-font-weight-medium, 500);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -245,7 +245,7 @@
   gap: 10px;
   color: var(--app-text-secondary);
   font-size: var(--app-font-size-label, 11px);
-  font-weight: var(--app-font-weight-medium, 650);
+  font-weight: var(--app-font-weight-medium, 500);
 }
 .subtitle-field-heading {
   color: var(--app-text-secondary);
@@ -257,7 +257,7 @@
   align-items: center;
   overflow: hidden;
   border: 1px solid var(--app-border);
-  border-radius: var(--app-control-radius, 11px);
+  border-radius: var(--app-control-radius, 12px);
   background: var(--app-surface);
 }
 .subtitle-adjustment-input input {
@@ -295,7 +295,7 @@
 }
 .subtitle-dialog-body > small b {
   color: var(--app-text-secondary);
-  font-weight: var(--app-font-weight-medium, 650);
+  font-weight: var(--app-font-weight-medium, 500);
 }
 .subtitle-dialog-error {
   margin: 12px 0 0;
@@ -363,8 +363,8 @@
   border-bottom: 1px solid var(--app-border-subtle);
   color: var(--app-text);
   cursor: default;
-  font-size: 13px;
-  font-weight: var(--app-font-weight-heading, 750);
+  font-size: 12px;
+  font-weight: 500;
 }
 .subtitle-preview-files-heading small {
   margin-left: 4px;
@@ -447,12 +447,12 @@
   display: grid;
   width: 38px;
   height: 30px;
-  border-radius: 7px;
+  border-radius: var(--app-radius-chip);
   place-items: center;
   background: rgba(var(--v-theme-primary), 0.1);
   color: rgb(var(--v-theme-primary));
   font-size: 9px;
-  font-weight: 800;
+  font-weight: 500;
   text-transform: uppercase;
 }
 .subtitle-preview-format.is-ass,
@@ -470,8 +470,8 @@
 .subtitle-preview-current-copy strong {
   overflow: hidden;
   color: var(--app-text);
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -510,7 +510,8 @@
   border-radius: 10px 10px 0 0;
 }
 .subtitle-preview-current-copy strong {
-  font-size: 13px;
+  font-size: 11px;
+  font-weight: 500;
 }
 .subtitle-preview-check {
   display: inline-flex;
@@ -579,7 +580,7 @@
   align-items: center;
   padding: 10px;
   border: 1px solid rgb(var(--v-theme-warning));
-  border-radius: var(--app-control-radius, 11px);
+  border-radius: var(--app-control-radius, 12px);
   background: rgba(var(--v-theme-warning), 0.06);
 }
 .subtitle-captcha-image {
@@ -608,7 +609,7 @@
   min-height: var(--app-control-height-compact, 40px);
   padding: 0 10px;
   border: 1px solid var(--app-border-subtle);
-  border-radius: var(--app-control-radius, 11px);
+  border-radius: var(--app-control-radius, 12px);
   background: var(--app-surface);
   color: var(--app-text-primary);
   font: inherit;
@@ -668,7 +669,7 @@
   margin: 8px 0 0;
   padding: 10px;
   overflow: auto;
-  border-radius: var(--app-control-radius, 11px);
+  border-radius: var(--app-control-radius, 12px);
   background: var(--app-surface-subtle);
   color: var(--app-text-secondary);
   font:

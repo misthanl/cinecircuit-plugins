@@ -87,12 +87,12 @@ function save(): void {
 <style scoped>
 .traffic-dialog{max-height:min(560px,calc(100dvh - 48px))}
 .traffic-dialog-heading{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--app-border-subtle,#e7ebf2)}
-.traffic-dialog-heading h2{margin:0}
+.traffic-dialog-heading h2{margin:0;font-size:16px;font-weight:600}
 .traffic-dialog-tabs{padding:0 16px;border-bottom:1px solid var(--app-border-subtle,#e7ebf2);flex-shrink:0}
 .traffic-dialog-body{padding:16px!important;min-height:0}
 .traffic-dialog-section{display:grid;gap:10px}
 .traffic-resource-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 16px}
 .traffic-dialog-actions{gap:8px;flex-wrap:wrap;justify-content:flex-end}
-.traffic-dialog-error{color:rgb(var(--v-theme-error));font-size:13px}
+.traffic-dialog-error{color:rgb(var(--v-theme-error));font-size:10px;font-weight:400}
 @media(max-width:560px){.traffic-resource-grid{grid-template-columns:1fr}}
 </style>

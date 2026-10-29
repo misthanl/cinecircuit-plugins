@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingState from "../_shared/LoadingState.vue";
 import { computed, onMounted, ref, type Component } from "vue";
 import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircuit/plugin-sdk";
 
@@ -58,7 +59,7 @@ onMounted(load);
         <component class="app-dialog-close" :is="buttonComponent" icon="mdi-close" variant="text" aria-label="关闭" @click="context.close" />
       </header>
       <main class="recycle-content">
-        <p v-if="loading" class="recycle-message" role="status">正在读取插件统计…</p>
+        <LoadingState v-if="loading && !runs.length" label="正在加载插件统计" />
         <component v-else-if="error" :is="alertComponent" type="error" variant="tonal">统计加载失败，请点击刷新重试。</component>
         <section v-else class="recycle-overview" aria-label="回收站清理概览">
           <div class="recycle-heading"><h3>运行概览</h3><span>最近 100 次运行</span></div>
@@ -85,12 +86,12 @@ onMounted(load);
 </template>
 
 <style scoped>
-.recycle-statistics{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);border:1px solid var(--app-border);border-radius:18px!important;background:var(--app-dialog-surface)!important;color:var(--app-text);font-family:var(--app-font-family,inherit);font-size:var(--app-font-size-body,14px)}
+.recycle-statistics{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);border:1px solid var(--app-border);border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface)!important;color:var(--app-text);font-family:var(--app-font-family,inherit);font-size:var(--app-font-size-body,14px)}
 .recycle-header{display:flex;box-sizing:border-box;flex:0 0 var(--app-plugin-dialog-header-height,58px);height:var(--app-plugin-dialog-header-height,58px);align-items:center;justify-content:space-between;gap:12px;padding:6px 24px;border-bottom:1px solid var(--app-border-subtle)}
 .recycle-header h2{margin:0;font-size:var(--app-font-size-section-title,18px);font-weight:700;line-height:1.2}
 .recycle-content{min-height:0;overflow:auto;padding:20px}.recycle-actions{display:flex;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--app-border-subtle)}
 .recycle-message{padding:32px 0;text-align:center;color:var(--app-text-muted)}
-.recycle-overview{display:grid;gap:20px;min-width:0}.recycle-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.recycle-heading h3{margin:0;font-size:var(--app-font-size-body,14px);font-weight:650}.recycle-heading>span{font-size:var(--app-font-size-helper,12px);color:var(--app-text-muted)}
+.recycle-overview{display:grid;gap:20px;min-width:0}.recycle-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.recycle-heading h3{margin:0;font-size:var(--app-font-size-body,14px);font-weight:500}.recycle-heading>span{font-size:var(--app-font-size-helper,12px);color:var(--app-text-muted)}
 .recycle-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0}.recycle-metric{padding:16px;border:1px solid color-mix(in srgb,var(--tone) 18%,transparent);border-radius:12px;background:color-mix(in srgb,var(--tone) 5%,transparent)}
 .tone-neutral{--tone:var(--app-text-secondary)}.tone-success{--tone:rgb(var(--v-theme-success))}.tone-error{--tone:rgb(var(--v-theme-error))}.tone-primary{--tone:rgb(var(--v-theme-primary))}
 .recycle-metric dt{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--app-font-size-label,13px);color:var(--app-text-secondary)}.recycle-metric dt .v-icon{color:var(--tone)}

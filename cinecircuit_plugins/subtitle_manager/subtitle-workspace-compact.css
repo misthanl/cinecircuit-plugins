@@ -128,7 +128,7 @@
   margin: 10px 0 14px;
   padding: 10px;
   border: 1px solid var(--app-border-subtle);
-  border-radius: var(--app-control-radius, 11px);
+  border-radius: var(--app-control-radius, 12px);
   background: var(--app-surface-subtle);
 }
 .subtitle-upload-file,
@@ -159,7 +159,7 @@
   padding-right: 15px;
   color: var(--app-text-secondary);
   font-size: var(--app-font-size-label, 11px);
-  font-weight: var(--app-font-weight-medium, 650);
+  font-weight: var(--app-font-weight-medium, 500);
   white-space: nowrap;
 }
 .subtitle-source-list {
@@ -238,7 +238,7 @@
   margin-top: 10px;
   overflow: auto;
   border: 1px solid var(--app-border-subtle);
-  border-radius: var(--app-control-radius, 11px);
+  border-radius: var(--app-control-radius, 12px);
 }
 .subtitle-online-file {
   min-height: 68px;
@@ -256,8 +256,8 @@
 .subtitle-online-file .subtitle-file-mark {
   width: 34px;
   height: 38px;
-  border-radius: 7px;
-  font-size: 13px;
+  border-radius: var(--app-radius-chip, 6px);
+  font-size: 9px;
 }
 .subtitle-online-file .subtitle-file-copy strong {
   font-size: 13px;

@@ -62,7 +62,7 @@ for (const [folder, pluginId, name] of [["iyuu_autoseed", "iyuu-autoseed", "IYUU
         return { counts: refreshed ? { seeding: 3 } : {}, items: refreshed ? [{ id: "1", name: "测试种子", status: "seeding", timestamp: 0 }] : [] };
       },
     });
-    const wrapper = mount(registration.component, { props: { context: { installation: { name }, close: () => { closed++; } } }, global: { components: { VDataTable: Table } } });
+    const wrapper = mount(registration.component, { props: { context: { installation: { name }, close: () => { closed++; } } }, global: { components: { VDataTable: Table, VIcon: Container } } });
     await flushPromises();
     assert.equal(wrapper.find('[role="dialog"]').exists(), true);
     assert.equal(wrapper.find("h2").text(), `${name} · 数据统计`);

@@ -33,5 +33,5 @@ function updateRanks(next: Record<string, unknown>, movie: boolean) {
 
 <style scoped>
 .douban-rank-settings h3,.rank-types{grid-column:1 / -1}
-.douban-rank-settings h3{margin:0;color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading,600)}
+.douban-rank-settings h3{margin:0;color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading, 600)}
 </style>

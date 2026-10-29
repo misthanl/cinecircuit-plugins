@@ -21,7 +21,7 @@ class SiteCheckinPlugin(PluginBase):
         entrypoint="plugin:SiteCheckinPlugin",
         id="auto-signin",
         name="站点签到助手",
-        version="1.0.2",
+        version="1.0.3",
         description="自动登录并签到指定 PT 站点。",
         icon="mdi-calendar-check-outline",
         permissions=(

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingState from "../_shared/LoadingState.vue";
 import { computed, onMounted, ref } from "vue";
 import type { Component } from "vue";
 import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircuit/plugin-sdk";
@@ -137,7 +138,7 @@ function stopPolling(): void { clearInterval(poll); }
       </header>
 
       <main class="cast-stat-content">
-        <p v-if="loading && !latest" class="cast-stat-message" role="status">正在读取处理结果…</p>
+        <LoadingState v-if="loading && !latest" label="正在加载处理结果" />
         <UiAlert v-else-if="error" type="error" variant="tonal">{{ error }}</UiAlert>
         <template v-else>
           <dl class="cast-metrics" aria-label="处理指标">
@@ -176,7 +177,7 @@ function stopPolling(): void { clearInterval(poll); }
 </template>
 
 <style scoped>
-.cast-stat-dialog{display:flex;max-height:calc(100dvh - 32px);overflow:hidden;flex-direction:column;border:1px solid var(--app-border-subtle);border-radius:18px!important;background:var(--app-dialog-surface)!important;color:var(--app-text)}
+.cast-stat-dialog{display:flex;max-height:calc(100dvh - 32px);overflow:hidden;flex-direction:column;border:1px solid var(--app-border-subtle);border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface)!important;color:var(--app-text)}
 .cast-stat-header{display:flex;box-sizing:border-box;height:var(--app-plugin-dialog-header-height,58px);min-height:var(--app-plugin-dialog-header-height,58px);max-height:var(--app-plugin-dialog-header-height,58px);flex:0 0 var(--app-plugin-dialog-header-height,58px);align-items:center;justify-content:space-between;gap:12px;padding:6px 24px;border-bottom:1px solid var(--app-border-subtle)}
 .cast-stat-header h2{margin:0;font-size:18px;font-weight:750;line-height:1.2}
 .cast-stat-content{display:grid;min-height:0;gap:18px;overflow:auto;padding:20px 24px;background:var(--app-surface-subtle)}

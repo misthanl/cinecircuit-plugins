@@ -54,7 +54,7 @@
   width: 34px;
   height: 34px;
   flex: 0 0 34px;
-  border-radius: 9px;
+  border-radius: var(--app-radius-action, 8px);
   font-size: 19px;
 }
 .subtitle-poster {
@@ -68,7 +68,7 @@
   background: var(--app-surface-muted);
   color: var(--app-text-muted);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
 }
 .subtitle-poster img {
   width: 100%;
@@ -177,10 +177,10 @@
   width: 36px;
   height: 28px;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--app-radius-chip, 6px);
   background: rgba(var(--v-theme-primary), 0.1);
   color: rgb(var(--v-theme-primary));
-  font-size: 10px;
+  font-size: 9px;
 }
 .subtitle-local-file .subtitle-file-mark.is-ass,
 .subtitle-local-file .subtitle-file-mark.is-ssa {
@@ -217,7 +217,7 @@
   height: 28px;
   padding: 0;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--app-radius-action, 8px);
   place-items: center;
   color: rgb(var(--v-theme-primary));
   background: transparent;
@@ -239,7 +239,7 @@
   min-width: 148px;
   padding: 6px;
   border: 1px solid var(--app-border-subtle);
-  border-radius: 10px;
+  border-radius: var(--app-radius-action, 8px);
   background: var(--app-surface);
   box-shadow: var(--app-shadow-overlay, 0 12px 30px rgba(15, 23, 42, 0.16));
 }
@@ -254,13 +254,13 @@
   min-height: 40px;
   padding: 0 10px;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--app-radius-action, 8px);
   color: var(--app-text);
   background: transparent;
   cursor: pointer;
   font: inherit;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 40px;
   text-align: left;
   text-decoration: none;
@@ -340,8 +340,8 @@
 .subtitle-online-file .subtitle-file-mark {
   width: 36px;
   height: 28px;
-  border-radius: 7px;
-  font-size: 10px;
+  border-radius: var(--app-radius-chip, 6px);
+  font-size: 9px;
 }
 .subtitle-online-file .subtitle-file-copy strong {
   font-size: 13px;

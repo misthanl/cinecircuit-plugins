@@ -33,8 +33,8 @@ test('cover settings stay compact and desktop history keeps four columns', () =>
   const shared = readFileSync(resolve('cinecircuit_plugins/_shared/ui-consistency.css'), 'utf8');
   const history = readFileSync(resolve('cinecircuit_plugins/media_cover_generator/HistoryView.vue'), 'utf8');
   assert.match(shared, /:is\(\.v-switch, \.v-checkbox, \.v-radio\) \.v-label/);
-  assert.match(shared, /font-size: var\(--app-font-size-label, 13px\) !important/);
-  assert.match(shared, /font-weight: var\(--app-font-weight-regular, 400\) !important/);
+  assert.match(shared, /font-size: 12px !important/);
+  assert.match(shared, /font-weight: 500 !important/);
   assert.match(shared, /font-family: var\(--app-font-family, inherit\) !important/);
   assert.match(shared, /font-size: var\(--app-font-size-control, 14px\)/);
   assert.match(history, /:max-width="920" width="calc\(100vw - 32px\)"/);

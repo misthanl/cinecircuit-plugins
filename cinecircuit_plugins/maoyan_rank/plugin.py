@@ -29,7 +29,7 @@ class MaoyanWatchlistPlugin(PluginBase):
         entrypoint="plugin:MaoyanWatchlistPlugin",
         id="maoyan-rank",
         name="影视榜单订阅",
-        version="1.0.3",
+        version="1.0.4",
         description="订阅猫眼电影票房榜及腾讯、爱奇艺、芒果、优酷分类榜单。",
         icon="mdi-movie-search-outline",
         permissions=(PluginPermission.MEDIA_DISCOVER, PluginPermission.SUBSCRIPTION_CREATE,

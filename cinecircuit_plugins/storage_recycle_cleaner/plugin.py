@@ -10,7 +10,7 @@ class StorageRecycleCleanerPlugin(PluginBase):
     manifest = PluginManifest(
         id="storage-recycle-cleaner",
         name="网盘回收站清理",
-        version="1.0.0",
+        version="1.0.1",
         entrypoint="plugin:StorageRecycleCleanerPlugin",
         description="定时清空所选网盘回收站，释放存储空间。",
         icon="mdi-trash-can-outline",

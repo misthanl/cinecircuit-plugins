@@ -81,7 +81,7 @@ onMounted(loadResources);
 <style scoped>
 .traffic-config{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;grid-column:1/-1;min-width:0}
 .traffic-config h3,.traffic-config h4,.traffic-config p{margin:0}
-.traffic-config h3,.traffic-config h4{color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading,600);overflow-wrap:anywhere}
+.traffic-config h3,.traffic-config h4{color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading, 600);overflow-wrap:anywhere}
 .traffic-config p{font-size:var(--app-font-size-helper,12px);line-height:1.5;color:var(--app-text-muted,#7a869d)}
 .global-heading{display:grid;gap:5px;min-width:0}
 .global-config-fields:deep(> .v-input){min-width:0}
@@ -92,7 +92,7 @@ onMounted(loadResources);
 .traffic-tasks{display:grid;gap:12px}
 .traffic-task{border:1px solid var(--app-border-subtle,#e7ebf2);border-radius:12px;padding:15px 16px;min-width:0;background:var(--app-surface,#fff)}
 .traffic-task header,.traffic-task footer{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.traffic-status{white-space:nowrap;font-size:12px;color:var(--app-text-secondary,#657087)}
+.traffic-status{white-space:nowrap;font-size:9px;color:var(--app-text-secondary,#657087)}
 .paused .traffic-status{color:var(--app-text-muted,#7a869d)}
 .traffic-route{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:12px 0;color:var(--app-text-secondary,#657087);font-size:var(--app-font-size-body,14px)}
 .traffic-route span:nth-child(2){color:var(--app-text-muted,#7a869d)}
@@ -101,7 +101,7 @@ onMounted(loadResources);
 .traffic-task dd{margin:4px 0 0;font-size:var(--app-font-size-body,14px);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 .traffic-rule{overflow-wrap:anywhere}
 .traffic-task footer{margin-top:12px;padding-top:12px;border-top:1px solid var(--app-border-subtle,#e7ebf2);font-size:12px;color:var(--app-text-muted,#7a869d)}
-.traffic-error{display:flex;align-items:center;gap:8px;color:rgb(var(--v-theme-error));font-size:13px;line-height:1.5}
+.traffic-error{display:flex;align-items:center;gap:8px;color:rgb(var(--v-theme-error));font-size:10px;line-height:1.5;font-weight:400}
 .traffic-error>span{min-width:0;overflow-wrap:anywhere}
 .traffic-error:deep(> .v-btn){flex:0 0 auto;align-self:center;margin:0}
 @media(max-width:480px){.traffic-heading{align-items:flex-start}.traffic-task footer{align-items:flex-start;flex-wrap:wrap}}

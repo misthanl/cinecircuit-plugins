@@ -81,5 +81,5 @@ onMounted(loadServers);
 </template>
 
 <style scoped>
-.cast-editor{display:grid;row-gap:var(--app-plugin-config-row-gap,14px);column-gap:var(--app-plugin-config-column-gap,16px);align-items:start;color:var(--app-text)}.cast-editor :deep(.v-field){border-radius:11px}
+.cast-editor{display:grid;row-gap:var(--app-plugin-config-row-gap,14px);column-gap:var(--app-plugin-config-column-gap,16px);align-items:start;color:var(--app-text)}.cast-editor :deep(.v-field){border-radius:var(--app-control-radius, 12px)}
 </style>

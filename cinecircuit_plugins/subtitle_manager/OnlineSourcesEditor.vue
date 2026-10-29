@@ -52,5 +52,5 @@ function update(next: Record<string, unknown>) {
 </template>
 
 <style scoped>
-.online-source-settings h3{grid-column:1 / -1;margin:0;color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading,600)}
+.online-source-settings h3{grid-column:1 / -1;margin:0;color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading, 600)}
 </style>

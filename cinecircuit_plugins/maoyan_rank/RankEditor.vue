@@ -62,5 +62,5 @@ function update(next: Record<string, unknown>) {
 .maoyan-rank-settings h3,.rank-types,.rank-help{grid-column:1 / -1}
 .rank-load-validation{display:none}
 .rank-help{margin:0;color:var(--app-text-muted);font-size:12px}
-.maoyan-rank-settings h3{margin:0;color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading,600)}
+.maoyan-rank-settings h3{margin:0;color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading, 600)}
 </style>

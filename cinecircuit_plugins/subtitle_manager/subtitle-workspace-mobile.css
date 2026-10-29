@@ -106,7 +106,8 @@
     min-width: 0;
   }
   .subtitle-detail-heading h2 {
-    font-size: 15px;
+    font-size: 16px;
+    font-weight: 600;
   }
   .subtitle-detail-heading .subtitle-detail-copy > p {
     display: none;

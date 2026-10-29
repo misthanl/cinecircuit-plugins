@@ -1,6 +1,8 @@
 import asyncio
 import json
+import socket
 from types import SimpleNamespace
+from unittest.mock import AsyncMock
 from urllib.parse import quote_from_bytes
 
 import httpx
@@ -26,8 +28,11 @@ def test_entities_are_decoded_before_removing_remote_directory():
     assert legacy_subtitle_name("C:&#92;下载&#92;chs&amp;eng.srt") == "chs&eng.srt"
 
 
-def test_mixed_response_records_keep_each_records_encoding():
+def test_mixed_response_records_keep_each_records_encoding(monkeypatch):
     async def run():
+        monkeypatch.setattr(asyncio.get_running_loop(), "getaddrinfo", AsyncMock(
+            return_value=[(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("8.8.8.8", 8000))],
+        ))
         names = ["简体双语.ass", "盗梦空间.srt"]
         records = [
             json.dumps({"sname": name}, ensure_ascii=False).encode(encoding)

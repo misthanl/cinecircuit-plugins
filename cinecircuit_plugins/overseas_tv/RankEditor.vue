@@ -28,5 +28,5 @@ function update(value: Record<string, unknown>) { emit("update:modelValue", { ..
   </div>
 </template>
 <style scoped>
-.maoyan-rank-settings h3{grid-column:1 / -1;margin:0;color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading,600)}
+.maoyan-rank-settings h3{grid-column:1 / -1;margin:0;color:var(--app-text);font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading, 600)}
 </style>

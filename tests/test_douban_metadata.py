@@ -110,7 +110,7 @@ def test_preflight_permission_declared_in_release():
     from app.modules.plugins.permissions import PluginPermission
 
     assert PluginPermission.MEDIA_SERVER_READ in DoubanWatchlistPlugin.manifest.permissions
-    assert DoubanWatchlistPlugin.manifest.version == "1.0.2"
+    assert DoubanWatchlistPlugin.manifest.version == "1.0.3"
 
 
 @pytest.mark.parametrize(

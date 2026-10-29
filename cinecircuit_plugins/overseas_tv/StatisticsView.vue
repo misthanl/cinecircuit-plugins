@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import LoadingState from "../_shared/LoadingState.vue";
 import { computed, onMounted, ref } from "vue";
 import type { Component } from "vue";
 import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircuit/plugin-sdk";
@@ -90,7 +91,7 @@ onMounted(() => load());
         <UiButton class="app-dialog-close" icon="mdi-close" variant="text" aria-label="关闭" @click="context.close" />
       </header>
       <div class="maoyan-dialog__content">
-        <p v-if="loading && !loaded" class="maoyan-dialog__message" role="status">正在读取订阅统计…</p>
+        <LoadingState v-if="loading && !loaded" label="正在加载订阅统计" />
         <UiAlert v-if="error" type="error" variant="tonal" role="alert">{{ error }}</UiAlert>
         <section v-if="loaded" class="maoyan-statistics" aria-label="TMDB 剧集追踪统计">
           <dl class="maoyan-statistics__metrics">
@@ -173,7 +174,7 @@ onMounted(() => load());
 .maoyan-subscription__time { flex-shrink: 0; height: 28px; margin: 0; margin-top: auto; color: var(--app-text-muted); font-size: var(--app-font-size-helper, 10px); line-height: 14px; overflow: hidden; font-variant-numeric: tabular-nums; }
 .maoyan-subscription__time span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .maoyan-statistics__pagination { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--app-text-muted); font-size: 12px; }
-.maoyan-dialog { display: flex; flex-direction: column; max-height: calc(100dvh - 32px); border: 1px solid var(--app-border); border-radius: 18px !important; background: var(--app-dialog-surface) !important; color: var(--app-text); }
+.maoyan-dialog { display: flex; flex-direction: column; max-height: calc(100dvh - 32px); border: 1px solid var(--app-border); border-radius: var(--app-dialog-radius, 16px) !important; background: var(--app-dialog-surface) !important; color: var(--app-text); }
 .maoyan-dialog__header { display: flex; box-sizing: border-box; height: var(--app-plugin-dialog-header-height, 58px); min-height: var(--app-plugin-dialog-header-height, 58px); max-height: var(--app-plugin-dialog-header-height, 58px); flex: 0 0 var(--app-plugin-dialog-header-height, 58px); align-items: center; justify-content: space-between; gap: 12px; padding: 6px 24px; }
 .maoyan-dialog__header h2 { margin: 0; font-size: 18px; font-weight: 750; }
 .maoyan-dialog__content { min-height: 0; overflow: auto; padding: 20px 24px; background: var(--app-surface-subtle); }
@@ -181,7 +182,7 @@ onMounted(() => load());
 .maoyan-dialog__message { padding: 40px 12px; text-align: center; color: var(--app-text-muted); }
 .maoyan-statistics__pagination button:focus-visible { outline: 2px solid var(--app-violet-text); outline-offset: 2px; }
 @media (max-width: 760px) {
-  .maoyan-dialog { height: auto; max-height: min(680px, 76dvh); border-radius: 16px !important; }
+  .maoyan-dialog { height: auto; max-height: min(680px, 76dvh); border-radius: var(--app-dialog-radius, 16px) !important; }
   .maoyan-statistics__metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .maoyan-statistics__metrics > div { padding: 14px 16px; }
   .maoyan-dialog__content { padding: 16px; }

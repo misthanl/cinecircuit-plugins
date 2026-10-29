@@ -22,7 +22,7 @@ class OverseasTVPlugin(PluginBase):
         entrypoint="plugin:OverseasTVPlugin",
         id="overseas-tv",
         name="TMDB 剧集追踪",
-        version="1.0.1",
+        version="1.0.2",
         description="按播出平台追踪近期新剧与新季，自动创建订阅。",
         icon="mdi-television-classic",
         permissions=(
