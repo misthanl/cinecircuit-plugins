@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorText, pluginErrorFallback, requestErrorNotified } from "../_shared/request-feedback";
 import { computed, ref } from "vue";
 import { coverImagePayload, waitForCoverPreview } from "./previewImage";
 import sampleMulti from "./assets/thumb-sample-multi.jpg?inline";
@@ -112,7 +113,7 @@ async function loadCarouselSample(): Promise<void> {
     const result=await decodeImage(await props.request(`/plugins/emby-cover-generator/api/sample?style=${style}&variant=1`));
     animationSamples.value={...animationSamples.value,[style]:{image:result.image}};
     if(preview.value?.value===style && !preview.value.width) preview.value={...preview.value,image:result.image};
-  } catch { if (!disposed) previewError.value='动态样例加载失败，可点击“预览当前设置”重试'; }
+  } catch (cause) { if (!disposed) previewError.value=pluginErrorFallback(cause, '动态样例加载失败，可点击“预览当前设置”重试'); }
 }
 function disposeImages(): void { disposed=true; for (const image of objectUrls) URL.revokeObjectURL(image); objectUrls.clear(); }
 async function renderCurrent(): Promise<void> {
@@ -125,7 +126,7 @@ async function renderCurrent(): Promise<void> {
     if (payload === null) return;
     const result=await decodeImage(payload);
     generated.value={signature:requested,image:result.image,width:result.width,height:result.height};
-  } catch(error) { previewError.value=error instanceof Error ? error.message : '生成预览失败，请重试'; }
+  } catch(error) { previewError.value=pluginErrorText(error, '生成预览失败，请重试'); }
   finally { rendering.value=false; }
 }
 
@@ -148,7 +149,8 @@ async function openPreview(sample: Sample): Promise<void> {
   } catch (error) { if (requestId === previewRequest) previewError.value = previewFailureMessage(error); }
 }
 function previewFailureMessage(error: unknown) {
-  return '高清图加载失败，已保留预览图。' + (error instanceof Error ? error.message : '请重试');
+  if (requestErrorNotified(error)) return "";
+  return '高清图加载失败，已保留预览图。' + (pluginErrorText(error, '请重试'));
 }
 function closePreview(): void { ++previewRequest; previewDialog.value?.close(); preview.value=null; }
 function backdropClick(event: MouseEvent): void {

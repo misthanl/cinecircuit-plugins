@@ -35,11 +35,13 @@ RANK_OPTIONS = (
 class DoubanWatchlistPlugin(PluginBase):
     """跟踪豆瓣榜单并将符合条件的作品加入订阅。"""
 
+    disabled_read_actions = ("statistics",)
+
     manifest = PluginManifest(
         entrypoint="plugin:DoubanWatchlistPlugin",
         id="douban-hot",
         name="豆瓣榜单追踪",
-        version="1.0.3",
+        version="1.0.4",
         description="跟踪豆瓣热门榜单，筛选作品并自动添加订阅。",
         icon="mdi-movie-search-outline",
         permissions=(

@@ -27,6 +27,8 @@ _SPACE = re.compile(r"\s+")
 class CastProfileEnricherPlugin(PluginBase):
     """Complete localized cast and crew data through the public plugin SDK."""
 
+    disabled_read_actions = ("progress",)
+
     manifest = manifest
 
     async def on_lifecycle(

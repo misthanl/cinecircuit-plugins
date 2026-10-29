@@ -23,11 +23,13 @@ from .intake_retry import ready as retry_ready, failure as intake_failure
 class SiteTrafficPlugin(PluginBase):
     """集中管理站点流量任务、选种规则与下载器调度。"""
 
+    disabled_read_actions = ("inventory",)
+
     manifest = PluginManifest(
         entrypoint="plugin:SiteTrafficPlugin",
         id="brush-flow",
         name="站点刷流",
-        version="1.0.2",
+        version="1.0.3",
         description="按站点和规则自动选种、下载与删种。",
         icon="mdi-swap-vertical",
         permissions=(
@@ -137,6 +139,11 @@ class SiteTrafficPlugin(PluginBase):
         tasks = due_tasks(context, configured)
         result = await self._run_tasks(context, tasks)
         return {**result, "cleanup": cleanup}
+
+    async def handle_disabled_api(self, request: PluginApiRequest, context: PluginContext) -> dict[str, Any]:
+        if request.action == "statistics" and request.method == "GET":
+            return await build_statistics(context, self._tasks(context.config), live=False)
+        return await super().handle_disabled_api(request, context)
 
     async def handle_api(self, request: PluginApiRequest, context: PluginContext) -> dict[str, Any]:
         if request.action == "statistics" and request.method == "GET":

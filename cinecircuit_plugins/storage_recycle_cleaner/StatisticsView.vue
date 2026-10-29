@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { requestErrorNotified } from "../_shared/request-feedback";
 import LoadingState from "../_shared/LoadingState.vue";
 import { computed, onMounted, ref, type Component } from "vue";
 import type { CineCircuitPluginSdk, PluginContributionContext } from "@cinecircuit/plugin-sdk";
@@ -44,7 +45,7 @@ async function load() {
   loading.value = true;
   error.value = false;
   try { runs.value = (await props.request<{ items?: Run[] }>("/plugins/storage-recycle-cleaner/runs?limit=100")).items || []; }
-  catch { error.value = true; }
+  catch (cause) { error.value = !requestErrorNotified(cause); }
   finally { loading.value = false; }
 }
 onMounted(load);
@@ -86,16 +87,16 @@ onMounted(load);
 </template>
 
 <style scoped>
-.recycle-statistics{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);border:1px solid var(--app-border);border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface)!important;color:var(--app-text);font-family:var(--app-font-family,inherit);font-size:var(--app-font-size-body,14px)}
+.recycle-statistics{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);border:1px solid var(--app-border);border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface)!important;color:var(--app-text);font-family:var(--app-font-family,inherit);font-size:var(--app-font-size-body,14px);font-weight:400}
 .recycle-header{display:flex;box-sizing:border-box;flex:0 0 var(--app-plugin-dialog-header-height,58px);height:var(--app-plugin-dialog-header-height,58px);align-items:center;justify-content:space-between;gap:12px;padding:6px 24px;border-bottom:1px solid var(--app-border-subtle)}
-.recycle-header h2{margin:0;font-size:var(--app-font-size-section-title,18px);font-weight:700;line-height:1.2}
+.recycle-header h2{margin:0;font-size:16px;font-weight:600;line-height:1.2}
 .recycle-content{min-height:0;overflow:auto;padding:20px}.recycle-actions{display:flex;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--app-border-subtle)}
 .recycle-message{padding:32px 0;text-align:center;color:var(--app-text-muted)}
-.recycle-overview{display:grid;gap:20px;min-width:0}.recycle-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.recycle-heading h3{margin:0;font-size:var(--app-font-size-body,14px);font-weight:500}.recycle-heading>span{font-size:var(--app-font-size-helper,12px);color:var(--app-text-muted)}
+.recycle-overview{display:grid;gap:20px;min-width:0}.recycle-heading{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.recycle-heading h3{margin:0;font-size:12px;font-weight:500}.recycle-heading>span{font-size:10px;color:var(--app-text-muted);font-weight:400}
 .recycle-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0}.recycle-metric{padding:16px;border:1px solid color-mix(in srgb,var(--tone) 18%,transparent);border-radius:12px;background:color-mix(in srgb,var(--tone) 5%,transparent)}
 .tone-neutral{--tone:var(--app-text-secondary)}.tone-success{--tone:rgb(var(--v-theme-success))}.tone-error{--tone:rgb(var(--v-theme-error))}.tone-primary{--tone:rgb(var(--v-theme-primary))}
-.recycle-metric dt{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:var(--app-font-size-label,13px);color:var(--app-text-secondary)}.recycle-metric dt .v-icon{color:var(--tone)}
-.recycle-metric dd{display:flex;align-items:baseline;gap:6px;margin:12px 0 0;color:var(--tone);font-size:calc(var(--app-font-size-body,14px) * 2);font-weight:700;line-height:1.15;font-variant-numeric:tabular-nums}.recycle-metric dd span{font-size:var(--app-font-size-helper,12px);font-weight:400;color:var(--app-text-muted)}
-.recycle-schedule{display:flex;align-items:center;gap:12px;padding-top:20px;border-top:1px solid var(--app-border-subtle)}.recycle-clock{display:grid;place-items:center;width:42px;height:42px;flex:0 0 auto;border-radius:12px;color:rgb(var(--v-theme-primary));background:rgba(var(--v-theme-primary),.08)}.recycle-time{display:grid;flex:1;gap:5px;min-width:0}.recycle-time>span{font-size:var(--app-font-size-helper,12px);color:var(--app-text-muted)}.recycle-time strong{font-size:var(--app-font-size-body,14px);font-weight:600;overflow-wrap:anywhere}
+.recycle-metric dt{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px;color:var(--app-text-secondary,#657087);font-weight:400}.recycle-metric dt .v-icon{color:var(--tone)}
+.recycle-metric dd{display:flex;align-items:baseline;gap:6px;margin:12px 0 0;color:var(--tone);font-size:var(--app-font-size-metric,24px);font-weight:600;line-height:1.15;font-variant-numeric:tabular-nums}.recycle-metric dd span{font-size:var(--app-font-size-helper,9px);font-weight:400;color:var(--app-text-muted)}
+.recycle-schedule{display:flex;align-items:center;gap:12px;padding-top:20px;border-top:1px solid var(--app-border-subtle)}.recycle-clock{display:grid;place-items:center;width:42px;height:42px;flex:0 0 auto;border-radius:12px;color:rgb(var(--v-theme-primary));background:rgba(var(--v-theme-primary),.08)}.recycle-time{display:grid;flex:1;gap:5px;min-width:0}.recycle-time>span{font-size:10px;color:var(--app-text-secondary,#657087);font-weight:400}.recycle-time strong{font-size:11px;font-weight:400;overflow-wrap:anywhere;color:var(--app-text-secondary,#657087)}
 @media(max-width:760px){.recycle-header{padding:6px 16px}.recycle-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.recycle-schedule{flex-wrap:wrap}}
 </style>

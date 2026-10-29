@@ -14,10 +14,12 @@ from . import manual
 
 
 class CloudCopyPlugin(PluginBase):
+    disabled_read_actions = ("options", "status", "batches", "batch", "browse")
+
     manifest = PluginManifest(
         id="cloud-copy",
         name="跨网盘复制",
-        version="1.0.2",
+        version="1.0.3",
         api_version=2,
         entrypoint="plugin:CloudCopyPlugin",
         icon="mdi-content-copy",

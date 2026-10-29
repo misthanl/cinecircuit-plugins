@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorText } from "../_shared/request-feedback";
 import { computed, onMounted, ref } from "vue";
 import type { Component } from "vue";
 import SubtitleLocalList from "./SubtitleLocalList.vue";
@@ -186,7 +187,7 @@ async function load(nextOffset = 0) {
     if (requestId !== catalogRequest) return;
     applyCatalogPage(result, nextOffset, keyword);
   } catch (reason) {
-    if (requestId === catalogRequest) error.value = reason instanceof Error ? reason.message : "媒体记录读取失败";
+    if (requestId === catalogRequest) error.value = pluginErrorText(reason, "媒体记录读取失败");
   } finally {
     if (requestId === catalogRequest) loading.value = false;
   }
@@ -216,7 +217,7 @@ async function upload(event?: Event) {
     await load(offset.value);
     uploadPanelOpen.value = false;
   } catch (reason) {
-    error.value = reason instanceof Error ? reason.message : "字幕上传失败";
+    error.value = pluginErrorText(reason, "字幕上传失败");
   } finally {
     uploading.value = false;
   }
@@ -278,7 +279,7 @@ async function confirmPreview() {
     activePreviewIndex.value = null;
     await load(offset.value);
   } catch (reason) {
-    error.value = reason instanceof Error ? reason.message : "字幕保存失败";
+    error.value = pluginErrorText(reason, "字幕保存失败");
   } finally {
     savingPreview.value = false;
   }
@@ -315,7 +316,7 @@ async function removeSubtitle(event?: Event) {
     deletingSubtitle.value = null;
     await load(offset.value);
   } catch (reason) {
-    deleteError.value = reason instanceof Error ? reason.message : "字幕删除失败";
+    deleteError.value = pluginErrorText(reason, "字幕删除失败");
   } finally {
     deleting.value = false;
   }
@@ -362,7 +363,7 @@ async function submitAdjustment(event?: Event) {
     await load(offset.value);
   } catch (reason) {
     adjustmentError.value =
-      reason instanceof Error ? reason.message : "字幕调轴失败";
+      pluginErrorText(reason, "字幕调轴失败");
   } finally {
     adjusting.value = false;
   }
@@ -406,7 +407,7 @@ async function loadSelection(item: MediaItem) {
     ).then((result) => {
       if (current()) item.subtitles = Array.isArray(result?.items) ? result.items : [];
     }).catch((reason) => {
-      if (current()) error.value = reason instanceof Error ? reason.message : "字幕读取失败";
+      if (current()) error.value = pluginErrorText(reason, "字幕读取失败");
     }).finally(() => { if (current()) inventoryLoading.value = false; }),
     props.request<MediaItem>(`/plugins/subtitle-manager/api/detail?${params}`).then((result) => {
       if (!current()) return;
@@ -415,7 +416,7 @@ async function loadSelection(item: MediaItem) {
       if (result?.title) item.title = result.title;
       if (onlineQuery.value === previousQuery) onlineQuery.value = identityQuery(item);
     }).catch((reason) => {
-      if (current()) error.value = reason instanceof Error ? reason.message : "媒体详情读取失败";
+      if (current()) error.value = pluginErrorText(reason, "媒体详情读取失败");
     }),
   ]);
 }

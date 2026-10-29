@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import StatisticValue from "../_shared/StatisticValue.vue";
+import { requestErrorNotified } from "../_shared/request-feedback";
 import LoadingState from "../_shared/LoadingState.vue";
 import { computed, onMounted, ref } from "vue";
 import type { Component } from "vue";
@@ -47,6 +49,7 @@ function statusLabel(item: RunItem) {
 }
 
 function failureMessage(reason: unknown, fallback: string): string {
+  if (requestErrorNotified(reason)) return "";
   if (reason && typeof reason === "object" && "message" in reason) return String(reason.message || fallback);
   return fallback;
 }
@@ -95,10 +98,10 @@ onMounted(() => load());
         <UiAlert v-if="error" type="error" variant="tonal" role="alert">{{ error }}</UiAlert>
         <section v-if="loaded" class="maoyan-statistics" aria-label="TMDB 剧集追踪统计">
           <dl class="maoyan-statistics__metrics">
-            <div><dt>累计检查</dt><dd>{{ cumulative?.checked ?? '—' }}</dd></div>
-            <div><dt>累计新增订阅</dt><dd>{{ cumulative?.subscribed ?? '—' }}</dd></div>
-            <div><dt>累计已存在／已处理</dt><dd>{{ cumulative?.existing ?? '—' }}</dd></div>
-            <div class="maoyan-retry-metric"><dt>累计需重试次数</dt><dd>{{ cumulative?.retry ?? '—' }}</dd></div>
+            <div><dt>累计检查</dt><dd><StatisticValue :value="cumulative?.checked ?? '—'" /></dd></div>
+            <div><dt>累计新增订阅</dt><dd><StatisticValue :value="cumulative?.subscribed ?? '—'" /></dd></div>
+            <div><dt>累计已存在／已处理</dt><dd><StatisticValue :value="cumulative?.existing ?? '—'" /></dd></div>
+            <div class="maoyan-retry-metric"><dt>累计需重试次数</dt><dd><StatisticValue :value="cumulative?.retry ?? '—'" /></dd></div>
           </dl>
           <section class="maoyan-run" aria-label="本次处理结果">
             <div class="maoyan-run__heading"><h3>本次处理结果<span> · {{ latest?.items.length ?? 0 }} 条</span></h3><UiButton variant="text" :disabled="!latest?.items.length" :aria-expanded="expanded" aria-controls="maoyan-run-details" @click="toggleDetails">{{ expanded ? '收起明细' : '查看明细' }}</UiButton></div>
@@ -145,7 +148,7 @@ onMounted(() => load());
 .maoyan-statistics { display: grid; gap: 22px; min-width: 0; }
 .maoyan-run { border-block: 1px solid var(--app-border-subtle); padding-block: 12px; }
 .maoyan-run__heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.maoyan-run__heading h3 { margin: 0; color: var(--app-text); font-size: var(--app-font-size-body); }
+.maoyan-run__heading h3 { margin: 0; color: var(--app-text); font-size:12px;font-weight:500}
 .maoyan-run__heading span { color: var(--app-text-muted); font-weight: normal; }
 .maoyan-run__filters { display: flex; gap: 8px; }
 .maoyan-run__table { overflow-x: auto; }
@@ -157,26 +160,26 @@ onMounted(() => load());
 .maoyan-run__status.is-retry { color: var(--app-warning, #b76a00); }
 .maoyan-statistics__metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 6px; }
 .maoyan-statistics__metrics > div { padding: 15px 16px; border: 1px solid var(--app-border-subtle); border-radius: 12px; background: var(--app-surface-muted); }
-.maoyan-statistics__metrics dt { color: var(--app-text-muted); font-size: 12px; }
-.maoyan-statistics__metrics dd { margin: 10px 0 0; color: var(--app-text); font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.maoyan-statistics__metrics dd span { font-size: 11px; font-weight: 400; }
-.maoyan-statistics__page-info { display: flex; justify-content: space-between; color: var(--app-text-muted); font-size: 13px; }
+.maoyan-statistics__metrics dt { color:var(--app-text-secondary,#657087); font-size:10px;font-weight:400}
+.maoyan-statistics__metrics dd { margin: 10px 0 0; color: var(--app-text); font-size:var(--app-font-size-metric,24px); font-weight:600; font-variant-numeric: tabular-nums; }
+.maoyan-statistics__metrics dd span:not(.plugin-statistic-placeholder) { font-size:var(--app-font-size-helper,9px); font-weight:400; }
+.maoyan-statistics__page-info { display: flex; justify-content: space-between; color: var(--app-text-muted); font-size:10px;font-weight:400}
 .maoyan-statistics__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start; margin-top: -10px; }
 .maoyan-subscription { display: grid; grid-template-columns: 64px minmax(0, 1fr); grid-template-rows: 96px; align-items: start; gap: 10px; padding: 10px; min-width: 0; overflow: hidden; border: 1px solid var(--app-border-subtle); border-radius: 11px; background: var(--app-surface); }
 .maoyan-subscription__poster { display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 6px; background: var(--app-surface-muted); color: var(--app-text-muted); font-size: var(--app-font-size-caption, 12px); }
 .maoyan-subscription__poster img { width: 100%; height: 100%; min-height: 0; object-fit: contain; }
 .maoyan-subscription__body { display: flex; flex-direction: column; gap: 5px; min-width: 0; height: 96px; max-height: 96px; overflow: hidden; }
-.maoyan-subscription h3 { flex-shrink: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--app-text); font-size: var(--app-font-size-caption, 12px); line-height: 18px; font-weight: 600; }
+.maoyan-subscription h3 { flex-shrink: 0; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--app-text); font-size:12px; line-height: 18px; font-weight:500; }
 .maoyan-subscription__tags { display: flex; flex-wrap: nowrap; flex-shrink: 0; gap: 4px; min-width: 0; overflow: hidden; }
 .maoyan-subscription__tags span { min-width: 0; max-width: 100%; padding: 1px 5px; border-radius: 16px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: var(--app-surface-muted); color: var(--app-text-secondary); font-size: var(--app-font-size-helper, 10px); line-height: 16px; }
 .maoyan-subscription__tags span:first-child { flex-shrink: 0; }
 .maoyan-subscription__release { flex-shrink: 0; margin: 0; color: var(--app-text-secondary); font-size: var(--app-font-size-helper, 10px); line-height: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.maoyan-subscription__time { flex-shrink: 0; height: 28px; margin: 0; margin-top: auto; color: var(--app-text-muted); font-size: var(--app-font-size-helper, 10px); line-height: 14px; overflow: hidden; font-variant-numeric: tabular-nums; }
+.maoyan-subscription__time { flex-shrink: 0; height: 28px; margin: 0; margin-top: auto; color:var(--app-text-secondary,#657087); font-size:11px; line-height: 14px; overflow: hidden; font-variant-numeric: tabular-nums;font-weight:400}
 .maoyan-subscription__time span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.maoyan-statistics__pagination { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--app-text-muted); font-size: 12px; }
-.maoyan-dialog { display: flex; flex-direction: column; max-height: calc(100dvh - 32px); border: 1px solid var(--app-border); border-radius: var(--app-dialog-radius, 16px) !important; background: var(--app-dialog-surface) !important; color: var(--app-text); }
+.maoyan-statistics__pagination { display: flex; align-items: center; justify-content: center; gap: 14px; color: var(--app-text-muted); font-size:10px;font-weight:400}
+.maoyan-dialog{ display: flex; flex-direction: column; max-height: calc(100dvh - 32px); border: 1px solid var(--app-border); border-radius: var(--app-dialog-radius, 16px) !important; background: var(--app-dialog-surface) !important; color: var(--app-text);font-weight:400}
 .maoyan-dialog__header { display: flex; box-sizing: border-box; height: var(--app-plugin-dialog-header-height, 58px); min-height: var(--app-plugin-dialog-header-height, 58px); max-height: var(--app-plugin-dialog-header-height, 58px); flex: 0 0 var(--app-plugin-dialog-header-height, 58px); align-items: center; justify-content: space-between; gap: 12px; padding: 6px 24px; }
-.maoyan-dialog__header h2 { margin: 0; font-size: 18px; font-weight: 750; }
+.maoyan-dialog__header h2 { margin: 0; font-size:16px; font-weight:600; }
 .maoyan-dialog__content { min-height: 0; overflow: auto; padding: 20px 24px; background: var(--app-surface-subtle); }
 .maoyan-dialog__actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding: 12px 24px; border-top: 1px solid var(--app-border-subtle); }
 .maoyan-dialog__message { padding: 40px 12px; text-align: center; color: var(--app-text-muted); }
@@ -187,7 +190,7 @@ onMounted(() => load());
   .maoyan-statistics__metrics > div { padding: 14px 16px; }
   .maoyan-dialog__content { padding: 16px; }
   .maoyan-dialog__header { padding: 6px 16px; }
-  .maoyan-dialog__header h2 { font-size: 18px; }
+  .maoyan-dialog__header h2 { font-size:16px;font-weight:600}
 }
 @media (max-width: 1100px) and (min-width: 851px) {
   .maoyan-statistics__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -198,4 +201,6 @@ onMounted(() => load());
 @media (max-width: 600px) {
   .maoyan-statistics__grid { grid-template-columns: minmax(0, 1fr); }
 }
+
+.maoyan-run__heading>span,.maoyan-run__heading h3>span{font-size:10px;font-weight:400}
 </style>

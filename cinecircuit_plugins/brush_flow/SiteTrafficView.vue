@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { requestErrorNotified } from "../_shared/request-feedback";
 import { onMounted, ref } from "vue";
 
 const PLUGIN_ID = "brush-flow";
@@ -41,6 +42,7 @@ const message = ref("");
 const busy = ref(false);
 
 function errorMessage(error: unknown, fallback: string): string {
+  if (requestErrorNotified(error)) return "";
   return error instanceof Error ? error.message : fallback;
 }
 async function load(): Promise<void> {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorText } from "../_shared/request-feedback";
 import LoadingState from "../_shared/LoadingState.vue";
 import { computed, onMounted, ref } from "vue";
 import type { Component } from "vue";
@@ -118,7 +119,7 @@ async function load(): Promise<void> {
     latest.value = payload.items?.[0] || null;
     progress.value = await props.request<Progress>("/plugins/cast-profile-enricher/api/progress");
   } catch (reason: unknown) {
-    error.value = reason instanceof Error ? reason.message : "统计数据加载失败";
+    error.value = pluginErrorText(reason, "统计数据加载失败");
   } finally {
     loading.value = false;
   }
@@ -177,15 +178,15 @@ function stopPolling(): void { clearInterval(poll); }
 </template>
 
 <style scoped>
-.cast-stat-dialog{display:flex;max-height:calc(100dvh - 32px);overflow:hidden;flex-direction:column;border:1px solid var(--app-border-subtle);border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface)!important;color:var(--app-text)}
+.cast-stat-dialog{display:flex;max-height:calc(100dvh - 32px);overflow:hidden;flex-direction:column;border:1px solid var(--app-border-subtle);border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface)!important;color:var(--app-text);font-weight:400}
 .cast-stat-header{display:flex;box-sizing:border-box;height:var(--app-plugin-dialog-header-height,58px);min-height:var(--app-plugin-dialog-header-height,58px);max-height:var(--app-plugin-dialog-header-height,58px);flex:0 0 var(--app-plugin-dialog-header-height,58px);align-items:center;justify-content:space-between;gap:12px;padding:6px 24px;border-bottom:1px solid var(--app-border-subtle)}
-.cast-stat-header h2{margin:0;font-size:18px;font-weight:750;line-height:1.2}
+.cast-stat-header h2{margin:0;font-size:16px;font-weight:600;line-height:1.2}
 .cast-stat-content{display:grid;min-height:0;gap:18px;overflow:auto;padding:20px 24px;background:var(--app-surface-subtle)}
 .cast-stat-message{min-height:220px;margin:0;display:grid;place-items:center;color:var(--app-text-muted)}
-.cast-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 6px}.cast-metrics>div{min-width:0;padding:15px 16px;border:1px solid var(--app-border-subtle);border-radius:12px;background:var(--app-surface-muted)}.cast-metrics dt{color:var(--app-text-muted);font-size:12px}.cast-metrics dd{margin:10px 0 0;color:var(--app-text);font-size:24px;font-weight:600;font-variant-numeric:tabular-nums}
+.cast-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 6px}.cast-metrics>div{min-width:0;padding:15px 16px;border:1px solid var(--app-border-subtle);border-radius:12px;background:var(--app-surface-muted)}.cast-metrics dt{color:var(--app-text-secondary,#657087);font-size:10px;font-weight:400}.cast-metrics dd{margin:10px 0 0;color:var(--app-text);font-size:var(--app-font-size-metric,24px);font-weight:600;font-variant-numeric:tabular-nums}
 .cast-tone--blue{--cast-tone:#2f74ee}.cast-tone--violet{--cast-tone:#7451d5}.cast-tone--green{--cast-tone:#29a866}.cast-tone--amber{--cast-tone:#e49312}.cast-tone--red{--cast-tone:#e4525d}
-.cast-latest{padding:18px 20px;border:1px solid var(--app-border-subtle);border-radius:14px;background:var(--app-surface)}.cast-latest-heading{display:flex;align-items:center;gap:10px}.cast-latest-heading h3{margin:0;font-size:15px}.cast-latest-heading time{margin-left:auto;color:var(--app-text-muted);font-size:11px;font-variant-numeric:tabular-nums}.cast-latest>p{margin:15px 0;color:var(--app-text);font-size:12px;line-height:1.6}.cast-result-bar{display:flex;height:7px;overflow:hidden;border-radius:999px;background:var(--app-surface-muted)}.cast-result-bar span{min-width:0;background:var(--cast-tone)}.cast-result-legend{display:flex;flex-wrap:wrap;gap:10px 22px;padding:0;margin:14px 0 0;list-style:none}.cast-result-legend li{display:flex;align-items:center;gap:6px;color:var(--app-text-secondary);font-size:11px}.cast-result-legend i{width:7px;height:7px;border-radius:50%;background:var(--cast-tone)}.cast-result-legend strong{color:var(--app-text)}
+.cast-latest{padding:18px 20px;border:1px solid var(--app-border-subtle);border-radius:14px;background:var(--app-surface)}.cast-latest-heading{display:flex;align-items:center;gap:10px}.cast-latest-heading h3{margin:0;font-size:12px;font-weight:500}.cast-latest-heading time{margin-left:auto;color:var(--app-text-secondary,#657087);font-size:11px;font-variant-numeric:tabular-nums;font-weight:400}.cast-latest>p{margin:15px 0;color:var(--app-text);font-size:10px;line-height:1.6;font-weight:400}.cast-result-bar{display:flex;height:7px;overflow:hidden;border-radius:999px;background:var(--app-surface-muted)}.cast-result-bar span{min-width:0;background:var(--cast-tone)}.cast-result-legend{display:flex;flex-wrap:wrap;gap:10px 22px;padding:0;margin:14px 0 0;list-style:none}.cast-result-legend li{display:flex;align-items:center;gap:6px;color:var(--app-text-secondary);font-size:10px;font-weight:400}.cast-result-legend i{width:7px;height:7px;border-radius:50%;background:var(--cast-tone)}.cast-result-legend strong{color:var(--app-text)}
 .cast-stat-actions{display:flex;flex:0 0 auto;justify-content:flex-end;padding:10px 20px;border-top:1px solid var(--app-border-subtle);background:var(--app-surface-raised)}
-@media(max-width:700px){.cast-stat-content{padding:16px}.cast-stat-header{padding:6px 16px}.cast-stat-header h2{font-size:16px}.cast-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.cast-latest-heading{align-items:flex-start;flex-wrap:wrap}.cast-latest-heading time{width:100%;margin-left:0}}
+@media(max-width:700px){.cast-stat-content{padding:16px}.cast-stat-header{padding:6px 16px}.cast-stat-header h2{font-size:16px;font-weight:600}.cast-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.cast-latest-heading{align-items:flex-start;flex-wrap:wrap}.cast-latest-heading time{width:100%;margin-left:0;font-size:11px;font-weight:400;color:var(--app-text-secondary,#657087)}}
 @media(max-width:420px){.cast-metrics{grid-template-columns:1fr}}
 </style>

@@ -3,6 +3,10 @@
     "1.0.1": [
       "7e70ab2da5094e105d88c110d29d53293f108d8871cc4890f38d6fbb7559c434",
       "ad15a695ce755594b9764495c3ee0d78d6cce9f5538444023da50fa5dbe42663"
+    ],
+    "1.0.3": [
+      "b0e9c9e2d619491e6df15115ce0b5874f0f382f8c2dc0b2f25ffaf461a1c6b2d",
+      "1c10d5bbd2dcded3d6921e2ab1a3b24e18b39e157a3c63bb2786b747ef1f649f"
     ]
   },
   "torrent-transfer": {
@@ -14,6 +18,9 @@
       "32fe45c293570f2465742aaf3c749577ac422e5ab1980d4fec505cd4a2a5e2b8",
       "59069014d30d2565c2c685f023a3af80561cc60b26545ca64544ce59acb14e08",
       "ed32c80b7ee944a37af007a60e7ee788f2d8261a194de1a890a08e8a07566034"
+    ],
+    "1.0.3": [
+      "cf7e0a64e9e4d7049001d196ac65102bc2f0d4e698cbc6f0378ee95edb3e0882"
     ]
   },
   "iyuu-autoseed": {
@@ -24,63 +31,101 @@
       "02f403dfdc27c84314a70a980e86d84cff64aabef0e20be360a46880f21b4ff8",
       "13a94880c4e22b001f2902afb3dd6b7f6e828c2dff9a17313af882c515f33cc2",
       "4a165688279fa5cd4c31e8e77085b9e351c2d7e3cf677777787c6d156fc3b3ec"
+    ],
+    "1.0.3": [
+      "27f62c6c5fda3316613b7f895a0be768bd813d679355405ddbf508d1f43dd813"
     ]
   },
   "auto-signin": {
     "1.0.2": [
       "4e6a958a96587c04bd6ee5f16da7390f0fedbaa20595b3a69477abc964228ae0",
       "db61400a29cfe75ee1c767caa296b80cbe6ceebb3a34a2596288efea41b96e98"
+    ],
+    "1.0.4": [
+      "efe98bf2558bb972a8802e4e3d87984057c4b1ee46167264b03a3ef58b05b541"
     ]
   },
   "cast-profile-enricher": {
     "1.0.3": [
       "6f9df54e5b839f6f2f953461deec6b67abfa6d73bd69689577b67063211ca436",
       "9ffb719611b614a5df52154b1e5c6bb1778209f9fe23973eee29ce048e8bf9fd"
+    ],
+    "1.0.5": [
+      "ae5e5fb1a0f1fc8d8966e9dc67789d830d94de306ec3cf6035bb6759a74b0bc9",
+      "b3095411b57db35e32a7cfcbfce77fd92017f748e37208228a902f902dddfb30"
     ]
   },
   "cloud-copy": {
     "1.0.1": [
       "dd3d8fab48a86aa9f4abfe519a7f68f1c619aba98c8a8e8b450c0a10aad091fa"
+    ],
+    "1.0.3": [
+      "9965f1dba7a7a37a3a1cb5c57c0f0e1108f83444b5be97d09f3e16c2a5e1469d",
+      "e9bb12d3de9d58b178ece8795af151d98252b366fa731bac679024c54069113c"
     ]
   },
   "cookiecloud": {
     "1.0.0": [
       "33f7d12f7ab651c857c2908a25fbe0505b0e0dc4a7751341b9fdfcd391009fbd",
       "3b8ed5592b94aec98bb7219b11671542766297183e18046e3a4996a6e806482a"
+    ],
+    "1.0.2": [
+      "77d409835e81d7310e736bdead60a9ffe30f31b15288c4a91ea7fc9cb067743e"
     ]
   },
   "douban-hot": {
     "1.0.2": [
       "78111c1aa655a486106f48d0c352be06d6c3279931ab69ea0206ade213b19332"
+    ],
+    "1.0.4": [
+      "ddaef4ae982567685c575d97dac7413f813ed083efa02491f792e6059454ab00",
+      "21a095118c762a3cfe0093e7065e2e0b6b1e499872a11c62ba78be7222eb2a5b"
     ]
   },
   "maoyan-rank": {
     "1.0.3": [
       "55bc8783b8699f4ea5393237504c274fe3994591439129e092c659aef8d1b7e3",
       "e6d6a9c016526d0ed11c0db62ac9006c8a49f5204fcf2633cc70a2c9811a53a6"
+    ],
+    "1.0.5": [
+      "ac4256d971cc815c52ee52c4efec565b157a2d31a6addf9c358ace4f0aabe6f3",
+      "de250471bf2cce77ee00c25989a5bc4a08e76cd9620e7b90fe4d17ac88225ac7"
     ]
   },
   "emby-cover-generator": {
     "1.0.2": [
       "33782be61f1f668233619039ca138838cacebf35e08138e58a4d7e3aee74d9c7"
+    ],
+    "1.0.4": [
+      "57280b1e12efebbd261013eaf6f4a84a8329010250480c0f3c16f90c94b02d0d"
     ]
   },
   "overseas-tv": {
     "1.0.1": [
       "659ea56628c237d323f5b53bf4abe88940e502247aa09ca2cdccf4197aea6fcb",
       "7c774bbde8e54c2ac70e7a6a02e3bde092e3790796a2064e291da4154b37ad6f"
+    ],
+    "1.0.3": [
+      "2144d50253a18f46e1794260ea189b6662ed714332a034cc14f2f999399fa926",
+      "a87e68455df377a83a73ee48498820262313144bdc21e869bcf14c0365af5a81"
     ]
   },
   "storage-recycle-cleaner": {
     "1.0.0": [
       "171b6d58a00c08d1d7ec6b110d6f39d08fe9b83357d729d1523e8ac530df1763",
       "42cb52c5935fe18aa4f77b35c73f9c22a252ae43d265352f7bc88e9538e56531"
+    ],
+    "1.0.2": [
+      "420cb1ad87249c084b5b81fc7403d34226b8034d7c66b054d2790d06ab08c697"
     ]
   },
   "subtitle-manager": {
     "1.0.3": [
       "e30526e73b0f59ca0e48d3afa4f40e717fa52709e13a6ed0463e0ec706a858c0",
       "f5bf5ddc6cb0912d56d2da223147f09dc4195789b8779218a29f6c6ee0d5a1a5"
+    ],
+    "1.0.5": [
+      "c490513880d331ea024367b99879e28e9d31675a17ad9ed78148e92c50799197"
     ]
   }
 }

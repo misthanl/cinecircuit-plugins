@@ -4,7 +4,7 @@
       "manifest": {
         "id": "auto-signin",
         "name": "站点签到助手",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "自动登录并签到指定 PT 站点。",
         "icon": "mdi-calendar-check-outline",
         "api_version": 1,
@@ -102,14 +102,17 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/auto-signin-1.0.3-0a2cc78abca5f790.zip",
-      "sha256": "0a2cc78abca5f79063f64da18b578598bef04c15ae220b0b328837b99a195c8d"
+      "package_url": "packages/auto-signin-1.0.4-b6484c902a35943a.zip",
+      "sha256": "b6484c902a35943af8acc7546a794eaa0be061785b3a8e49a3576127e5e7c562",
+      "supersedes_sha256": [
+        "efe98bf2558bb972a8802e4e3d87984057c4b1ee46167264b03a3ef58b05b541"
+      ]
     },
     {
       "manifest": {
         "id": "brush-flow",
         "name": "站点刷流",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "按站点和规则自动选种、下载与删种。",
         "icon": "mdi-swap-vertical",
         "api_version": 2,
@@ -239,14 +242,18 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.2-b797971145435676.zip",
-      "sha256": "b79797114543567673857d7239019684dfb0f5afc5b3a551cc6117dc34e609de"
+      "package_url": "packages/brush-flow-1.0.3-dc3991012e1f8868.zip",
+      "sha256": "dc3991012e1f8868c5af715555002352fafee85f3df36a5a435fc73a5e3748b0",
+      "supersedes_sha256": [
+        "b0e9c9e2d619491e6df15115ce0b5874f0f382f8c2dc0b2f25ffaf461a1c6b2d",
+        "1c10d5bbd2dcded3d6921e2ab1a3b24e18b39e157a3c63bb2786b747ef1f649f"
+      ]
     },
     {
       "manifest": {
         "id": "cast-profile-enricher",
         "name": "演职员资料完善",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "补充影视人物的中文姓名、简介、角色信息与头像。",
         "icon": "mdi-account-star-outline",
         "api_version": 1,
@@ -391,14 +398,18 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.4-41b9a70a2cb6cd83.zip",
-      "sha256": "41b9a70a2cb6cd8341e8307ec988edc518d1d765fd4d937f88c834234a147654"
+      "package_url": "packages/cast-profile-enricher-1.0.5-870bf9029247fa3d.zip",
+      "sha256": "870bf9029247fa3d751191850f980ddd94212175b6b90a211ee7c5d81765d7dc",
+      "supersedes_sha256": [
+        "ae5e5fb1a0f1fc8d8966e9dc67789d830d94de306ec3cf6035bb6759a74b0bc9",
+        "b3095411b57db35e32a7cfcbfce77fd92017f748e37208228a902f902dddfb30"
+      ]
     },
     {
       "manifest": {
         "id": "cloud-copy",
         "name": "跨网盘复制",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "通过统一存储能力复制文件，支持秒传、校验后秒传及可选服务器中转。保留源文件。",
         "icon": "mdi-content-copy",
         "api_version": 2,
@@ -564,14 +575,18 @@
           }
         ]
       },
-      "package_url": "packages/cloud-copy-1.0.2-ecd42ac9312b9ed9.zip",
-      "sha256": "ecd42ac9312b9ed9f782f1e2b6cca50cfdd2484324209397bc4e5de66a725e78"
+      "package_url": "packages/cloud-copy-1.0.3-759f65a0331dd494.zip",
+      "sha256": "759f65a0331dd4946fb34ec2d9f5ae904784d0437e4349231eaa7d24fcee139f",
+      "supersedes_sha256": [
+        "9965f1dba7a7a37a3a1cb5c57c0f0e1108f83444b5be97d09f3e16c2a5e1469d",
+        "e9bb12d3de9d58b178ece8795af151d98252b366fa731bac679024c54069113c"
+      ]
     },
     {
       "manifest": {
         "id": "cookiecloud",
         "name": "CookieCloud 站点同步",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "同步 CookieCloud 数据，自动验证并更新 PT 站点。",
         "icon": "mdi-cloud-sync-outline",
         "api_version": 2,
@@ -685,14 +700,17 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.1-3f28cc619fcd041a.zip",
-      "sha256": "3f28cc619fcd041ab48fdf2e3756a2981909ccc73984527c1d864b9f52834e5d"
+      "package_url": "packages/cookiecloud-1.0.2-c73812d7d3a4a50d.zip",
+      "sha256": "c73812d7d3a4a50dcd61dccc9c55eac58d5c96d500bb0641c4f827e8608f0174",
+      "supersedes_sha256": [
+        "77d409835e81d7310e736bdead60a9ffe30f31b15288c4a91ea7fc9cb067743e"
+      ]
     },
     {
       "manifest": {
         "id": "douban-hot",
         "name": "豆瓣榜单追踪",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "跟踪豆瓣热门榜单，筛选作品并自动添加订阅。",
         "icon": "mdi-movie-search-outline",
         "api_version": 1,
@@ -821,14 +839,18 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/douban-hot-1.0.3-e7cb07b32df19280.zip",
-      "sha256": "e7cb07b32df192802c28c19b1f79efef3ecf8fe5c4c07bc0d51e49e52f269927"
+      "package_url": "packages/douban-hot-1.0.4-dc6af2a2f4883f6e.zip",
+      "sha256": "dc6af2a2f4883f6e7801898c9f804187bad3838e462ba450dda7d506ae4d4ded",
+      "supersedes_sha256": [
+        "ddaef4ae982567685c575d97dac7413f813ed083efa02491f792e6059454ab00",
+        "21a095118c762a3cfe0093e7065e2e0b6b1e499872a11c62ba78be7222eb2a5b"
+      ]
     },
     {
       "manifest": {
         "id": "iyuu-autoseed",
         "name": "IYUU 辅种",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "通过 IYUU 查找其他站点的同源种子，复用已有数据校验做种。",
         "icon": "mdi-source-branch",
         "api_version": 2,
@@ -1003,14 +1025,17 @@
           }
         ]
       },
-      "package_url": "packages/iyuu-autoseed-1.0.2-0f59a1b52ead722e.zip",
-      "sha256": "0f59a1b52ead722ed41cabf8b6d96c73d42f87b037038dbecdb08666746de285"
+      "package_url": "packages/iyuu-autoseed-1.0.3-5baa1e555d3f31fe.zip",
+      "sha256": "5baa1e555d3f31fe2e9aa5e7d896d681d8979fe35a9005a654fced3a2d4895ab",
+      "supersedes_sha256": [
+        "27f62c6c5fda3316613b7f895a0be768bd813d679355405ddbf508d1f43dd813"
+      ]
     },
     {
       "manifest": {
         "id": "maoyan-rank",
         "name": "影视榜单订阅",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "订阅猫眼电影票房榜及腾讯、爱奇艺、芒果、优酷分类榜单。",
         "icon": "mdi-movie-search-outline",
         "api_version": 1,
@@ -1274,14 +1299,18 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.4-6195513bab0fca16.zip",
-      "sha256": "6195513bab0fca16689ccccd82bf4dadfcacf4afe39b0e5839616b6ff3ea821f"
+      "package_url": "packages/maoyan-rank-1.0.5-79edca509e56c09d.zip",
+      "sha256": "79edca509e56c09dff520b129b6530720c294d054ce79049a3f124af589c88f9",
+      "supersedes_sha256": [
+        "ac4256d971cc815c52ee52c4efec565b157a2d31a6addf9c358ace4f0aabe6f3",
+        "de250471bf2cce77ee00c25989a5bc4a08e76cd9620e7b90fe4d17ac88225ac7"
+      ]
     },
     {
       "manifest": {
         "id": "emby-cover-generator",
         "name": "媒体库视觉封面",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "为媒体库生成并上传静态或动态风格封面。",
         "icon": "mdi-image-multiple-outline",
         "api_version": 1,
@@ -2045,14 +2074,17 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/emby-cover-generator-1.0.3-5a933341514e76ec.zip",
-      "sha256": "5a933341514e76ec26fb45774e41a06553f1d8f022db483289a4d7d7e4440065"
+      "package_url": "packages/emby-cover-generator-1.0.4-c112bad56cbc6ccd.zip",
+      "sha256": "c112bad56cbc6ccdd4cf21a414a8ccbe38891a9eb71cf55d91e3b6f131707cf3",
+      "supersedes_sha256": [
+        "57280b1e12efebbd261013eaf6f4a84a8329010250480c0f3c16f90c94b02d0d"
+      ]
     },
     {
       "manifest": {
         "id": "overseas-tv",
         "name": "TMDB 剧集追踪",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "按播出平台追踪近期新剧与新季，自动创建订阅。",
         "icon": "mdi-television-classic",
         "api_version": 1,
@@ -2528,14 +2560,18 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/overseas-tv-1.0.2-71ff46d31a38da4c.zip",
-      "sha256": "71ff46d31a38da4cf78943abc20608c2706dbd622632bc8a6d18fa3d4bcd51b9"
+      "package_url": "packages/overseas-tv-1.0.3-104da074ea525f20.zip",
+      "sha256": "104da074ea525f206fa57d5ce83524a2c6541c6f22524bb73b47794ad0bc17ff",
+      "supersedes_sha256": [
+        "2144d50253a18f46e1794260ea189b6662ed714332a034cc14f2f999399fa926",
+        "a87e68455df377a83a73ee48498820262313144bdc21e869bcf14c0365af5a81"
+      ]
     },
     {
       "manifest": {
         "id": "storage-recycle-cleaner",
         "name": "网盘回收站清理",
-        "version": "1.0.1",
+        "version": "1.0.2",
         "description": "定时清空所选网盘回收站，释放存储空间。",
         "icon": "mdi-trash-can-outline",
         "api_version": 1,
@@ -2607,14 +2643,17 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/storage-recycle-cleaner-1.0.1-a75ed4e1d93049a1.zip",
-      "sha256": "a75ed4e1d93049a1aa02e72eda7a3e4a04d1111c26d3a4780d0c4dd2ac25cd7e"
+      "package_url": "packages/storage-recycle-cleaner-1.0.2-185be518110db85f.zip",
+      "sha256": "185be518110db85f1a8605267931119525aa42a89d5530cd34d35a064e5ee2e6",
+      "supersedes_sha256": [
+        "420cb1ad87249c084b5b81fc7403d34226b8034d7c66b054d2790d06ab08c697"
+      ]
     },
     {
       "manifest": {
         "id": "subtitle-manager",
         "name": "字幕管理助手",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "在线搜索、自动匹配并管理媒体外挂字幕。",
         "icon": "mdi-subtitles-outline",
         "api_version": 1,
@@ -2983,14 +3022,17 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.4-30d6eb04bbcb5b58.zip",
-      "sha256": "30d6eb04bbcb5b58b649362cc91cc7fd2747f59d5a20e7c8899a9a6c51266bed"
+      "package_url": "packages/subtitle-manager-1.0.5-4c030716a29a154c.zip",
+      "sha256": "4c030716a29a154ce6e88bd33c9f4163bee9b12bb65a66df4ec9ca4b0f22b49d",
+      "supersedes_sha256": [
+        "c490513880d331ea024367b99879e28e9d31675a17ad9ed78148e92c50799197"
+      ]
     },
     {
       "manifest": {
         "id": "torrent-transfer",
         "name": "转移做种",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "将已完成的种子转移到其他下载器，复用原有数据做种。",
         "icon": "mdi-file-move-outline",
         "api_version": 2,
@@ -3180,8 +3222,11 @@
           }
         ]
       },
-      "package_url": "packages/torrent-transfer-1.0.2-af181bde52651e45.zip",
-      "sha256": "af181bde52651e458acde09ae9d414a1664922b32e52edebd31e907885f9e117"
+      "package_url": "packages/torrent-transfer-1.0.3-c385df3a7af15126.zip",
+      "sha256": "c385df3a7af151261a82066ccbc28e3799fcaa48b8ba3254a9ed3520cb110a51",
+      "supersedes_sha256": [
+        "cf7e0a64e9e4d7049001d196ac65102bc2f0d4e698cbc6f0378ee95edb3e0882"
+      ]
     }
   ]
 }

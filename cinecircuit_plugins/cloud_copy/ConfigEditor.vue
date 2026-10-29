@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorFallback } from "../_shared/request-feedback";
 import { computed, onMounted, ref, type Component } from "vue";
 import type { ConfigField } from "../_shared/config-fields";
 const props = defineProps<{ modelValue: Record<string, unknown>; fields: ConfigField[]; disabled?: boolean; schemaFieldsComponent: Component; request: <T = unknown>(path: string, init?: RequestInit) => Promise<T> }>();
@@ -29,7 +30,7 @@ function update(next: Record<string, unknown>) {
 }
 onMounted(async () => {
   try { sources.value = (await props.request<{items: Array<{id:string;capabilities:string[]}>}>("/plugins/cloud-copy/sdk/resources/storage?capability=file_copy_source&limit=500")).items; }
-  catch { error.value = "读取源网盘能力失败，请重新打开配置"; }
+  catch (cause) { error.value = pluginErrorFallback(cause, "读取源网盘能力失败，请重新打开配置"); }
 });
 </script>
 <template>

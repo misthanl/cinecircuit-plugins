@@ -86,3 +86,14 @@ def test_execution_history_keeps_counts_and_limit_reason(monkeypatch):
     assert len(report["history"]) == 2
     assert report["history"][0]["failed"] == 1
     assert report["history"][1]["reason"] == "达到体积上限"
+
+
+def test_disabled_statistics_reads_history_without_refreshing_downloader():
+    ctx, receipt, task, rules = fixture()
+    previous = deepcopy(ctx.state.values)
+    result = asyncio.run(build_statistics(ctx, rules, live=False))
+    assert result["enabled"] is False
+    assert result["tasks"]
+    assert all(row["available"] is False for row in result["tasks"])
+    ctx.downloads.list_tagged_tasks.assert_not_awaited()
+    assert ctx.state.values == previous

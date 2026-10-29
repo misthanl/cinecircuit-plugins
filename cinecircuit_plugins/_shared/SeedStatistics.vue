@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorText } from "./request-feedback";
 import { computed, onMounted, ref, type Component } from "vue";
 import type { PluginContributionContext } from "@cinecircuit/plugin-sdk";
 const props = defineProps<{
@@ -42,14 +43,14 @@ async function load(): Promise<void> {
   if (loading.value) return;
   loading.value = true; error.value = "";
   try { report.value = await props.request<Report>(`/plugins/${props.pluginId}/api/statistics`); changePage(page.value); }
-  catch (cause) { error.value = cause instanceof Error ? cause.message : "读取统计失败"; }
+  catch (cause) { error.value = pluginErrorText(cause, "读取统计失败"); }
   finally { loading.value = false; }
 }
 async function check(): Promise<void> {
   if (loading.value) return;
   loading.value = true; error.value = "";
   try { await props.request(`/plugins/${props.pluginId}/api/check`, { method: "POST", body: "{}" }); report.value = await props.request<Report>(`/plugins/${props.pluginId}/api/statistics`); changePage(page.value); }
-  catch (cause) { error.value = cause instanceof Error ? cause.message : "检查失败"; }
+  catch (cause) { error.value = pluginErrorText(cause, "检查失败"); }
   finally { loading.value = false; }
 }
 onMounted(load);
@@ -91,17 +92,17 @@ onMounted(load);
 </template>
 
 <style scoped>
-.seed-statistics-dialog{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);overflow:hidden;border:1px solid var(--app-border);border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface,var(--app-surface,#fff))!important;color:var(--app-text);font-family:var(--app-font-family,inherit);font-size:var(--app-font-size-body,14px)}
+.seed-statistics-dialog{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);overflow:hidden;border:1px solid var(--app-border);border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface,var(--app-surface,#fff))!important;color:var(--app-text);font-family:var(--app-font-family,inherit);font-size:var(--app-font-size-body,14px);font-weight:400}
 .seed-statistics-header{display:flex;box-sizing:border-box;flex:0 0 var(--app-plugin-dialog-header-height,58px);min-height:var(--app-plugin-dialog-header-height,58px);align-items:center;justify-content:space-between;gap:12px;padding:6px 24px;border-bottom:1px solid var(--app-border-subtle)}
-.seed-statistics-header h2{margin:0;font-size:var(--app-font-size-section-title,18px);font-weight:var(--app-font-weight-heading, 600);line-height:1.2;overflow-wrap:anywhere}
+.seed-statistics-header h2{margin:0;font-size:16px;font-weight:600;line-height:1.2;overflow-wrap:anywhere}
 .seed-statistics-content{display:grid;gap:18px;min-height:0;min-width:0;overflow:auto;padding:20px}
 .seed-statistics-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0}
 .seed-statistics-metrics>div{min-width:0;padding:15px 16px;border:1px solid var(--app-border-subtle);border-radius:12px;background:var(--app-surface-muted)}
-.seed-statistics-metrics dt{color:var(--app-text-muted);font-size:12px}
-.seed-statistics-metrics dd{margin:7px 0 0;color:var(--app-text);font-family:inherit;font-size:var(--app-font-size-metric,24px);font-weight:var(--app-font-weight-metric, 600);font-variant-numeric:tabular-nums;line-height:1.15;overflow-wrap:anywhere}
+.seed-statistics-metrics dt{color:var(--app-text-secondary,#657087);font-size:10px;font-weight:400}
+.seed-statistics-metrics dd{margin:7px 0 0;color:var(--app-text);font-family:inherit;font-size:var(--app-font-size-metric,24px);font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15;overflow-wrap:anywhere}
 .seed-statistics-table{min-width:0;overflow:auto;border:1px solid var(--app-border-subtle);border-radius:var(--app-radius-panel, 12px)}
 .seed-statistics-actions{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;gap:8px;padding:10px 18px;border-top:1px solid var(--app-border-subtle);background:var(--app-surface,#fff)}
-.seed-statistics-pagination{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;min-width:0;font-size:12px;color:var(--app-text-muted)}
+.seed-statistics-pagination{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;min-width:0;font-size:10px;color:var(--app-text-muted);font-weight:400}
 .seed-statistics-pagination>div{display:flex;align-items:center;gap:6px;max-width:100%}
 .seed-statistics-pagination button{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;padding:0;border:0;border-radius:8px;background:none;color:inherit;cursor:pointer}
 .seed-statistics-pagination .v-icon{font-size:18px}
@@ -111,4 +112,8 @@ onMounted(load);
 .seed-statistics-pagination button:focus-visible,.seed-statistics-pagination input:focus-visible{outline:2px solid rgb(var(--v-theme-primary));outline-offset:2px}
 @media(max-width:700px){.seed-statistics-pagination>div{gap:4px}}
 @media(max-width:700px){.seed-statistics-header{padding:6px 16px}.seed-statistics-content{padding:16px}.seed-statistics-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.seed-statistics-table :deep(td){font-size:12px;font-weight:400}.seed-statistics-table :deep(th){font-size:11px;font-weight:500}
+
+.seed-statistics-table :deep(td:nth-child(3)){font-size:11px}.seed-statistics-table :deep(td:nth-child(4)){font-size:var(--app-font-size-explanation,10px)}
 </style>

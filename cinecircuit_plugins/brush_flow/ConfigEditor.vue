@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorText } from "../_shared/request-feedback";
 import { computed, onMounted, ref, type Component } from "vue";
 import { orderedFields, type ConfigField } from "../_shared/config-fields";
 import TaskDialog from "./TaskDialog.vue";
@@ -54,7 +55,7 @@ async function loadResources(): Promise<void> {
     if (Array.isArray(result.tasks)) {
       emit("update:modelValue", { ...props.modelValue, tasks: result.tasks });
     }
-  } catch (cause) { error.value = cause instanceof Error ? cause.message : "读取站点与下载器失败"; }
+  } catch (cause) { error.value = pluginErrorText(cause, "读取站点与下载器失败"); }
   finally { loading.value = false; }
 }
 onMounted(loadResources);

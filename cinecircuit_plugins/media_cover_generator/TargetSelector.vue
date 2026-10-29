@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorText, requestErrorNotified } from "../_shared/request-feedback";
 import { computed, onMounted, ref } from 'vue';
 type Model=Record<string,unknown>;
 type Item={value:string;title:string};
@@ -14,7 +15,8 @@ function dispose(){disposed=true;revision++;}
 const selectedServers=computed(()=>Array.isArray(props.modelValue.selected_servers)?props.modelValue.selected_servers.map(String):props.modelValue.server_id?[String(props.modelValue.server_id)]:[]);
 const selectedLibraries=computed(()=>Array.isArray(props.modelValue.library_targets)?props.modelValue.library_targets.map(String):[]);
 const libraryItems=computed(()=>[...libraries.value,...selectedLibraries.value.filter(value=>!libraries.value.some(item=>item.value===value)).map(value=>({value,title:`待确认媒体库 ${value}`}))]);
-function targetError(reason:unknown){return reason instanceof Error?reason.message:'媒体服务器读取失败';}
+function targetError(reason:unknown){
+  if (requestErrorNotified(reason)) return "";return pluginErrorText(reason, '媒体服务器读取失败');}
 function isCurrent(requestRevision:number){ return !disposed && requestRevision===revision; }
 async function load(ids:string[],migrate=false){
   const requestRevision=++revision;

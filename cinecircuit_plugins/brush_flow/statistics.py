@@ -168,10 +168,10 @@ async def _observe(context, record, row, current):
     _add_counters(row, counters)
 
 
-async def build_statistics(context, tasks):
-    available = True
+async def build_statistics(context, tasks, *, live=True):
+    available = live
     try:
-        current = await tagged_downloads(context)
+        current = await tagged_downloads(context) if live else {}
     except Exception:
         current, available = {}, False
     rows = {str(task["id"]): _task_row(task) for task in tasks}
@@ -209,5 +209,5 @@ async def build_statistics(context, tasks):
         "tasks": list(rows.values()),
         "history": sorted(history, key=lambda row: row.get("timestamp", 0), reverse=True)[:200],
         "updated_at": time(),
-        "enabled": context.config.get("enabled", True),
+        "enabled": live and context.config.get("enabled", True),
     }

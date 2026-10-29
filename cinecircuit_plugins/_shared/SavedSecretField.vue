@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorFallback } from "./request-feedback";
 import { computed, onMounted, ref } from "vue";
 
 const props = defineProps<{
@@ -26,7 +27,7 @@ async function load() {
 async function restore() {
   error.value = "";
   try { await load(); return true; }
-  catch { error.value = "密钥读取失败，请点击眼睛重试"; return false; }
+  catch (cause) { error.value = pluginErrorFallback(cause, "密钥读取失败，请点击眼睛重试"); return false; }
 }
 async function toggle() {
   if (props.disabled) return;

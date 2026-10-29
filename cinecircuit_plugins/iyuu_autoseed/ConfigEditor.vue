@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorFallback } from "../_shared/request-feedback";
 import { computed, onMounted, ref, type Component } from "vue";
 import type { ConfigField } from "../_shared/config-fields";
 
@@ -28,7 +29,7 @@ async function restore() {
   try {
     const result = await props.request<{ value?: string }>("/plugins/iyuu-autoseed/config/secret/token");
     if (!edited) emit("update:modelValue", { ...props.modelValue, token: result.value || "", token_clear: false });
-  } catch { error.value = "IYUU Token 读取失败，请重试"; }
+  } catch (cause) { error.value = pluginErrorFallback(cause, "IYUU Token 读取失败，请重试"); }
   finally { restoring.value = false; }
 }
 onMounted(restore);

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorText, pluginErrorFallback } from "../_shared/request-feedback";
 import {computed,onMounted,ref,type Component} from "vue";
 import CopyRecordsTable from "./CopyRecordsTable.vue";
 import FileBrowser from "./FileBrowser.vue";
@@ -21,7 +22,7 @@ async function recordAction(action:string,key:string){
  if(recordBusy.value)return;
  recordBusy.value=true;error.value='';
  try{await props.request(`/plugins/cloud-copy/api/batch-${action}`,{method:'POST',body:JSON.stringify({id:batch.id})});await load();}
- catch(e){error.value=e instanceof Error ? e.message : '操作未完成，请重试';}
+ catch(e){error.value=pluginErrorText(e, '操作未完成，请重试');}
  finally{recordBusy.value=false;}
 }
 const recordsOpen=ref(false),settingsOpen=ref(false),activePane=ref("source");
@@ -45,16 +46,16 @@ const policies=computed(()=>[{title:'仅使用已有校验信息',value:'metadat
 const followups=[{title:'仅复制',value:'none'},{title:'交接整理',value:'organize'},{title:'同步本批文件',value:'sync'}];
 const storageNames=computed(()=>Object.fromEntries(storages.value.map(row=>[row.id,row.name])));
 const name=(id:string)=>storageNames.value[id] || id;
-async function load(){clearTimeout(refreshTimer);loading.value=true;try{batches.value=(await props.request<{items:Batch[]}>('/plugins/cloud-copy/api/batches')).items;}catch{error.value='批次记录读取失败，请刷新重试';}finally{loading.value=false;if(!disposed && (recordsOpen.value || busy.value || batches.value.some(row=>['queued','running'].includes(row.status))))refreshTimer=setTimeout(()=>void load(),5000);}}
+async function load(){clearTimeout(refreshTimer);loading.value=true;try{batches.value=(await props.request<{items:Batch[]}>('/plugins/cloud-copy/api/batches')).items;}catch (cause) {error.value=pluginErrorFallback(cause, '批次记录读取失败，请刷新重试');}finally{loading.value=false;if(!disposed && (recordsOpen.value || busy.value || batches.value.some(row=>['queued','running'].includes(row.status))))refreshTimer=setTimeout(()=>void load(),5000);}}
 async function submit(){
  if(busy.value || !source.value.selected.length || !target.value.storage)return;
  busy.value=true;error.value='';recordsOpen.value=true;void load();
  const data={source:source.value.storage,source_root:source.value.parent,target:target.value.storage,target_root:target.value.parent,selected:source.value.selected,policy:policy.value,followup:followup.value,max_gib:maxGib.value};
  try{const encoded=JSON.stringify(data);if(encoded!==submittedPayload){submissionId=newSubmissionId();submittedPayload=encoded;}
  await props.request('/plugins/cloud-copy/api/submit',{method:'POST',body:JSON.stringify({...data,id:submissionId}),signal:AbortSignal.timeout(60000)});await load();}
- catch(e){error.value=e instanceof Error && ['TimeoutError','AbortError'].includes(e.name) ? '提交等待超时，请刷新记录确认是否已受理；重试会沿用同一批次标识' : e instanceof Error ? e.message : '复制提交失败，请重试';}finally{busy.value=false;}
+ catch(e){error.value=e instanceof Error && ['TimeoutError','AbortError'].includes(e.name) ? '提交等待超时，请刷新记录确认是否已受理；重试会沿用同一批次标识' : pluginErrorText(e, '复制提交失败，请重试');}finally{busy.value=false;}
 }
-onMounted(async()=>{fitWorkspace();try{const options=await props.request<{items:typeof storages.value;temporary_directory_configured?:boolean}>('/plugins/cloud-copy/api/options');storages.value=options.items;temporaryDirectoryConfigured.value=options.temporary_directory_configured===true;await load();}catch{error.value='网盘列表读取失败，请刷新页面';}});
+onMounted(async()=>{fitWorkspace();try{const options=await props.request<{items:typeof storages.value;temporary_directory_configured?:boolean}>('/plugins/cloud-copy/api/options');storages.value=options.items;temporaryDirectoryConfigured.value=options.temporary_directory_configured===true;await load();}catch (cause) {error.value=pluginErrorFallback(cause, '网盘列表读取失败，请刷新页面');}});
 </script>
 <template>
  <section ref="workspaceRoot" class="copy-workspace" @vue:before-unmount="dispose">

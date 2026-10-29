@@ -25,11 +25,13 @@ from .._shared.rank_logging import result_text
 class MaoyanWatchlistPlugin(PluginBase):
     """跟踪猫眼热度榜并将符合条件的作品加入订阅。"""
 
+    disabled_read_actions = ("statistics",)
+
     manifest = PluginManifest(
         entrypoint="plugin:MaoyanWatchlistPlugin",
         id="maoyan-rank",
         name="影视榜单订阅",
-        version="1.0.4",
+        version="1.0.5",
         description="订阅猫眼电影票房榜及腾讯、爱奇艺、芒果、优酷分类榜单。",
         icon="mdi-movie-search-outline",
         permissions=(PluginPermission.MEDIA_DISCOVER, PluginPermission.SUBSCRIPTION_CREATE,

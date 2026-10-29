@@ -17,11 +17,13 @@ from app.modules.plugins.permissions import PluginPermission
 class SiteCheckinPlugin(PluginBase):
     """管理站点签到、登录保持与结果记录。"""
 
+    disabled_read_actions = ("inventory",)
+
     manifest = PluginManifest(
         entrypoint="plugin:SiteCheckinPlugin",
         id="auto-signin",
         name="站点签到助手",
-        version="1.0.3",
+        version="1.0.4",
         description="自动登录并签到指定 PT 站点。",
         icon="mdi-calendar-check-outline",
         permissions=(

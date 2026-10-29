@@ -32,6 +32,8 @@ from .generation import ArtworkGenerationRun
 
 
 class LibraryArtworkPlugin(PluginBase):
+    disabled_read_actions = ("inventory", "targets", "libraries", "history", "history_image", "sample", "preview_status")
+
     FONT_FILENAME = "NotoSansCJKsc-Regular.otf"
     FONT_URL = (
         "https://raw.githubusercontent.com/notofonts/noto-cjk/"
@@ -45,7 +47,7 @@ class LibraryArtworkPlugin(PluginBase):
         entrypoint="plugin:LibraryArtworkPlugin",
         id="emby-cover-generator",
         name="媒体库视觉封面",
-        version="1.0.3",
+        version="1.0.4",
         description="为媒体库生成并上传静态或动态风格封面。",
         icon="mdi-image-multiple-outline",
         permissions=(

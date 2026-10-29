@@ -18,11 +18,13 @@ from .._shared.rank_logging import result_text
 
 
 class OverseasTVPlugin(PluginBase):
+    disabled_read_actions = ("statistics",)
+
     manifest = PluginManifest(
         entrypoint="plugin:OverseasTVPlugin",
         id="overseas-tv",
         name="TMDB 剧集追踪",
-        version="1.0.2",
+        version="1.0.3",
         description="按播出平台追踪近期新剧与新季，自动创建订阅。",
         icon="mdi-television-classic",
         permissions=(

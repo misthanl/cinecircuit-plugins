@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorText } from "../_shared/request-feedback";
 import { computed, onMounted, ref, type Component } from "vue";
 
 const ID = "cast-profile-enricher";
@@ -50,7 +51,7 @@ async function loadServers(): Promise<void> {
     servers.value = Array.isArray(data.items) ? data.items : [];
   } catch (error) {
     servers.value = [];
-    serverError.value = error instanceof Error ? error.message : "媒体服务器读取失败";
+    serverError.value = pluginErrorText(error, "媒体服务器读取失败");
   } finally {
     loadingServers.value = false;
   }

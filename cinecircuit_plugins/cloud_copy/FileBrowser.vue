@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorFallback } from "../_shared/request-feedback";
 import { computed, ref } from "vue";
 type Item = {file_id:string;name:string;directory:boolean;size?:number};
 const props = defineProps<{request:<T=unknown>(path:string,init?:RequestInit)=>Promise<T>; storages:Array<{id:string;name:string}>; target?:boolean; disabled?:boolean}>();
@@ -20,7 +21,7 @@ async function load(more=false){
   if(current!==generation)return;
   if(!more)items.value=[];
   items.value.push(...data.items);cursor.value=data.cursor;
- }catch{if(current===generation)error.value="目录读取失败，请刷新重试";}
+ }catch (cause) {if(current===generation)error.value=pluginErrorFallback(cause, "目录读取失败，请刷新重试");}
  finally{if(current===generation)loading.value=false;}
 }
 function changeStorage(value:string){storage.value=value;folders.value=[{id:"0",name:"根目录"}];search.value="";void load();}

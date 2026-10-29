@@ -203,8 +203,9 @@
   .cover-history .metrics
 ) dt,
 :where(.cover-history .metrics) span {
-  color: var(--app-text-muted, #7a869d);
-  font-size: 12px !important;
+  color: var(--app-text-secondary, #657087);
+  font-size: 10px !important;
+  font-weight: var(--app-font-weight-regular, 400);
 }
 
 :where(
@@ -223,10 +224,10 @@
   line-height: 1.15;
 }
 
-:where(.douban-statistics__metrics, .maoyan-statistics__metrics) dd span,
-.cookie-metric dd > span {
+:where(.douban-statistics__metrics, .maoyan-statistics__metrics) dd span:not(.plugin-statistic-placeholder),
+.cookie-metric dd > span:not(.plugin-statistic-placeholder) {
   color: var(--app-text-muted, #7a869d);
-  font-size: 11px !important;
+  font-size: var(--app-font-size-helper, 9px) !important;
   font-weight: var(--app-font-weight-regular, 400);
 }
 
@@ -251,11 +252,17 @@
 }
 
 .signin-stat-results article p {
-  font-size: 12px !important;
+  font-size: var(--app-font-size-explanation, 10px) !important;
 }
 
 .signin-stat-results :is(article span, time) {
   font-size: 10px !important;
+}
+
+.signin-stat-results time {
+  color: var(--app-text-secondary, #657087);
+  font-size: 11px !important;
+  font-weight: var(--app-font-weight-regular, 400);
 }
 
 :where(.signin-page, .brush, .cover, .subtitle-workspace) {

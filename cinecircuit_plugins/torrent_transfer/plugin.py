@@ -21,10 +21,12 @@ from .path_mapping import mapped_save_path
 
 
 class TorrentTransferPlugin(PluginBase):
+    disabled_read_actions = ("statistics",)
+
     manifest = PluginManifest(
         id="torrent-transfer",
         name="转移做种",
-        version="1.0.2",
+        version="1.0.3",
         entrypoint="plugin:TorrentTransferPlugin",
         description="将已完成的种子转移到其他下载器，复用原有数据做种。",
         icon="mdi-file-move-outline",

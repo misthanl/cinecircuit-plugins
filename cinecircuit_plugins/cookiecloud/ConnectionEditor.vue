@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { requestErrorNotified } from "../_shared/request-feedback";
 import { computed, onMounted, ref, type Component } from "vue";
 import { orderedFields, type ConfigField } from "../_shared/config-fields";
 import SavedSecretField from "../_shared/SavedSecretField.vue";
@@ -55,8 +56,8 @@ onMounted(async () => {
       const response = await props.request<SecretResponse>("/plugins/cookiecloud/config/secret/user_key");
       restoredUserKey.value = response.value || "";
     }
-  } catch {
-    failures.push("KEY");
+  } catch (cause) {
+    if (!requestErrorNotified(cause)) failures.push("KEY");
   }
   if (failures.length) revealError.value = `${failures.join("和")}读取失败，请重试`;
 });

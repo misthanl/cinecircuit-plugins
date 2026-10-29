@@ -234,7 +234,8 @@ test('statistics use real response, filter, paginate and show unavailable values
   assert.match(wrapper.find('.execution-detail').text(), /失败 1/);
   report.tasks=[{...task,available:false,history_complete:false}];
   await button(wrapper,'刷新').trigger('click'); await flushPromises();
-  assert.match(wrapper.text(), /当前占用和速度显示为 —/);
+  assert.equal(wrapper.find('[role="status"]').exists(), false);
+  assert.equal(wrapper.findAll('.stat-totals .plugin-statistic-placeholder').length, 1);
   // Partial history retains recorded totals; missing totals are not presented as zero.
   assert.match(wrapper.find('.stat-totals').text(), /4 KiB/);
   report.tasks = [{ ...task, uploaded: 0, downloaded: 0, available: false, history_complete: false }];

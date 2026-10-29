@@ -54,6 +54,8 @@ from .subtitle_download import fetch
 class SubtitleWorkspacePlugin(PluginBase):
     """Manual sidecar subtitle workspace backed by configured media directories."""
 
+    disabled_read_actions = ("catalog", "detail", "inventory", "poster")
+
     manifest = MANIFEST
 
     def __init__(self) -> None:

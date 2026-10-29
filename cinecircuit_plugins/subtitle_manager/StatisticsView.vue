@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { pluginErrorFallback } from "../_shared/request-feedback";
 import LoadingState from "../_shared/LoadingState.vue";
 import { computed, onMounted, ref, type Component } from "vue";
 interface Row { media?: string; provider?: string; language?: string; format?: string; status?: string; reason?: string }
@@ -39,7 +40,7 @@ async function load() {
     const data = await props.request<{ items?: Run[] }>("/plugins/subtitle-manager/runs?limit=1");
     latest.value = data.items?.[0] || null;
     page.value = 1; expanded.value = {};
-  } catch { error.value = "统计数据加载失败，请刷新重试"; }
+  } catch (cause) { error.value = pluginErrorFallback(cause, "统计数据加载失败，请刷新重试"); }
   finally { loading.value = false; }
 }
 onMounted(load);
@@ -75,12 +76,14 @@ onMounted(load);
 </template>
 
 <style scoped>
-.subtitle-statistics{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);overflow:hidden;border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface,#fff);color:var(--app-text,#1a2434);font-family:var(--app-font-family,inherit);font-size:var(--app-font-size-body,14px)}
+.subtitle-statistics{display:flex;flex-direction:column;max-height:calc(100dvh - 32px);overflow:hidden;border-radius:var(--app-dialog-radius, 16px)!important;background:var(--app-dialog-surface,#fff);color:var(--app-text,#1a2434);font-family:var(--app-font-family,inherit);font-size:var(--app-font-size-body,14px);font-weight:400}
 .stats-header{display:flex;align-items:center;justify-content:space-between;flex:none;height:var(--app-plugin-dialog-header-height,58px);padding:0 24px;border-bottom:1px solid var(--app-border-subtle,#e0e6ef)}
-.stats-header h2{margin:0;font-size:var(--app-font-size-title,18px)}.stats-body{padding:24px;overflow:auto;min-height:0;display:grid;gap:20px}
+.stats-header h2{margin:0;font-size:16px;font-weight:600}.stats-body{padding:24px;overflow:auto;min-height:0;display:grid;gap:20px}
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.metrics article{border:1px solid var(--app-border-subtle);border-radius:12px;padding:15px 16px;min-width:0;background:var(--app-surface-muted)}
-h3{margin:0;font-size:var(--app-font-size-body,14px);font-weight:var(--app-font-weight-heading, 600)}.metrics h3,.secondary,.pagination{color:var(--app-text-muted,#73819a)}.metrics h3{font-size:var(--app-font-size-caption,12px);font-weight:400}.metrics strong{display:block;margin:10px 0 0;font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--app-text)}
-.pill{display:inline-block;border-radius:var(--app-radius-chip, 6px);padding:4px 10px;font-size:var(--app-font-size-helper,12px)}.saved{background:var(--app-success-soft);color:var(--app-success-text)}.failed{background:var(--app-danger-soft);color:var(--app-danger-text)}.skipped{background:var(--app-surface-muted);color:var(--app-text-secondary)}
+h3{margin:0;font-size:12px;font-weight:500}.metrics h3,.secondary,.pagination{color:var(--app-text-muted,#73819a)}.metrics h3{font-size:10px;font-weight:400;color:var(--app-text-secondary,#657087)}.metrics strong{display:block;margin:10px 0 0;font-size:var(--app-font-size-metric,24px);font-weight:600;font-variant-numeric:tabular-nums;color:var(--app-text)}
+.pill{display:inline-block;border-radius:var(--app-radius-chip, 6px);padding:4px 10px;font-size:var(--app-font-size-helper,9px);font-weight:400}.saved{background:var(--app-success-soft);color:var(--app-success-text)}.failed{background:var(--app-danger-soft);color:var(--app-danger-text)}.skipped{background:var(--app-surface-muted);color:var(--app-text-secondary)}
 .detail-title{margin-bottom:14px}.table-scroll{overflow-x:auto;border:1px solid var(--app-border-subtle,#e0e6ef);border-radius:var(--app-radius-panel, 12px)}table{width:100%;border-collapse:collapse;text-align:left}th,td{padding:12px 16px;border-bottom:1px solid var(--app-border-subtle,#e0e6ef)}th{background:var(--app-surface-subtle,#f5f7fb);white-space:nowrap}td:first-child{max-width:260px;overflow-wrap:anywhere}td:not(:first-child){white-space:nowrap}.reason{white-space:normal!important}.reason-toggle{border:0;background:transparent;color:inherit;margin-left:12px;cursor:pointer}.reason-toggle:focus-visible{outline:2px solid rgb(var(--v-theme-primary,41,104,255))}.empty{text-align:center;color:var(--app-text-muted,#73819a);padding:30px}.pagination{display:flex;align-items:center;justify-content:space-between;margin-top:12px}.pagination>div{display:flex;align-items:center;gap:8px}footer{display:flex;justify-content:flex-end;padding:10px 20px;border-top:1px solid var(--app-border-subtle,#e0e6ef)}
 @media(max-width:760px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stats-body{padding:16px}.metrics article{padding:14px 16px}.stats-header{padding:0 16px}}
+
+th,td{font-size:12px;font-weight:400}th{font-size:11px;font-weight:500}.pagination{font-size:10px;font-weight:400}.reason,.stats-body>p[role="alert"]{font-size:var(--app-font-size-explanation,10px);font-weight:400}
 </style>

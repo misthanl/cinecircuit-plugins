@@ -24,10 +24,12 @@ from .client import IyuuClient
 
 
 class IyuuAutoSeedPlugin(PluginBase):
+    disabled_read_actions = ("statistics",)
+
     manifest = PluginManifest(
         id="iyuu-autoseed",
         name="IYUU 辅种",
-        version="1.0.2",
+        version="1.0.3",
         entrypoint="plugin:IyuuAutoSeedPlugin",
         description="通过 IYUU 查找其他站点的同源种子，复用已有数据校验做种。",
         icon="mdi-source-branch",
