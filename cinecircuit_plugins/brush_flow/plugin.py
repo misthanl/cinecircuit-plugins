@@ -12,6 +12,7 @@ from app.modules.plugins.contracts import (
 )
 from app.modules.plugins.permissions import PluginPermission
 from .statistics import build_statistics, record_execution
+from .notifications import notify_outcomes, notify_failure
 from .cleanup import check_downloads
 from .selection import matches
 from .subscription_matching import load_index
@@ -29,7 +30,7 @@ class SiteTrafficPlugin(PluginBase):
         entrypoint="plugin:SiteTrafficPlugin",
         id="brush-flow",
         name="站点刷流",
-        version="1.0.3",
+        version="1.0.4",
         description="按站点和规则自动选种、下载与删种。",
         icon="mdi-swap-vertical",
         permissions=(
@@ -47,6 +48,7 @@ class SiteTrafficPlugin(PluginBase):
         jobs=(PluginJobSpec(name="tasks", interval_seconds=60),),
         frontend_module="frontend.js",
         config_schema={
+            "notification_control": {"collection": "tasks", "field": "notification_enabled"},
             "editor_width": 920,
             "editor_height": 640,
             "description_display": "hidden",
@@ -58,14 +60,6 @@ class SiteTrafficPlugin(PluginBase):
                     "label": "启用刷流任务",
                     "default": True,
                     "description": "开启后按任务周期自动选种；关闭后不会新增下载。",
-                    "section": "general",
-                },
-                {
-                    "key": "notification_enabled",
-                    "input_type": "switch",
-                    "label": "发送通知",
-                    "default": False,
-                    "description": "开启后发送每次刷流任务的执行结果。",
                     "section": "general",
                 },
                 {
@@ -193,13 +187,22 @@ class SiteTrafficPlugin(PluginBase):
         tasks = [task for task in tasks if intake_allowed(task)]
         if not tasks:
             return {"status": "completed", "tasks": 0, "added": 0, "results": []}
-        existing_items = await owned_downloads(context)
-        index = await load_index(context, tasks)
-        remaining = max(0, int(context.config.get("max_tasks") or 30) - len(existing_items))
+        try:
+            existing_items = await owned_downloads(context)
+            index = await load_index(context, tasks)
+            remaining = max(0, int(context.config.get("max_tasks") or 30) - len(existing_items))
+        except Exception:
+            await notify_failure(context, tasks, "运行前检查失败")
+            raise
         added = 0
         results: list[dict[str, Any]] = []
         for task in tasks:
-            outcome = await self._run_task(context, task, existing_items, index, remaining)
+            try:
+                outcome = await self._run_task(context, task, existing_items, index, remaining)
+            except Exception:
+                await notify_outcomes(context, tasks, results)
+                await notify_failure(context, [task], "站点读取或选种执行失败")
+                raise
             if outcome is not None:
                 results.append(outcome)
                 added += outcome["added"]
@@ -246,17 +249,7 @@ class SiteTrafficPlugin(PluginBase):
     async def _notify_tasks(
         context: PluginContext, tasks: list[dict[str, Any]], results: list[dict[str, Any]]
     ) -> None:
-        configured = {task["id"]: task for task in tasks}
-        for outcome in results:
-            task = configured[outcome["task_id"]]
-            if context.config.get("notification_enabled", False) and task.get(
-                "notification_enabled", True
-            ):
-                await context.notifications.send(
-                    f"刷流任务：{task['name']}",
-                    f"匹配 {outcome['matched']} 个，新增下载 {outcome['added']} 个。",
-                    notification_type="plugin",
-                )
+        await notify_outcomes(context, tasks, results)
 
     @staticmethod
     async def _add_candidate(
@@ -346,14 +339,14 @@ class SiteTrafficPlugin(PluginBase):
             return None
         if remaining <= 0:
             record_execution(context, task, reason="达到全局数量上限")
-            return None
+            return {"task_id": task["id"], "matched": 0, "added": 0, "reason": "达到全局数量上限"}
         capacity = task_capacity(context, task, existing_items)
         volume = await volume_remaining(context, task, existing_items, complete=True)
         if capacity <= 0 or volume == 0:
             record_execution(
                 context, task, reason="达到体积上限" if volume == 0 else "达到任务数量上限"
             )
-            return None
+            return {"task_id": task["id"], "matched": 0, "added": 0, "reason": "达到体积上限" if volume == 0 else "达到任务数量上限"}
         sites = self._site_actions(context)
         site_id = str(task.get("site_id") or "")
         feed = await self._task_feed(context, task, sites, site_id)
@@ -386,6 +379,7 @@ class SiteTrafficPlugin(PluginBase):
             "name": task["name"],
             "matched": len(candidates),
             "added": task_added,
+            "failed": task_failed,
         }
 
     @staticmethod

@@ -16,7 +16,7 @@ const tasks = computed(() => Array.isArray(props.modelValue.tasks) ? props.model
 const globalFields = computed(() => orderedFields(props.fields || [], ["enabled", "max_tasks"]).map(field => field.key === "max_tasks" ? { ...field, label: "全局下载任务上限" } : field));
 function resolved(task: Task): Task {
   return { exclude_tags: "CineCircuit,H&R", promotion: "free", exclude_hr: true,
-    notification_enabled: props.modelValue.notification_enabled ?? false, cron: props.modelValue.cron || "", interval_minutes: 10, task_limit: 0, max_add: 3, cleanup_enabled: true, allow_delete_files: true, delete_task: true, ...task,
+    notification_enabled: false, cron: props.modelValue.cron || "", interval_minutes: 10, task_limit: 0, max_add: 3, cleanup_enabled: true, allow_delete_files: true, delete_task: true, ...task,
     site_id: task.site_id || props.modelValue.default_site_id || "", downloader_id: task.downloader_id || props.modelValue.default_downloader_id || "" };
 }
 function editTask(index = -1): void {

@@ -112,7 +112,7 @@
       "manifest": {
         "id": "brush-flow",
         "name": "站点刷流",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "按站点和规则自动选种、下载与删种。",
         "icon": "mdi-swap-vertical",
         "api_version": 2,
@@ -135,6 +135,10 @@
         "events": [],
         "schedule_seconds": 0,
         "config_schema": {
+          "notification_control": {
+            "collection": "tasks",
+            "field": "notification_enabled"
+          },
           "editor_width": 920,
           "editor_height": 640,
           "description_display": "hidden",
@@ -150,14 +154,6 @@
               "label": "启用刷流任务",
               "default": true,
               "description": "开启后按任务周期自动选种；关闭后不会新增下载。",
-              "section": "general"
-            },
-            {
-              "key": "notification_enabled",
-              "input_type": "switch",
-              "label": "发送通知",
-              "default": false,
-              "description": "开启后发送每次刷流任务的执行结果。",
               "section": "general"
             },
             {
@@ -242,12 +238,8 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.3-dc3991012e1f8868.zip",
-      "sha256": "dc3991012e1f8868c5af715555002352fafee85f3df36a5a435fc73a5e3748b0",
-      "supersedes_sha256": [
-        "b0e9c9e2d619491e6df15115ce0b5874f0f382f8c2dc0b2f25ffaf461a1c6b2d",
-        "1c10d5bbd2dcded3d6921e2ab1a3b24e18b39e157a3c63bb2786b747ef1f649f"
-      ]
+      "package_url": "packages/brush-flow-1.0.4-4d9b6ee1da5b1fa9.zip",
+      "sha256": "4d9b6ee1da5b1fa9be6fc97dcf80603b79e57164cd0469cf663575c567266ad2"
     },
     {
       "manifest": {
@@ -844,6 +836,92 @@
       "supersedes_sha256": [
         "ddaef4ae982567685c575d97dac7413f813ed083efa02491f792e6059454ab00",
         "21a095118c762a3cfe0093e7065e2e0b6b1e499872a11c62ba78be7222eb2a5b"
+      ]
+    },
+    {
+      "manifest": {
+        "id": "douban-wish",
+        "name": "豆瓣想看",
+        "version": "1.0.0",
+        "description": "同步豆瓣用户的公开想看记录，检查入库情况后自动添加订阅。",
+        "icon": "mdi-movie-search-outline",
+        "api_version": 1,
+        "entrypoint": "plugin:DoubanWishPlugin",
+        "permissions": [
+          "media:discover",
+          "subscription:create",
+          "media_server:read",
+          "notification:send"
+        ],
+        "capabilities": [
+          "scheduled_task",
+          "statistics_page"
+        ],
+        "events": [],
+        "schedule_seconds": 1800,
+        "config_schema": {
+          "description_display": "hidden",
+          "layout": {
+            "columns": 2,
+            "row_gap": 14,
+            "column_gap": 16
+          },
+          "fields": [
+            {
+              "key": "users",
+              "input_type": "textarea",
+              "rows": 1,
+              "label": "豆瓣用户ID",
+              "default": "",
+              "placeholder": "多个用户用逗号或换行分隔",
+              "description": "同步公开动态RSS中的想看条目；填写个人主页中的用户ID。"
+            },
+            {
+              "key": "cron",
+              "input_type": "cron",
+              "label": "执行周期",
+              "default": "",
+              "description": "留空时每30分钟同步，可通过插件菜单立即运行。"
+            },
+            {
+              "key": "days",
+              "input_type": "number",
+              "label": "同步天数",
+              "default": 7,
+              "validation": {
+                "minimum": 1,
+                "maximum": 3650
+              },
+              "description": "只处理此时间范围内的想看记录。"
+            },
+            {
+              "key": "proxy",
+              "input_type": "switch",
+              "label": "使用系统代理服务器",
+              "default": false
+            },
+            {
+              "key": "notification_enabled",
+              "input_type": "switch",
+              "label": "发送同步通知",
+              "default": false
+            },
+            {
+              "key": "clear",
+              "input_type": "switch",
+              "label": "下次执行前清理同步历史",
+              "default": false,
+              "description": "仅清理本插件的去重与订阅记录，不删除已有订阅；清理后重新检查。"
+            }
+          ]
+        },
+        "frontend_module": "frontend.js",
+        "navigation": {}
+      },
+      "package_url": "packages/douban-wish-1.0.0-7bf3f6dbba3bb694.zip",
+      "sha256": "7bf3f6dbba3bb6942c5981c6898946e2d873f4bd0f7d873b15a8ffad1abfb30f",
+      "supersedes_sha256": [
+        "d11746bf26b2c939ee4f6afe027a14315da82302ef5af2b8dece6dd2e0743f7e"
       ]
     },
     {

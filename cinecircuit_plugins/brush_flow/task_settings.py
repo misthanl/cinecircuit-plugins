@@ -15,12 +15,12 @@ def task_defaults(task: dict[str, Any], config: dict[str, Any]) -> dict[str, Any
         key: config.get(key, False)
         for key in (
             "cleanup_enabled",
-            "notification_enabled",
             "allow_delete_files",
         )
     }
     return {
         **inherited,
+        "notification_enabled": False,
         "exclude_tags": "CineCircuit,H&R",
         "promotion": "free",
         "exclude_hr": True,

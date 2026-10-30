@@ -6,9 +6,11 @@ from typing import Any
 import re
 import logging
 
+from .notifications import notify_cleanup, notify_failure, record_cleanup
 from .ownership import same_generation
 from .deletion_rules import configured, matches, value, promotion_expired
 from .task_labels import brush_tagged, tagged_downloads
+from . import statistics
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +57,7 @@ def added_records(context: Any) -> list[dict[str, Any]]:
             return records
 
 
-async def check_downloads(context: Any, rules: list[dict[str, Any]]) -> dict[str, Any]:
+async def _check_downloads(context: Any, rules: list[dict[str, Any]]) -> dict[str, Any]:
     summary: dict[str, Any] = {
         "status": "completed",
         "checked": 0,
@@ -94,6 +96,7 @@ async def check_downloads(context: Any, rules: list[dict[str, Any]]) -> dict[str
             await check_record(context, record, receipt, rule, pair, summary)
         except Exception as error:
             summary["errors"].append({"task_id": rule["id"], "error": str(error)})
+            record_cleanup(summary, rule["id"], "failed")
     return summary
 
 
@@ -121,10 +124,8 @@ async def check_record(
     ):
         summary["skipped"] += 1
         return
-    from .statistics import capture
-
     try:
-        capture(context, receipt, task)
+        statistics.capture(context, receipt, task)
     except Exception:
         # Keep authorized cleanup running; avoid logging receipt credentials or URLs.
         logger.warning("Brush-flow statistics capture failed; cleanup will continue")
@@ -144,6 +145,17 @@ async def check_record(
         status = "paused"
     context.items.record(key, status, payload=record.get("payload"), result=receipt)
     summary[status] += 1
-    from .statistics import record_execution
+    if status == "deleted" or not task.get("paused"):
+        record_cleanup(summary, rule["id"], status)
+    statistics.record_execution(context, rule, cleaned=1, reason="已清理" if status == "deleted" else "已暂停")
 
-    record_execution(context, rule, cleaned=1, reason="已清理" if status == "deleted" else "已暂停")
+
+async def check_downloads(context: Any, rules: list[dict[str, Any]]) -> dict[str, Any]:
+    try:
+        summary = await _check_downloads(context, rules)
+    except Exception:
+        active = [rule for rule in rules if rule.get("cleanup_enabled", context.config.get("cleanup_enabled", False))]
+        await notify_failure(context, active, "清理检查失败")
+        raise
+    await notify_cleanup(context, rules, summary)
+    return summary

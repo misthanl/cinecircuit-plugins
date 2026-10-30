@@ -243,7 +243,7 @@ def test_scheduled_run_checks_cleanup_and_old_host_is_safe():
     assert asyncio.run(check_downloads(ctx, [rule]))["status"] == "unsupported"
     fields = {field["key"]: field for field in plugin.manifest.config_schema["fields"]}
     assert fields["cleanup_enabled"]["default"] is False
-    assert plugin.manifest.version == "1.0.3"
+    assert plugin.manifest.version == "1.0.4"
 
 
 def test_preview_uses_latest_and_inherits_default_site():

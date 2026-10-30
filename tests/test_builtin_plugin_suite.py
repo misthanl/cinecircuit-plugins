@@ -107,7 +107,7 @@ def test_each_builtin_plugin_owns_an_isolated_directory() -> None:
 
 def test_notification_capable_builtin_plugins_are_explicit_opt_in() -> None:
     registry = PluginRegistry()
-    for plugin_id in ("auto-signin", "brush-flow", "cookiecloud", "subtitle-manager"):
+    for plugin_id in ("auto-signin", "cookiecloud", "subtitle-manager"):
         manifest = registry.builtin_manifest(plugin_id)
         fields = manifest.config_schema.get("fields") or []
         notification_field = next(
@@ -118,6 +118,12 @@ def test_notification_capable_builtin_plugins_are_explicit_opt_in() -> None:
         assert notification_field.get("input_type") == "switch"
         assert notification_field.get("default") is False
         assert PluginPermission.NOTIFICATION_SEND in manifest.permissions
+    # Brush-flow opts in per task, rather than through a second global switch.
+    manifest = SiteTrafficPlugin.manifest
+    assert manifest.config_schema["notification_control"] == {"collection": "tasks", "field": "notification_enabled"}
+    defaults = SiteTrafficPlugin._tasks({"tasks": [{"id": "one"}]})
+    assert defaults[0]["notification_enabled"] is False
+    assert PluginPermission.NOTIFICATION_SEND in manifest.permissions
 
 
 def test_auto_signin_uses_one_config_page_without_field_descriptions() -> None:
