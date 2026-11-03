@@ -62,6 +62,9 @@
     "1.0.3": [
       "9965f1dba7a7a37a3a1cb5c57c0f0e1108f83444b5be97d09f3e16c2a5e1469d",
       "e9bb12d3de9d58b178ece8795af151d98252b366fa731bac679024c54069113c"
+    ],
+    "1.0.4": [
+      "28555aa7689f1db184cf89d1f31cacc330b1f455e1ff9afc94873db72160e274"
     ]
   },
   "cookiecloud": {

@@ -1,0 +1,20 @@
+export type StatisticsTask = {
+  id: string;
+  name: string;
+  site_id: string;
+  downloader_id: string;
+  enabled: boolean;
+  removed?: boolean;
+  seeding_limit_gib: number;
+  interval_minutes: number;
+  cron: string;
+  download_count: number;
+  seed_count: number;
+  upload_speed: number;
+  download_speed: number;
+  size: number;
+  uploaded: number;
+  downloaded: number;
+  available: boolean;
+  history_complete: boolean;
+};

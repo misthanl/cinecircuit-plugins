@@ -25,7 +25,11 @@ it("edits real schema fields and uses Vuetify site availability", async () => {
   });
   const wrapper = mount(Harness, { attachTo: document.body, global: { plugins: [createVuetify({ components })] } });
   await flushPromises();
-  await wrapper.findAllComponents(components.VBtn).find(button => button.text() === "编辑任务")!.trigger("click");
+  await wrapper.get('[aria-label="更多任务操作"]').trigger('click');
+  await flushPromises();
+  const edit = [...document.querySelectorAll('.v-list-item')].find(node => node.textContent?.includes('编辑任务')) as HTMLElement;
+  expect(edit).toBeTruthy();
+  edit.click();
   await flushPromises();
   const site = wrapper.findAllComponents(components.VSelect).find(field => field.props("label") === "任务 PT 站点")!;
   expect(site.props("items")).toMatchObject([{ props: { disabled: false } }, { props: { disabled: true } }]);

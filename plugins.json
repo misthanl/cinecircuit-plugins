@@ -112,7 +112,7 @@
       "manifest": {
         "id": "brush-flow",
         "name": "站点刷流",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "按站点和规则自动选种、下载与删种。",
         "icon": "mdi-swap-vertical",
         "api_version": 2,
@@ -238,8 +238,8 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.4-4d9b6ee1da5b1fa9.zip",
-      "sha256": "4d9b6ee1da5b1fa9be6fc97dcf80603b79e57164cd0469cf663575c567266ad2"
+      "package_url": "packages/brush-flow-1.0.5-cca52573700a8ba5.zip",
+      "sha256": "cca52573700a8ba592ce474d6e3b2ad42c2abb9544bef778ee42d7c3c54e70f3"
     },
     {
       "manifest": {
@@ -401,7 +401,7 @@
       "manifest": {
         "id": "cloud-copy",
         "name": "跨网盘复制",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "通过统一存储能力复制文件，支持秒传、校验后秒传及可选服务器中转。保留源文件。",
         "icon": "mdi-content-copy",
         "api_version": 2,
@@ -567,11 +567,10 @@
           }
         ]
       },
-      "package_url": "packages/cloud-copy-1.0.3-759f65a0331dd494.zip",
-      "sha256": "759f65a0331dd4946fb34ec2d9f5ae904784d0437e4349231eaa7d24fcee139f",
+      "package_url": "packages/cloud-copy-1.0.4-97941f6731213e55.zip",
+      "sha256": "97941f6731213e5558653a4820a6a1e19b592dbe89cedd2b7c373208722c4672",
       "supersedes_sha256": [
-        "9965f1dba7a7a37a3a1cb5c57c0f0e1108f83444b5be97d09f3e16c2a5e1469d",
-        "e9bb12d3de9d58b178ece8795af151d98252b366fa731bac679024c54069113c"
+        "28555aa7689f1db184cf89d1f31cacc330b1f455e1ff9afc94873db72160e274"
       ]
     },
     {

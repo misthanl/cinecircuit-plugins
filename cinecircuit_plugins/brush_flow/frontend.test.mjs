@@ -187,14 +187,25 @@ test('task limits tab preserves rates and volume and routes invalid values', asy
 });
 
 
-test('task cards expose the six limits in compact grid', async () => {
+test('task details expand independently without changing configuration', async () => {
   const wrapper = editor(inventory, { max_tasks: 30, tasks: [{ id: 'r1', name: '容量任务', seeding_limit_gib: 500, upload_limit_kib: 2048, download_limit_kib: 0 }] });
   await flushPromises();
-  assert.equal(wrapper.findAll('.task-card dl > div').length, 6);
+  assert.equal(wrapper.find('.task-details').exists(), false);
+  assert.match(wrapper.find('.task-summary').text(), /500 GiB/);
+  const toggle = wrapper.get('[aria-label="展开任务详情"]');
+  assert.equal(toggle.attributes('aria-expanded'), 'false');
+  await toggle.trigger('click');
+  assert.equal(toggle.attributes('aria-expanded'), 'true');
+  assert.equal(wrapper.findAll('.task-detail-group').length, 3);
+  assert.equal(wrapper.findAll('.task-detail-group:not(.task-rules) dl > div').length, 6);
   assert.match(wrapper.text(), /500 GiB/);
   assert.match(wrapper.text(), /2,048 KiB\/s/);
   assert.match(wrapper.text(), /不限速/);
   assert.equal(wrapper.findAllComponents({ name: 'VMenu' }).length, 1);
+  assert.equal(wrapper.find('.task-summary').exists(), false);
+  await wrapper.get('.task-disclosure').trigger('click');
+  assert.equal(wrapper.find('.task-details').exists(), false);
+  assert.equal(wrapper.emitted('update:modelValue'), undefined);
   wrapper.unmount();
 });
 
@@ -207,6 +218,29 @@ test('task action menu uses the host menu pattern', async () => {
   assert.equal(menu.props('closeOnContentClick'), true);
   assert.equal(wrapper.get('[aria-label="更多任务操作"]').exists(), true);
   assert.equal(button(wrapper, '移除任务').exists(), true);
+  assert.equal(menu.findAll('button').some(item => item.text() === '编辑任务'), true);
+  assert.equal(wrapper.find('.task-details').exists(), false);
+  wrapper.unmount();
+});
+
+test('read-only task details stay available and cards keep separate expansion state', async () => {
+  const wrapper = editor(inventory, { tasks: [
+    { id: 'first', name: '任务一', promotion: '2xfree', include: 'WEB-DL', exclude: 'CAM', notification_enabled: true, cleanup_enabled: false },
+    { id: 'second', name: '任务二', enabled: false },
+  ] }, true);
+  await flushPromises();
+  const cards = wrapper.findAll('.task-card');
+  await cards[0].get('.task-disclosure').trigger('click');
+  assert.equal(cards[0].find('.task-details').exists(), true);
+  assert.equal(cards[1].find('.task-details').exists(), false);
+  assert.match(cards[0].find('.task-rules').text(), /2X 免费资源/);
+  assert.match(cards[0].find('.task-rules').text(), /包含：WEB-DL；排除：CAM/);
+  assert.match(cards[0].find('.task-rules').text(), /不自动清理/);
+  assert.match(cards[0].find('.task-rules').text(), /已开启/);
+  assert.equal(cards[0].get('.task-details').attributes('id'), cards[0].get('.task-disclosure').attributes('aria-controls'));
+  assert.equal(button(cards[0], '编辑任务').attributes('disabled'), '');
+  assert.equal(button(cards[0], '移除任务').attributes('disabled'), '');
+  assert.equal(wrapper.emitted('update:modelValue'), undefined);
   wrapper.unmount();
 });
 
