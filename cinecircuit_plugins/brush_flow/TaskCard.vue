@@ -99,5 +99,5 @@ const groups = computed(() => [
 .task-notification{display:flex;align-items:center;justify-content:flex-end;gap:8px}
 .notification-dot{width:7px;height:7px;flex-shrink:0;border-radius:50%;background:var(--app-success-text)}
 @media(max-width:700px){.task-disclosure{gap:12px}.task-details{gap:20px}.task-rule-columns{gap:20px}}
-@media(max-width:480px){.task-header{flex-wrap:wrap;gap:8px}.task-disclosure{flex-basis:100%}.task-status{margin-left:52px;margin-right:auto}.task-details,.task-rule-columns{grid-template-columns:minmax(0,1fr)}.task-rule-columns{gap:10px}}
+@media(max-width:480px){.task-header{display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:8px}.task-disclosure{grid-column:1;grid-row:1}.task-status{grid-column:1;grid-row:2;justify-self:start;margin-left:52px}.task-actions{display:contents}.task-menu{grid-column:2;grid-row:1;align-self:start}.task-actions>.v-btn{grid-column:2;grid-row:2}.task-details,.task-rule-columns{grid-template-columns:minmax(0,1fr)}.task-rule-columns{gap:10px}}
 </style>

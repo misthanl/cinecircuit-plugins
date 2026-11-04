@@ -30,7 +30,7 @@ class SiteTrafficPlugin(PluginBase):
         entrypoint="plugin:SiteTrafficPlugin",
         id="brush-flow",
         name="站点刷流",
-        version="1.0.5",
+        version="1.0.6",
         description="按站点和规则自动选种、下载与删种。",
         icon="mdi-swap-vertical",
         permissions=(

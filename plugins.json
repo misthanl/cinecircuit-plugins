@@ -112,7 +112,7 @@
       "manifest": {
         "id": "brush-flow",
         "name": "站点刷流",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "description": "按站点和规则自动选种、下载与删种。",
         "icon": "mdi-swap-vertical",
         "api_version": 2,
@@ -238,8 +238,8 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.5-cca52573700a8ba5.zip",
-      "sha256": "cca52573700a8ba592ce474d6e3b2ad42c2abb9544bef778ee42d7c3c54e70f3"
+      "package_url": "packages/brush-flow-1.0.6-b1b040060f839e28.zip",
+      "sha256": "b1b040060f839e285ebfa24aa7e1e88ffedc77d11ae2bf6ff619697cdf4cb749"
     },
     {
       "manifest": {
