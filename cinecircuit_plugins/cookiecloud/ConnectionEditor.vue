@@ -46,7 +46,9 @@ const periods = [
 ];
 
 function update(key: keyof ConnectionConfig, value: unknown) {
-  emit("update:modelValue", { ...props.modelValue, [key]: value });
+  emit("update:modelValue", { ...props.modelValue, [key]: value,
+    ...(["user_key", "password"].includes(String(key)) ? { [`${String(key)}_clear`]: !String(value || "").trim() } : {}),
+  });
 }
 
 onMounted(async () => {

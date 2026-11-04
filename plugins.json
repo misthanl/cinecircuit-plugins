@@ -577,7 +577,7 @@
       "manifest": {
         "id": "cookiecloud",
         "name": "CookieCloud 站点同步",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "同步 CookieCloud 数据，自动验证并更新 PT 站点。",
         "icon": "mdi-cloud-sync-outline",
         "api_version": 2,
@@ -691,11 +691,8 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.2-c73812d7d3a4a50d.zip",
-      "sha256": "c73812d7d3a4a50dcd61dccc9c55eac58d5c96d500bb0641c4f827e8608f0174",
-      "supersedes_sha256": [
-        "77d409835e81d7310e736bdead60a9ffe30f31b15288c4a91ea7fc9cb067743e"
-      ]
+      "package_url": "packages/cookiecloud-1.0.3-48127641405e9265.zip",
+      "sha256": "48127641405e9265d0225d595aacc49d9e25983bf6790646aefdd68585d684d7"
     },
     {
       "manifest": {
@@ -2648,7 +2645,7 @@
       "manifest": {
         "id": "storage-recycle-cleaner",
         "name": "网盘回收站清理",
-        "version": "1.0.2",
+        "version": "1.0.3",
         "description": "定时清空所选网盘回收站，释放存储空间。",
         "icon": "mdi-trash-can-outline",
         "api_version": 1,
@@ -2720,17 +2717,14 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/storage-recycle-cleaner-1.0.2-185be518110db85f.zip",
-      "sha256": "185be518110db85f1a8605267931119525aa42a89d5530cd34d35a064e5ee2e6",
-      "supersedes_sha256": [
-        "420cb1ad87249c084b5b81fc7403d34226b8034d7c66b054d2790d06ab08c697"
-      ]
+      "package_url": "packages/storage-recycle-cleaner-1.0.3-fe206ba3fed2ec04.zip",
+      "sha256": "fe206ba3fed2ec04c6f6d769318efbfd2eb9029b390b49ded89a45cbd1810aa6"
     },
     {
       "manifest": {
         "id": "subtitle-manager",
         "name": "字幕管理助手",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "description": "在线搜索、自动匹配并管理媒体外挂字幕。",
         "icon": "mdi-subtitles-outline",
         "api_version": 1,
@@ -3099,11 +3093,8 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.5-4c030716a29a154c.zip",
-      "sha256": "4c030716a29a154ce6e88bd33c9f4163bee9b12bb65a66df4ec9ca4b0f22b49d",
-      "supersedes_sha256": [
-        "c490513880d331ea024367b99879e28e9d31675a17ad9ed78148e92c50799197"
-      ]
+      "package_url": "packages/subtitle-manager-1.0.6-3a72a73ca38820e3.zip",
+      "sha256": "3a72a73ca38820e3d84074f736600d276d25a0907125aaeb95383554804a8a4f"
     },
     {
       "manifest": {

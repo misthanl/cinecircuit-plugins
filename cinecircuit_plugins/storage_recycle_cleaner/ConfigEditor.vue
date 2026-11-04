@@ -25,7 +25,7 @@ const formValue = computed(() => ({ ...props.modelValue, storage_id: props.model
     <SavedSecretField :model-value="modelValue.password" :disabled="disabled"
       :label="password?.label || '回收站安全密钥'" :request="request"
       endpoint="/plugins/storage-recycle-cleaner/config/secret/password"
-      @update:model-value="emit('update:modelValue', { ...modelValue, password: $event, password_clear: false })" />
+      @update:model-value="emit('update:modelValue', { ...modelValue, password: $event, password_clear: !String($event || '').trim() })" />
     <component v-for="field in bottom" :key="field.key" :is="schemaFieldsComponent"
       :fields="[field]" :model-value="formValue" :disabled="disabled" compact plugin-id="storage-recycle-cleaner"
       @update:model-value="emit('update:modelValue', $event)" />

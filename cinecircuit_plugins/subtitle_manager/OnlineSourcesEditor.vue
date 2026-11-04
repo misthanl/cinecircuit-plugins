@@ -43,7 +43,7 @@ function update(next: Record<string, unknown>) {
         <SavedSecretField v-if="field.secret" :model-value="modelValue[field.key]"
           :disabled="disabled" :label="field.label || field.key" :request="request"
           :endpoint="`/plugins/subtitle-manager/config/secret/${field.key}`"
-          @update:model-value="update({ [field.key]: $event, [field.key + '_clear']: false })" />
+          @update:model-value="update({ [field.key]: $event, [field.key + '_clear']: !String($event || '').trim() })" />
         <component v-else :is="schemaFieldsComponent" :fields="[field]"
           :model-value="modelValue" :disabled="disabled" compact @update:model-value="update" />
       </template>
