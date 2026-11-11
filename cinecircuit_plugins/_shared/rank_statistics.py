@@ -9,6 +9,7 @@ REASONS = {
     "identity_incomplete": "媒体身份不完整",
     "not_recognized": "未确认媒体身份",
     "identity_lookup_failed": "媒体识别查询失败",
+    "subscription_identity_lookup_failed": "跨来源订阅去重查询失败",
     "season_ambiguous": "目标季不明确",
     "episode_metadata_unavailable": "季集信息不完整",
     "season_lookup_failed": "季集查询失败",

@@ -78,7 +78,28 @@ def parse_tencent(text):
 
 
 async def tencent(client):
-    return parse_tencent(await read_page(client, "https://v.qq.com/biu/ranks"))
+    data = await read_json(
+        client,
+        "https://pbaccess.video.qq.com/trpc.tencentvideohotlistdata.hotlistdata.DoSearchHotListHttp/getSearchHotListHttp",
+        params={"ChannelID": "", "PageSize": 10, "PageNum": 0, "SceneID": 2},
+    )
+    payload = data.get("data", data)
+    if payload.get("ErrCode", 0) != 0:
+        raise BoardRequestError("腾讯热搜榜接口返回错误")
+    groups = {}
+    for group in payload.get("Results", []):
+        label = group.get("ChannelName")
+        if label not in CATEGORIES.values():
+            continue
+        entries = []
+        for row in (group.get("Result") or {}).get("ListInfo", []):
+            title = str(row.get("Query") or "").strip()
+            if title:
+                entries.append({"title": title, "platform_id": str(row.get("ID") or "")})
+        groups[label] = entries[:10]
+    if not groups:
+        raise BoardRequestError("腾讯热搜榜接口未返回分类榜单")
+    return groups
 
 
 async def mango(client):

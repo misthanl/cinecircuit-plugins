@@ -88,7 +88,7 @@ def test_partial_failure_retries_once_and_preserves_other_platform():
     calls = []
     def handler(request):
         calls.append(request.url.host)
-        if request.url.host == "v.qq.com":
+        if request.url.host == "pbaccess.video.qq.com":
             return httpx.Response(403)
         return httpx.Response(200, json={"data": {"topList": [{"label": "电影", "data": [{"name": "影片"}]}]}})
     async def run():
@@ -98,7 +98,7 @@ def test_partial_failure_retries_once_and_preserves_other_platform():
             assert client.succeeded == 1 and len(client.errors) == 1
             assert "HTTP 403" in client.errors[0]
     asyncio.run(run())
-    assert calls == ["v.qq.com", "v.qq.com", "mobileso.bz.mgtv.com"]
+    assert calls == ["pbaccess.video.qq.com", "pbaccess.video.qq.com", "mobileso.bz.mgtv.com"]
 
 
 @pytest.mark.parametrize("cancel", [False, True])
@@ -170,4 +170,32 @@ def test_empty_payload_is_failure_not_success():
             client = BoardClient(transport)
             assert await platforms.collect(client, normalized({"platform_types": ["movie"], "iqy_enabled": True})) == []
             assert client.succeeded == 0 and len(client.errors) == 1
+    asyncio.run(run())
+
+
+def test_tencent_uses_json_categories_and_ignores_total_board():
+    def handler(request):
+        assert request.url.host == "pbaccess.video.qq.com"
+        assert request.url.params["SceneID"] == "2"
+        return httpx.Response(200, json={"data": {"ErrCode": 0, "Results": [
+            {"ChannelName": label, "Result": {"ListInfo": [
+                {"Query": f"{label}{i}", "ID": str(i)} for i in range(12)]}}
+            for label in [*platforms.CATEGORIES.values(), "总榜"]
+        ]}})
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            groups = await platforms.tencent(client)
+            assert set(groups) == set(platforms.CATEGORIES.values())
+            for label, rows in groups.items():
+                assert [r["title"] for r in rows] == [f"{label}{i}" for i in range(10)]
+                assert rows[0]["platform_id"] == "0"
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize("payload", [{"data": {"ErrCode": 1}}, {"data": {"Results": []}}])
+def test_tencent_rejects_failed_or_empty_api_response(payload):
+    async def run():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=payload))) as client:
+            with pytest.raises(BoardRequestError):
+                await platforms.tencent(client)
     asyncio.run(run())

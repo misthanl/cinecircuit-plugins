@@ -1109,7 +1109,7 @@
       "manifest": {
         "id": "maoyan-rank",
         "name": "影视榜单订阅",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "description": "订阅猫眼电影票房榜及腾讯、爱奇艺、芒果、优酷分类榜单。",
         "icon": "mdi-movie-search-outline",
         "api_version": 1,
@@ -1373,12 +1373,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.5-79edca509e56c09d.zip",
-      "sha256": "79edca509e56c09dff520b129b6530720c294d054ce79049a3f124af589c88f9",
-      "supersedes_sha256": [
-        "ac4256d971cc815c52ee52c4efec565b157a2d31a6addf9c358ace4f0aabe6f3",
-        "de250471bf2cce77ee00c25989a5bc4a08e76cd9620e7b90fe4d17ac88225ac7"
-      ]
+      "package_url": "packages/maoyan-rank-1.0.6-082a87ece6e25212.zip",
+      "sha256": "082a87ece6e2521225b8fcebcaaf130aae177a2439951de7f39a3affe41b5620"
     },
     {
       "manifest": {
@@ -2158,7 +2154,7 @@
       "manifest": {
         "id": "overseas-tv",
         "name": "TMDB 剧集追踪",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "按播出平台追踪近期新剧与新季，自动创建订阅。",
         "icon": "mdi-television-classic",
         "api_version": 1,
@@ -2634,12 +2630,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/overseas-tv-1.0.3-104da074ea525f20.zip",
-      "sha256": "104da074ea525f206fa57d5ce83524a2c6541c6f22524bb73b47794ad0bc17ff",
-      "supersedes_sha256": [
-        "2144d50253a18f46e1794260ea189b6662ed714332a034cc14f2f999399fa926",
-        "a87e68455df377a83a73ee48498820262313144bdc21e869bcf14c0365af5a81"
-      ]
+      "package_url": "packages/overseas-tv-1.0.4-463cadb4e2fa74b0.zip",
+      "sha256": "463cadb4e2fa74b0fb995b6b93bf9ef88fd4ad7e89fc2e174ca90105a5d81026"
     },
     {
       "manifest": {

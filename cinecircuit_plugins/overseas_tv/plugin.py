@@ -24,7 +24,7 @@ class OverseasTVPlugin(PluginBase):
         entrypoint="plugin:OverseasTVPlugin",
         id="overseas-tv",
         name="TMDB 剧集追踪",
-        version="1.0.3",
+        version="1.0.4",
         description="按播出平台追踪近期新剧与新季，自动创建订阅。",
         icon="mdi-television-classic",
         permissions=(
@@ -102,7 +102,8 @@ class OverseasTVPlugin(PluginBase):
                 actions.append(
                     {"title": media["title"], "season": media["season"], "board": label, **result}
                 )
-                context.logger.info(
+                log = context.logger.warning if result.get("status") in {"unknown", "not_recognized"} else context.logger.info
+                log(
                     "%s %s：%s", media["title"], media["season"], result_text(result)
                 )
         return {

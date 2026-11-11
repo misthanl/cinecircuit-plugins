@@ -31,7 +31,7 @@ class MaoyanWatchlistPlugin(PluginBase):
         entrypoint="plugin:MaoyanWatchlistPlugin",
         id="maoyan-rank",
         name="影视榜单订阅",
-        version="1.0.5",
+        version="1.0.6",
         description="订阅猫眼电影票房榜及腾讯、爱奇艺、芒果、优酷分类榜单。",
         icon="mdi-movie-search-outline",
         permissions=(PluginPermission.MEDIA_DISCOVER, PluginPermission.SUBSCRIPTION_CREATE,
@@ -144,11 +144,11 @@ class MaoyanWatchlistPlugin(PluginBase):
                     match = await task
                 except Exception:
                     actions.append({**row, "status": "unknown", "reason": "identity_lookup_failed"})
-                    context.logger.info("%s：媒体识别查询失败，下次重试", row["title"])
+                    context.logger.warning("%s：媒体识别查询失败，下次重试", row["title"])
                     continue
                 if match is None:
                     actions.append({**row, "status": "not_recognized"})
-                    context.logger.info("%s：未确认媒体身份，下次重试", row["title"])
+                    context.logger.warning("%s：未确认媒体身份，下次重试", row["title"])
                     continue
                 candidate = self._subscription_candidate(row, match)
                 identity = ":".join(str(candidate.get(key) or "") for key in ("media_type", "source_key", "source_id", "season"))
@@ -162,7 +162,8 @@ class MaoyanWatchlistPlugin(PluginBase):
                 with stage_timing(context, "create_checked", str(row["title"])):
                     result = await create_checked(item_key, candidate)
                 checked[identity] = result
-                context.logger.info("%s：%s", row["title"], result_text(result))
+                log = context.logger.warning if result.get("status") in {"unknown", "not_recognized"} else context.logger.info
+                log("%s：%s", row["title"], result_text(result))
                 actions.append({**row, "season": candidate.get("season", ""), **result})
         return actions
 
