@@ -42,6 +42,7 @@
       "db61400a29cfe75ee1c767caa296b80cbe6ceebb3a34a2596288efea41b96e98"
     ],
     "1.0.4": [
+      "b6484c902a35943af8acc7546a794eaa0be061785b3a8e49a3576127e5e7c562",
       "efe98bf2558bb972a8802e4e3d87984057c4b1ee46167264b03a3ef58b05b541"
     ]
   },
@@ -51,6 +52,7 @@
       "9ffb719611b614a5df52154b1e5c6bb1778209f9fe23973eee29ce048e8bf9fd"
     ],
     "1.0.5": [
+      "870bf9029247fa3d751191850f980ddd94212175b6b90a211ee7c5d81765d7dc",
       "ae5e5fb1a0f1fc8d8966e9dc67789d830d94de306ec3cf6035bb6759a74b0bc9",
       "b3095411b57db35e32a7cfcbfce77fd92017f748e37208228a902f902dddfb30"
     ]
@@ -74,6 +76,9 @@
     ],
     "1.0.2": [
       "77d409835e81d7310e736bdead60a9ffe30f31b15288c4a91ea7fc9cb067743e"
+    ],
+    "1.0.3": [
+      "48127641405e9265d0225d595aacc49d9e25983bf6790646aefdd68585d684d7"
     ]
   },
   "douban-hot": {
@@ -81,8 +86,9 @@
       "78111c1aa655a486106f48d0c352be06d6c3279931ab69ea0206ade213b19332"
     ],
     "1.0.4": [
-      "ddaef4ae982567685c575d97dac7413f813ed083efa02491f792e6059454ab00",
-      "21a095118c762a3cfe0093e7065e2e0b6b1e499872a11c62ba78be7222eb2a5b"
+      "21a095118c762a3cfe0093e7065e2e0b6b1e499872a11c62ba78be7222eb2a5b",
+      "dc6af2a2f4883f6e7801898c9f804187bad3838e462ba450dda7d506ae4d4ded",
+      "ddaef4ae982567685c575d97dac7413f813ed083efa02491f792e6059454ab00"
     ]
   },
   "maoyan-rank": {
@@ -93,6 +99,9 @@
     "1.0.5": [
       "ac4256d971cc815c52ee52c4efec565b157a2d31a6addf9c358ace4f0aabe6f3",
       "de250471bf2cce77ee00c25989a5bc4a08e76cd9620e7b90fe4d17ac88225ac7"
+    ],
+    "1.0.6": [
+      "082a87ece6e2521225b8fcebcaaf130aae177a2439951de7f39a3affe41b5620"
     ]
   },
   "emby-cover-generator": {
@@ -111,6 +120,9 @@
     "1.0.3": [
       "2144d50253a18f46e1794260ea189b6662ed714332a034cc14f2f999399fa926",
       "a87e68455df377a83a73ee48498820262313144bdc21e869bcf14c0365af5a81"
+    ],
+    "1.0.4": [
+      "463cadb4e2fa74b0fb995b6b93bf9ef88fd4ad7e89fc2e174ca90105a5d81026"
     ]
   },
   "storage-recycle-cleaner": {
@@ -120,6 +132,9 @@
     ],
     "1.0.2": [
       "420cb1ad87249c084b5b81fc7403d34226b8034d7c66b054d2790d06ab08c697"
+    ],
+    "1.0.3": [
+      "fe206ba3fed2ec04c6f6d769318efbfd2eb9029b390b49ded89a45cbd1810aa6"
     ]
   },
   "subtitle-manager": {
@@ -129,10 +144,14 @@
     ],
     "1.0.5": [
       "c490513880d331ea024367b99879e28e9d31675a17ad9ed78148e92c50799197"
+    ],
+    "1.0.6": [
+      "3a72a73ca38820e3d84074f736600d276d25a0907125aaeb95383554804a8a4f"
     ]
   },
   "douban-wish": {
     "1.0.0": [
+      "7bf3f6dbba3bb6942c5981c6898946e2d873f4bd0f7d873b15a8ffad1abfb30f",
       "d11746bf26b2c939ee4f6afe027a14315da82302ef5af2b8dece6dd2e0743f7e"
     ]
   }

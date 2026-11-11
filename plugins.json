@@ -102,9 +102,10 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/auto-signin-1.0.4-b6484c902a35943a.zip",
-      "sha256": "b6484c902a35943af8acc7546a794eaa0be061785b3a8e49a3576127e5e7c562",
+      "package_url": "packages/auto-signin-1.0.4-c7d3f0fad8b4b962.zip",
+      "sha256": "c7d3f0fad8b4b962c3930c912686ab15d619b6c426fcd9b852c49ce722cc9b7e",
       "supersedes_sha256": [
+        "b6484c902a35943af8acc7546a794eaa0be061785b3a8e49a3576127e5e7c562",
         "efe98bf2558bb972a8802e4e3d87984057c4b1ee46167264b03a3ef58b05b541"
       ]
     },
@@ -390,9 +391,10 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.5-870bf9029247fa3d.zip",
-      "sha256": "870bf9029247fa3d751191850f980ddd94212175b6b90a211ee7c5d81765d7dc",
+      "package_url": "packages/cast-profile-enricher-1.0.5-70506764c2379176.zip",
+      "sha256": "70506764c237917659fcc17cb98ce67e8343422cd8ab451e9c7bc61267ec2452",
       "supersedes_sha256": [
+        "870bf9029247fa3d751191850f980ddd94212175b6b90a211ee7c5d81765d7dc",
         "ae5e5fb1a0f1fc8d8966e9dc67789d830d94de306ec3cf6035bb6759a74b0bc9",
         "b3095411b57db35e32a7cfcbfce77fd92017f748e37208228a902f902dddfb30"
       ]
@@ -691,8 +693,11 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.3-48127641405e9265.zip",
-      "sha256": "48127641405e9265d0225d595aacc49d9e25983bf6790646aefdd68585d684d7"
+      "package_url": "packages/cookiecloud-1.0.3-37b04a9eee20d522.zip",
+      "sha256": "37b04a9eee20d52258fbcdd17fb66509bcb857acbfa7ea6d46c619973ce6ce63",
+      "supersedes_sha256": [
+        "48127641405e9265d0225d595aacc49d9e25983bf6790646aefdd68585d684d7"
+      ]
     },
     {
       "manifest": {
@@ -827,11 +832,12 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/douban-hot-1.0.4-dc6af2a2f4883f6e.zip",
-      "sha256": "dc6af2a2f4883f6e7801898c9f804187bad3838e462ba450dda7d506ae4d4ded",
+      "package_url": "packages/douban-hot-1.0.4-25aeb6221c921f0b.zip",
+      "sha256": "25aeb6221c921f0bf189042e3ced2f76b369fea6fb308892dba8fc9bd07538b5",
       "supersedes_sha256": [
-        "ddaef4ae982567685c575d97dac7413f813ed083efa02491f792e6059454ab00",
-        "21a095118c762a3cfe0093e7065e2e0b6b1e499872a11c62ba78be7222eb2a5b"
+        "21a095118c762a3cfe0093e7065e2e0b6b1e499872a11c62ba78be7222eb2a5b",
+        "dc6af2a2f4883f6e7801898c9f804187bad3838e462ba450dda7d506ae4d4ded",
+        "ddaef4ae982567685c575d97dac7413f813ed083efa02491f792e6059454ab00"
       ]
     },
     {
@@ -914,9 +920,10 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/douban-wish-1.0.0-7bf3f6dbba3bb694.zip",
-      "sha256": "7bf3f6dbba3bb6942c5981c6898946e2d873f4bd0f7d873b15a8ffad1abfb30f",
+      "package_url": "packages/douban-wish-1.0.0-1f0206cc018fcd1f.zip",
+      "sha256": "1f0206cc018fcd1fe1366c3bb03c22d0dee87138342ee97c1bace68af53fee3a",
       "supersedes_sha256": [
+        "7bf3f6dbba3bb6942c5981c6898946e2d873f4bd0f7d873b15a8ffad1abfb30f",
         "d11746bf26b2c939ee4f6afe027a14315da82302ef5af2b8dece6dd2e0743f7e"
       ]
     },
@@ -1373,8 +1380,11 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/maoyan-rank-1.0.6-082a87ece6e25212.zip",
-      "sha256": "082a87ece6e2521225b8fcebcaaf130aae177a2439951de7f39a3affe41b5620"
+      "package_url": "packages/maoyan-rank-1.0.6-de293faa83473a11.zip",
+      "sha256": "de293faa83473a11d7e6d0b69f9b9ce476611799a50598dea4d99a78db28897e",
+      "supersedes_sha256": [
+        "082a87ece6e2521225b8fcebcaaf130aae177a2439951de7f39a3affe41b5620"
+      ]
     },
     {
       "manifest": {
@@ -2630,8 +2640,11 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/overseas-tv-1.0.4-463cadb4e2fa74b0.zip",
-      "sha256": "463cadb4e2fa74b0fb995b6b93bf9ef88fd4ad7e89fc2e174ca90105a5d81026"
+      "package_url": "packages/overseas-tv-1.0.4-faa6e77e5dd5dd7b.zip",
+      "sha256": "faa6e77e5dd5dd7bc7b435667aecd39971458f69815aea7d93fba251e4710f6e",
+      "supersedes_sha256": [
+        "463cadb4e2fa74b0fb995b6b93bf9ef88fd4ad7e89fc2e174ca90105a5d81026"
+      ]
     },
     {
       "manifest": {
@@ -2709,8 +2722,11 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/storage-recycle-cleaner-1.0.3-fe206ba3fed2ec04.zip",
-      "sha256": "fe206ba3fed2ec04c6f6d769318efbfd2eb9029b390b49ded89a45cbd1810aa6"
+      "package_url": "packages/storage-recycle-cleaner-1.0.3-e4001c5688369496.zip",
+      "sha256": "e4001c5688369496c7cd36962dbdb41674bd27eea6b7d3e8401149716063f57d",
+      "supersedes_sha256": [
+        "fe206ba3fed2ec04c6f6d769318efbfd2eb9029b390b49ded89a45cbd1810aa6"
+      ]
     },
     {
       "manifest": {
@@ -3085,8 +3101,11 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.6-3a72a73ca38820e3.zip",
-      "sha256": "3a72a73ca38820e3d84074f736600d276d25a0907125aaeb95383554804a8a4f"
+      "package_url": "packages/subtitle-manager-1.0.6-cefd5b968a117d0d.zip",
+      "sha256": "cefd5b968a117d0d3e9aa900c5d7f60a5829cb1d7dcd595ac756068dc58010bd",
+      "supersedes_sha256": [
+        "3a72a73ca38820e3d84074f736600d276d25a0907125aaeb95383554804a8a4f"
+      ]
     },
     {
       "manifest": {

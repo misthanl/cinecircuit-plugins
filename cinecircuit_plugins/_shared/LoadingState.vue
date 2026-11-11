@@ -11,5 +11,5 @@ withDefaults(defineProps<{ label?: string; inline?: boolean; minHeight?: number 
 .plugin-loading-ring{box-sizing:border-box;width:20px;height:20px;border:2px solid rgba(var(--v-theme-primary,36,107,253),.16);border-top-color:var(--app-primary,#246bfd);border-radius:50%;animation:plugin-loading-spin .9s linear infinite}
 .plugin-loading-state.is-inline{display:inline-flex;min-height:0;align-items:center;gap:6px}.is-inline .plugin-loading-ring{width:14px;height:14px}
 @keyframes plugin-loading-spin{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.plugin-loading-ring{animation:none;border-right-color:var(--app-primary,#246bfd)}}
+@media(prefers-reduced-motion:reduce){.plugin-loading-ring{animation-duration:1.8s}}
 </style>
