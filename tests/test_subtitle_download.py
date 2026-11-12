@@ -434,6 +434,7 @@ def test_pipeline_writes_event_media_only_and_preserves_existing(
             SRT,
             extension="srt",
             language="zh-CN",
+            title="简体中文",
             overwrite=False,
         )
 

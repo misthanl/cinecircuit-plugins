@@ -531,6 +531,7 @@ def test_subtitle_upload_uses_safe_sidecar_gateway() -> None:
         "1\n00:00:01,000 --> 00:00:02,000\n欢迎观看\n".encode(),
         extension="srt",
         language="zh-CN",
+        title="简体中文",
         overwrite=False,
     )
 

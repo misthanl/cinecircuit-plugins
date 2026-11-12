@@ -180,8 +180,11 @@ def test_page_search_preview_and_confirm_use_one_identity_safe_chain(
     )
     assert len(confirmed["saved"]) == 2
     assert [call.kwargs["language"] for call in ctx.media_files.write_subtitle.await_args_list] == [
-        "zh-CN-en",
+        "zh",
         "zh-CN",
+    ]
+    assert [call.kwargs["title"] for call in ctx.media_files.write_subtitle.await_args_list] == [
+        "简英双语", "简体中文",
     ]
 
 

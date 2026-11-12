@@ -13,6 +13,7 @@ import httpx
 from app.modules.plugins.runtime_services import http_client
 
 from .source_download import download_files
+from .sidecar_naming import sidecar_label, sidecar_metadata
 from .subtitle_files import (
     FORMATS,
     language_tag,
@@ -251,9 +252,11 @@ async def _save_pool(
     stem = PurePosixPath(target["media_path"].replace("\\", "/")).stem
     seen: set[str] = set()
     for _, (extension, language, content), info in pool:
-        output_name = f"{stem}.{language}.{extension}".casefold()
+        output_name = f"{stem}.{sidecar_label(language)}.{extension}".casefold()
+        legacy_name = f"{stem}.{language}.{extension}".casefold()
         if output_name in seen or (
-            output_name in existing and not context.config.get("overwrite_existing", False)
+            (output_name in existing or legacy_name in existing)
+            and not context.config.get("overwrite_existing", False)
         ):
             result["skipped"] += 1
             continue
@@ -262,7 +265,7 @@ async def _save_pool(
                 target["media_path"],
                 content,
                 extension=extension,
-                language=language,
+                **sidecar_metadata(language),
                 overwrite=bool(context.config.get("overwrite_existing", False)),
             )
         except (OSError, ValueError):

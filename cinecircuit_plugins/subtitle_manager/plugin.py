@@ -15,6 +15,7 @@ from app.modules.plugins.contracts import (
 from app.modules.plugins.runtime_services import http_client
 
 from .automatic_download import save_candidates
+from .sidecar_naming import sidecar_metadata
 from .event_search import catalog_identity, event_identities
 from .identity import (
     MediaIdentity,
@@ -322,10 +323,10 @@ class SubtitleWorkspacePlugin(PluginBase):
         language = request.query.get("language") or "auto"
         if language == "auto":
             from .subtitle_files import subtitle_text
-            from .subtitle_priority import detect_language
+            from .subtitle_priority import detect_language, language_kind
 
             text = subtitle_text(content, extension)
-            language = detect_language(filename, text, extension)
+            language = language_kind(detect_language(filename, text, extension), text, extension)
             if language == "und":
                 raise ValueError("无法可靠识别字幕语言，请手动选择语言后重新上传")
         overwrite = request.query.get("overwrite", "").casefold() in {
@@ -339,7 +340,7 @@ class SubtitleWorkspacePlugin(PluginBase):
             media_path,
             content,
             extension=extension,
-            language=language,
+            **sidecar_metadata(language),
             overwrite=overwrite,
         )
         await SubtitleWorkspacePlugin._notify_file_action(context, "字幕已保存", result)
@@ -833,7 +834,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                         identity.media_path,
                         item.content,
                         extension=item.extension,
-                        language=item.language,
+                        **sidecar_metadata(item.language),
                         overwrite=bool(context.config.get("overwrite_existing", False)),
                     )
                 )
