@@ -12,6 +12,7 @@ from zipfile import BadZipFile
 import httpx
 from app.modules.plugins.runtime_services import http_client
 
+from .download_policy import DOWNLOAD_TIMEOUT_SECONDS
 from .source_download import download_files
 from .sidecar_naming import sidecar_label, sidecar_metadata
 from .subtitle_files import (
@@ -236,7 +237,7 @@ async def _collect_candidates(
         if downloader is None:
             client = await stack.enter_async_context(
                 http_client(
-                    timeout=30,
+                    timeout=DOWNLOAD_TIMEOUT_SECONDS,
                     use_application_proxy=bool(context.config.get("online_use_proxy")),
                 )
             )
@@ -254,8 +255,10 @@ async def _save_pool(
     for _, (extension, language, content), info in pool:
         output_name = f"{stem}.{sidecar_label(language)}.{extension}".casefold()
         legacy_name = f"{stem}.{language}.{extension}".casefold()
+        metadata = sidecar_metadata(language)
+        previous_name = f"{stem}.{metadata['language']}({metadata['title']}).{extension}".casefold()
         if output_name in seen or (
-            (output_name in existing or legacy_name in existing)
+            bool({output_name, legacy_name, previous_name} & existing)
             and not context.config.get("overwrite_existing", False)
         ):
             result["skipped"] += 1

@@ -33,4 +33,4 @@ def sidecar_metadata(language: str, *, writer: Callable[..., object] | None = No
 def sidecar_label(language: str) -> str:
     values = sidecar_metadata(language)
     code, title = values["language"], values["title"]
-    return f"{code}({title})" if title else code
+    return f"{title}.{code}" if title else code

@@ -1,5 +1,7 @@
 """Compatibility entry point that delegates downloads to online source adapters."""
 
+import asyncio
+from .download_policy import DOWNLOAD_TIMEOUT_SECONDS
 from typing import Any
 from collections.abc import Callable
 from .online_sources.base import OnlineSource
@@ -46,7 +48,7 @@ async def download_files(client: Any, config: dict, candidate: dict) -> list[tup
         matched=True,
     )
     try:
-        downloaded = await source.download(internal)
+        downloaded = await asyncio.wait_for(source.download(internal), timeout=DOWNLOAD_TIMEOUT_SECONDS)
     except SourceFailure as error:
         raise ValueError(error.error.message) from error
     if downloaded.error:

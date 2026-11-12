@@ -752,6 +752,7 @@ test("Subtitle Manager discards search results after switching media", async () 
 test("Subtitle Manager clears an old preview before previewing another candidate", async () => {
   let registration;
   let previewCalls = 0;
+  let finishPreview;
   install({
     vue,
     request: async (path) => {
@@ -788,6 +789,7 @@ test("Subtitle Manager clears an old preview before previewing another candidate
       if (path === "/plugins/subtitle-manager/api/online-preview") {
         previewCalls += 1;
         if (previewCalls === 1) {
+          await new Promise(resolve => { finishPreview = resolve; });
           return {
             preview_handle: "old-preview",
             items: [
@@ -819,6 +821,13 @@ test("Subtitle Manager clears an old preview before previewing another candidate
   await wrapper.findAll(".subtitle-action-trigger")[0].trigger("click");
   await wrapper.get(".subtitle-download-action").trigger("click");
   await flushPromises();
+  assert.match(wrapper.get('.subtitle-download-status').text(), /正在下载并校验字幕/);
+  assert.equal(wrapper.get('.subtitle-download-active').attributes('aria-busy'), 'true');
+  await wrapper.findAll('.subtitle-action-trigger')[0].trigger('click');
+  assert.equal(wrapper.find('.subtitle-download-spinner').exists(), true);
+  finishPreview();
+  await flushPromises();
+  assert.equal(wrapper.find('.subtitle-download-status').exists(), false);
   assert.match(wrapper.text(), /old excerpt/);
   await wrapper.findAll(".subtitle-action-trigger")[1].trigger("click");
   await wrapper.get(".subtitle-download-action").trigger("click");

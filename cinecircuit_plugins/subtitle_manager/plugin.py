@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import re
 from pathlib import Path
 from typing import Any
@@ -14,6 +15,7 @@ from app.modules.plugins.contracts import (
 )
 from app.modules.plugins.runtime_services import http_client
 
+from .download_policy import DOWNLOAD_TIMEOUT_SECONDS, PREVIEW_API_TIMEOUT_SECONDS
 from .automatic_download import save_candidates
 from .sidecar_naming import sidecar_metadata
 from .event_search import catalog_identity, event_identities
@@ -56,7 +58,7 @@ class SubtitleWorkspacePlugin(PluginBase):
     """Manual sidecar subtitle workspace backed by configured media directories."""
 
     disabled_read_actions = ("catalog", "detail", "inventory", "poster")
-    api_action_timeouts = {"online-preview": 55, "online-captcha": 55}
+    api_action_timeouts = {"online-preview": PREVIEW_API_TIMEOUT_SECONDS, "online-captcha": PREVIEW_API_TIMEOUT_SECONDS}
 
     manifest = MANIFEST
 
@@ -77,7 +79,7 @@ class SubtitleWorkspacePlugin(PluginBase):
         identities = await self._supplement_event_identities(context, identities)
         results: list[dict[str, Any]] = []
         async with http_client(
-            timeout=45,
+            timeout=DOWNLOAD_TIMEOUT_SECONDS,
             use_application_proxy=bool(context.config.get("online_use_proxy")),
         ) as client:
             service = self._online_service(client, context.config, getattr(context, "media_files", None))
@@ -635,7 +637,7 @@ class SubtitleWorkspacePlugin(PluginBase):
         else:
             target["keyword"] = identity.title
         async with http_client(
-            timeout=45,
+            timeout=DOWNLOAD_TIMEOUT_SECONDS,
             use_application_proxy=bool(context.config.get("online_use_proxy")),
         ) as client:
             downloaded = await self._online_service(client, context.config, getattr(context, "media_files", None)).download(candidate)
@@ -759,19 +761,19 @@ class SubtitleWorkspacePlugin(PluginBase):
         candidate = SourceCandidate(**candidate_payload)
         cookies = cookies_from_snapshot(challenge.get("cookies") or ())
         client_options: dict[str, Any] = {
-            "timeout": 45,
+            "timeout": DOWNLOAD_TIMEOUT_SECONDS,
             "use_application_proxy": bool(context.config.get("online_use_proxy")),
             "cookies": cookies,
         }
         async with http_client(**client_options) as client:
             source = SubHDSource(client, context.config)
-            downloaded = await source.submit_download_captcha(
+            downloaded = await asyncio.wait_for(source.submit_download_captcha(
                 sid=sid,
                 down_url=down_url,
                 referer=referer,
                 code=code,
                 result_id=candidate.result_id,
-            )
+            ), timeout=DOWNLOAD_TIMEOUT_SECONDS)
         required = self._download_challenge(
             context, downloaded, media_path, candidate_payload, original_token
         )

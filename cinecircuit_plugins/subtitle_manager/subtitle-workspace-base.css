@@ -1,4 +1,8 @@
 .subtitle-host-notice--notification-only { display: none !important; }
+.subtitle-online-file.subtitle-download-active { background: rgba(41, 105, 255, .08); box-shadow: inset 3px 0 #2969ff; }
+.subtitle-download-status { display: flex; align-items: center; gap: 8px; color: #2969ff; font-weight: 600; font-size: 13px; margin-top: 7px; white-space: normal; }
+.subtitle-download-spinner { display: inline-block; flex: 0 0 auto; width: 16px; height: 16px; border: 2px solid rgba(41, 105, 255, .25); border-top-color: #2969ff; border-radius: 50%; animation: subtitle-download-spin 1s linear infinite !important; }
+@keyframes subtitle-download-spin { to { transform: rotate(360deg); } }
 
 .subtitle-workspace {
   --subtitle-provider-assrt: 124, 58, 237;

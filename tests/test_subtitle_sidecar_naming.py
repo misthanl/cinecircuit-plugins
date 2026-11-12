@@ -17,7 +17,7 @@ from cinecircuit_plugins.subtitle_manager.sidecar_naming import sidecar_metadata
 ])
 def test_language_is_separate_from_display_title(kind, code, title):
     assert sidecar_metadata(kind) == {"language": code, "title": title}
-    assert sidecar_label(kind) == f"{code}({title})"
+    assert sidecar_label(kind) == f"{title}.{code}"
 
 
 def test_legacy_host_writer_uses_legacy_language_suffix_once():
@@ -38,7 +38,7 @@ def test_current_host_writer_retains_display_title():
     assert sidecar_metadata("zh-CN-en", writer=current) == {"language": "zh", "title": "简英双语"}
 
 
-@pytest.mark.parametrize("existing", ["movie.zh-CN-en.ass", "movie.zh(简英双语).ass"])
+@pytest.mark.parametrize("existing", ["movie.zh-CN-en.ass", "movie.zh(简英双语).ass", "movie.简英双语.zh.ass"])
 def test_automatic_save_respects_existing_new_and_legacy_names(existing):
     writer = AsyncMock()
     context = SimpleNamespace(config={}, media_files=SimpleNamespace(write_subtitle=writer))

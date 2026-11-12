@@ -840,6 +840,8 @@ onMounted(() => {
                     v-for="item in visibleOnline.slice(0, 20)"
                     :key="item.candidate_handle"
                     class="subtitle-file subtitle-table-row subtitle-online-file"
+                    :class="{ 'subtitle-download-active': previewing && selectedCandidate === item.candidate_handle }"
+                    :aria-busy="previewing && selectedCandidate === item.candidate_handle"
                   >
                   <span
                     :class="[
@@ -856,6 +858,11 @@ onMounted(() => {
                       :aria-label="item.title"
                       tabindex="0"
                     >{{ item.title }}</strong>
+                    <span v-if="previewing && selectedCandidate === item.candidate_handle"
+                      class="subtitle-download-status" role="status" aria-live="polite">
+                      <span class="subtitle-download-spinner" aria-hidden="true"></span>
+                      正在下载并校验字幕，请稍候…
+                    </span>
                   </span>
                   <span class="subtitle-mobile-meta">
                     {{ item.provider }} · {{ item.language || "未知" }} ·

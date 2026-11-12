@@ -774,7 +774,7 @@ async def test_download_budget_is_independent_bounded_and_cancels_slow_source():
     result = await service.download(candidate)
     assert result.error.kind is SourceErrorKind.TIMEOUT
     assert source.cancelled
-    assert OnlineSubtitleService([], download_timeout=120).download_timeout == 45
+    assert OnlineSubtitleService([], download_timeout=120).download_timeout == 60
 
 
 @async_test
