@@ -20,6 +20,24 @@ def test_language_is_separate_from_display_title(kind, code, title):
     assert sidecar_label(kind) == f"{code}({title})"
 
 
+def test_legacy_host_writer_uses_legacy_language_suffix_once():
+    calls = []
+    async def legacy(path, content, *, extension, language, overwrite):
+        calls.append((path, language))
+        return {"path": path + "." + language + "." + extension}
+    context = SimpleNamespace(config={}, media_files=SimpleNamespace(write_subtitle=legacy))
+    result = {"skipped": 0, "saved": [], "details": []}
+    asyncio.run(_save_pool(context, {"media_path": "/media/movie.mkv"},
+                           [(0, ("ass", "zh-CN-en", b"subtitle"), {})], set(), result))
+    assert calls == [("/media/movie.mkv", "zh-CN-en")]
+
+
+def test_current_host_writer_retains_display_title():
+    async def current(path, content, *, extension, language, title, overwrite):
+        pass
+    assert sidecar_metadata("zh-CN-en", writer=current) == {"language": "zh", "title": "简英双语"}
+
+
 @pytest.mark.parametrize("existing", ["movie.zh-CN-en.ass", "movie.zh(简英双语).ass"])
 def test_automatic_save_respects_existing_new_and_legacy_names(existing):
     writer = AsyncMock()

@@ -3101,7 +3101,7 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "sha256": "799b56fed586606d98cbba8de2b235bc29b12508b3de9502d2e77067ccdb165a",
+      "sha256": "411ccfc65c158e36f93e292247899033d7335814e629a81a9a25a853b84e6cc1",
       "frontend_activation": {
         "on_demand": true,
         "routes": [
@@ -3114,9 +3114,10 @@
       "id": "subtitle-manager",
       "version": "1.0.7",
       "supersedes_sha256": [
-        "6a3b1a8d12f6bc954cb47b522ea32ff177ca7d5d422f4b563f7f3f48dcff3fef"
+        "6a3b1a8d12f6bc954cb47b522ea32ff177ca7d5d422f4b563f7f3f48dcff3fef",
+        "799b56fed586606d98cbba8de2b235bc29b12508b3de9502d2e77067ccdb165a"
       ],
-      "package_url": "packages/subtitle-manager-1.0.7-799b56fed586606d.zip"
+      "package_url": "packages/subtitle-manager-1.0.7-411ccfc65c158e36.zip"
     },
     {
       "manifest": {

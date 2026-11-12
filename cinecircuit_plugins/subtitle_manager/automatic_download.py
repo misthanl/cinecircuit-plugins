@@ -265,7 +265,7 @@ async def _save_pool(
                 target["media_path"],
                 content,
                 extension=extension,
-                **sidecar_metadata(language),
+                **sidecar_metadata(language, writer=context.media_files.write_subtitle),
                 overwrite=bool(context.config.get("overwrite_existing", False)),
             )
         except (OSError, ValueError):

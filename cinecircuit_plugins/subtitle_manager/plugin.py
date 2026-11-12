@@ -340,7 +340,7 @@ class SubtitleWorkspacePlugin(PluginBase):
             media_path,
             content,
             extension=extension,
-            **sidecar_metadata(language),
+            **sidecar_metadata(language, writer=context.media_files.write_subtitle),
             overwrite=overwrite,
         )
         await SubtitleWorkspacePlugin._notify_file_action(context, "字幕已保存", result)
@@ -834,7 +834,7 @@ class SubtitleWorkspacePlugin(PluginBase):
                         identity.media_path,
                         item.content,
                         extension=item.extension,
-                        **sidecar_metadata(item.language),
+                        **sidecar_metadata(item.language, writer=context.media_files.write_subtitle),
                         overwrite=bool(context.config.get("overwrite_existing", False)),
                     )
                 )
