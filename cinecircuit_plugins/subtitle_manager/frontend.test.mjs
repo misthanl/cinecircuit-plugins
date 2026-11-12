@@ -821,7 +821,7 @@ test("Subtitle Manager clears an old preview before previewing another candidate
   await wrapper.findAll(".subtitle-action-trigger")[0].trigger("click");
   await wrapper.get(".subtitle-download-action").trigger("click");
   await flushPromises();
-  assert.match(wrapper.get('.subtitle-download-status').text(), /正在下载并校验字幕/);
+  assert.equal(wrapper.get('.subtitle-download-status').text(), '下载中');
   assert.equal(wrapper.get('.subtitle-download-active').attributes('aria-busy'), 'true');
   await wrapper.findAll('.subtitle-action-trigger')[0].trigger('click');
   assert.equal(wrapper.find('.subtitle-download-spinner').exists(), true);
@@ -1069,6 +1069,32 @@ test("recorded media pages render before subtitles and ignore stale selection re
   await flushPromises();
   assert.ok(requests.some(path => path.includes("/catalog?") && path.includes("offset=100")));
   wrapper.unmount();
+});
+
+test("catalog refresh retains loaded posters and attaches pending posters to the refreshed selection", async () => {
+  for (const pending of [false, true]) {
+    let registration;
+    const posterResolvers = [];
+    const poster = "data:image/png;base64,cG9zdGVy";
+    install({ vue, registerPage(value) { registration = value; }, async request(path) {
+      if (path.includes('/catalog?')) return { items: [{ path: '/media/A.mkv', title: 'A' }, { path: '/media/B.mkv', title: 'B' }] };
+      if (path.includes('/poster?')) return new Promise(resolve => posterResolvers.push(resolve));
+      if (path.includes('/inventory?')) return { items: [] };
+      return {};
+    } });
+    const wrapper = mount(registration.component);
+    await flushPromises();
+    if (!pending) { posterResolvers[0]({ data_url: poster }); await flushPromises(); }
+    await wrapper.get('.subtitle-sidebar-refresh').trigger('click');
+    await flushPromises();
+    if (pending) { posterResolvers[0]({ data_url: poster }); await flushPromises(); }
+    assert.equal(wrapper.get('.subtitle-poster img').attributes('src'), poster);
+    if (!pending) assert.equal(posterResolvers.length, 1, 'refresh must reuse the loaded poster');
+    await wrapper.findAll('.subtitle-media')[1].trigger('click');
+    await flushPromises();
+    assert.equal(wrapper.find('.subtitle-poster img').exists(), false, 'another media must not inherit the previous poster');
+    wrapper.unmount();
+  }
 });
 
 test("recorded media search discards older list responses", async () => {

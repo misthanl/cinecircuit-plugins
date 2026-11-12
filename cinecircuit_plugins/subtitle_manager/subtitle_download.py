@@ -66,7 +66,7 @@ async def public_url(url: str) -> tuple[str, str, str]:
     return pinned, host_header, str(parsed.hostname)
 
 
-async def fetch(client: Any, url: str, *, method: str = "GET", **kwargs: Any) -> tuple[bytes, str]:
+async def fetch(client: Any, url: str, *, method: str = "GET", accepted_statuses: tuple[int, ...] = (), **kwargs: Any) -> tuple[bytes, str]:
     for _ in range(5):
         resolved = await public_url(url)
         request_url = url
@@ -104,7 +104,8 @@ async def fetch(client: Any, url: str, *, method: str = "GET", **kwargs: Any) ->
                     {"headers": redirect_headers} if redirect_headers else {},
                 )  # Keep API headers on-host, but never forward them to download hosts.
                 continue
-            response.raise_for_status()
+            if response.status_code not in accepted_statuses:
+                response.raise_for_status()
             content = bytearray()
             async for chunk in response.aiter_bytes():
                 content.extend(chunk)

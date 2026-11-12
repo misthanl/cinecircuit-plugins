@@ -465,6 +465,25 @@ async def test_subhd_search_cards_keep_language_and_format_labels():
 
 
 @async_test
+async def test_subhd_403_quota_is_not_generic_download_failure_or_captcha():
+    from cinecircuit_plugins.subtitle_manager.online_sources.base import SourceFailure
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(
+        lambda request: httpx.Response(403, json={
+            "success": False, "pass": False, "msg": "下载频率过高，请不要再试", "url": "",
+        })
+    )) as client:
+        source = SubHDSource(client, {})
+        with pytest.raises(SourceFailure) as caught:
+            await source._download_api_json(client, "https://subhd.example/api/sub/down", method="POST")
+        error = caught.value.error
+        assert error.kind is SourceErrorKind.QUOTA
+        assert not error.retryable
+        assert error.challenge is None
+        assert "停止重试" in error.message
+
+
+@async_test
 async def test_subhd_current_dynamic_download_flow_without_captcha():
     requests = []
 

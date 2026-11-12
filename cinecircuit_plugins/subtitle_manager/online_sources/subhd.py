@@ -292,7 +292,7 @@ class SubHDSource:
             headers=self._browser_headers(page_url),
         )
         download_api = urljoin(self.root + "/", "api/sub/down")
-        resolved = await api_json(
+        resolved = await self._download_api_json(
             self.client,
             download_api,
             method="POST",
@@ -347,6 +347,20 @@ class SubHDSource:
             ),
         )
 
+    async def _download_api_json(self, *args: Any, **kwargs: Any) -> dict:
+        # SubHD returns structured quota/captcha messages with HTTP 403.
+        # Only this endpoint opts into parsing those bodies; other HTTP errors
+        # retain the normal bounded transport checks.
+        result = await api_json(*args, accepted_statuses=(403, 429), **kwargs)
+        message = str(result.get("msg") or result.get("message") or "")
+        if any(word in message.casefold() for word in ("频率", "频繁", "配额", "rate limit", "too many")):
+            raise SourceFailure(SourceError(
+                self.name, SourceErrorKind.QUOTA,
+                "SubHD 下载频率过高，源站已限制下载；请停止重试，等待源站解除限制",
+                retryable=False,
+            ))
+        return result
+
     async def submit_download_captcha(
         self,
         *,
@@ -358,7 +372,7 @@ class SubHDSource:
     ) -> DownloadResult:
         api_url = urljoin(self.root + "/", "api/sub/down")
         try:
-            resolved = await api_json(
+            resolved = await self._download_api_json(
                 self.client,
                 api_url,
                 method="POST",

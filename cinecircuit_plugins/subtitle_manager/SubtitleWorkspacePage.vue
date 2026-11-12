@@ -149,6 +149,14 @@ function closeActionMenu(event?: FocusEvent) {
   if (!current || !next || !current.contains(next)) activeActionMenu.value = "";
 }
 
+function retainMediaDetails(next: MediaItem | null, previous: MediaItem | null) {
+  // Catalog pages omit the lazily loaded poster and detailed identity.
+  if (next && previous) {
+    next.poster_url ||= previous.poster_url;
+    next.identity ||= previous.identity;
+  }
+}
+
 function restoreSelection() {
     const next =
       items.value.find((item) => item.path === selected.value?.path) ||
@@ -156,8 +164,12 @@ function restoreSelection() {
       null;
     if (next && next.path !== selected.value?.path) selectMedia(next);
     else {
+      retainMediaDetails(next, selected.value);
       selected.value = next;
-      if (next) void loadSelection(next);
+      if (next) {
+        void loadSelection(next);
+        if (!next.poster_url) void loadPoster(next);
+      }
       else { selectionRequest++; inventoryLoading.value = false; }
     }
 }
@@ -425,7 +437,7 @@ async function loadPoster(item: MediaItem) {
       `/plugins/subtitle-manager/api/poster?media_path=${encodeURIComponent(item.path)}`,
     );
     if (selected.value?.path === item.path && result?.data_url) {
-      item.poster_url = result.data_url;
+      selected.value.poster_url = result.data_url;
       posterFailed.value = false;
     }
   } catch {
@@ -861,7 +873,7 @@ onMounted(() => {
                     <span v-if="previewing && selectedCandidate === item.candidate_handle"
                       class="subtitle-download-status" role="status" aria-live="polite">
                       <span class="subtitle-download-spinner" aria-hidden="true"></span>
-                      正在下载并校验字幕，请稍候…
+                      下载中
                     </span>
                   </span>
                   <span class="subtitle-mobile-meta">
