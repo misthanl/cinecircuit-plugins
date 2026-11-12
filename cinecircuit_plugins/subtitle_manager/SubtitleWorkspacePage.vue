@@ -62,7 +62,6 @@ const showNotice = computed(
   () => Boolean(error.value || (status.value && !status.value.startsWith("已读取 "))),
 );
 // Keep the host alert bridge's source mounted without showing a duplicate banner.
-const notificationOnly = computed(() => !error.value && /^(?:找到 |在线字幕源)/.test(status.value));
 const noticeTitle = computed(() => {
   if (error.value) return "操作失败";
   if (status.value.startsWith("找到 ") || status.value.startsWith("在线字幕源"))
@@ -549,8 +548,7 @@ onMounted(() => {
         v-if="showNotice"
         :type="error ? 'error' : 'info'"
         variant="tonal"
-        class="subtitle-host-notice"
-        :class="{ 'subtitle-host-notice--notification-only': notificationOnly }"
+        class="subtitle-host-notice subtitle-host-notice--notification-only"
         role="alert"
       >
         <strong>{{ noticeTitle }}</strong>

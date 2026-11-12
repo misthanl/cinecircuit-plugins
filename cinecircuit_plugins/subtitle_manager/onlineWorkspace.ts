@@ -1,4 +1,5 @@
 import { ref, type Ref } from "vue";
+import { pluginErrorText } from "../_shared/request-feedback";
 import type { MediaItem, OnlineSubtitle, SourceStatus, ManualAction, CaptchaChallenge, PreviewItem, OnlineResponse, PreviewResponse, Requester } from "./workspaceTypes";
 
 const list = <T>(value: T[] | undefined): T[] => Array.isArray(value) ? value : [];
@@ -102,7 +103,7 @@ export class SubtitleOnlineSession {
       if (this.isSearchCurrent(requestId, mediaPath)) this.applySearch(result);
     } catch (reason) {
       if (this.isSearchCurrent(requestId, mediaPath))
-        this.error.value = reason instanceof Error ? reason.message : "在线字幕搜索失败";
+        this.error.value = pluginErrorText(reason, "在线字幕搜索失败");
     } finally {
       if (requestId === this.searchSequence) this.searching.value = false;
     }
@@ -128,7 +129,7 @@ export class SubtitleOnlineSession {
       if (this.isPreviewCurrent(requestId, mediaPath) && this.selectedCandidate.value === candidateToken) this.applyPreview(result);
     } catch (reason) {
       if (this.isPreviewCurrent(requestId, mediaPath))
-        this.error.value = reason instanceof Error ? reason.message : "字幕下载预览失败";
+        this.error.value = pluginErrorText(reason, "字幕下载预览失败");
     } finally {
       if (requestId === this.previewSequence) this.previewing.value = false;
     }
@@ -164,7 +165,7 @@ export class SubtitleOnlineSession {
       });
       if (current()) this.applyCaptcha(result);
     } catch (reason) {
-      if (current()) this.error.value = reason instanceof Error ? reason.message : "验证码提交失败";
+      if (current()) this.error.value = pluginErrorText(reason, "验证码提交失败");
     } finally {
       if (current()) this.solvingCaptcha.value = false;
     }

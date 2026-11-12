@@ -40,10 +40,14 @@ class OnlineSubtitleService:
         sources: Iterable[OnlineSource],
         *,
         timeout: float = 12.0,
+        download_timeout: float = 45.0,
         retries: int = 1,
     ):
         self.sources = tuple(sources)
         self.timeout = max(0.01, timeout)
+        # Download includes detail pages, ticket negotiation and the file body.
+        # Leave headroom for preview preparation within the action's 55s API limit.
+        self.download_timeout = min(45.0, max(0.01, download_timeout))
         self.retries = max(0, retries)
 
     async def search(self, requests: SearchRequest | Sequence[SearchRequest]) -> SearchReport:
@@ -225,7 +229,7 @@ class OnlineSubtitleService:
                 ),
             )
         try:
-            return await asyncio.wait_for(source.download(candidate), timeout=self.timeout)
+            return await asyncio.wait_for(source.download(candidate), timeout=self.download_timeout)
         except TimeoutError:
             return DownloadResult(
                 candidate.provider,

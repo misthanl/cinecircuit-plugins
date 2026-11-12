@@ -55,6 +55,7 @@ class SubtitleWorkspacePlugin(PluginBase):
     """Manual sidecar subtitle workspace backed by configured media directories."""
 
     disabled_read_actions = ("catalog", "detail", "inventory", "poster")
+    api_action_timeouts = {"online-preview": 55, "online-captcha": 55}
 
     manifest = MANIFEST
 
@@ -75,7 +76,7 @@ class SubtitleWorkspacePlugin(PluginBase):
         identities = await self._supplement_event_identities(context, identities)
         results: list[dict[str, Any]] = []
         async with http_client(
-            timeout=20,
+            timeout=45,
             use_application_proxy=bool(context.config.get("online_use_proxy")),
         ) as client:
             service = self._online_service(client, context.config, getattr(context, "media_files", None))
@@ -633,7 +634,7 @@ class SubtitleWorkspacePlugin(PluginBase):
         else:
             target["keyword"] = identity.title
         async with http_client(
-            timeout=30,
+            timeout=45,
             use_application_proxy=bool(context.config.get("online_use_proxy")),
         ) as client:
             downloaded = await self._online_service(client, context.config, getattr(context, "media_files", None)).download(candidate)
@@ -757,7 +758,7 @@ class SubtitleWorkspacePlugin(PluginBase):
         candidate = SourceCandidate(**candidate_payload)
         cookies = cookies_from_snapshot(challenge.get("cookies") or ())
         client_options: dict[str, Any] = {
-            "timeout": 30,
+            "timeout": 45,
             "use_application_proxy": bool(context.config.get("online_use_proxy")),
             "cookies": cookies,
         }

@@ -802,7 +802,9 @@ test("Subtitle Manager clears an old preview before previewing another candidate
             ],
           };
         }
-        throw new Error("new preview failed");
+        throw Object.assign(new Error("new preview failed"), {
+          notificationHandled: previewCalls > 2,
+        });
       }
       throw new Error(`unexpected request: ${path}`);
     },
@@ -823,6 +825,13 @@ test("Subtitle Manager clears an old preview before previewing another candidate
   await flushPromises();
   assert.doesNotMatch(wrapper.text(), /old excerpt|确认保存/);
   assert.match(wrapper.get('[role="alert"]').text(), /new preview failed/);
+  assert.ok(wrapper.get('.subtitle-host-notice').classes().includes('subtitle-host-notice--notification-only'));
+  // A transport-owned failure must leave only the host toast, with no second
+  // alert for the page-alert bridge to turn into another notification.
+  await wrapper.findAll(".subtitle-action-trigger")[1].trigger("click");
+  await wrapper.get(".subtitle-download-action").trigger("click");
+  await flushPromises();
+  assert.equal(wrapper.find('.subtitle-host-notice').exists(), false);
   wrapper.unmount();
 });
 

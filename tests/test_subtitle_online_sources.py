@@ -748,6 +748,36 @@ def test_matcher_keeps_year_conflict_only_when_opensubtitles_used_exact_id():
 
 
 @async_test
+async def test_download_budget_is_independent_bounded_and_cancels_slow_source():
+    from cinecircuit_plugins.subtitle_manager.online_sources.base import DownloadResult
+
+    class Source:
+        name = "SubHD"
+        cancelled = False
+        delay = 0.04
+
+        async def download(self, candidate):
+            try:
+                await asyncio.sleep(self.delay)
+                return DownloadResult(self.name, (("example.srt", b"subtitle"),))
+            except asyncio.CancelledError:
+                self.cancelled = True
+                raise
+
+    source = Source()
+    candidate = SourceCandidate("SubHD", "1", "Example", matched=True)
+    service = OnlineSubtitleService([source], timeout=0.01, download_timeout=0.2)
+    result = await service.download(candidate)
+    assert result.files == (("example.srt", b"subtitle"),)
+    source.delay = 1
+    service.download_timeout = 0.01
+    result = await service.download(candidate)
+    assert result.error.kind is SourceErrorKind.TIMEOUT
+    assert source.cancelled
+    assert OnlineSubtitleService([], download_timeout=120).download_timeout == 45
+
+
+@async_test
 async def test_service_runs_sources_concurrently_keeps_timeout_and_deduplicates():
     class Source:
         def __init__(self, name, delay):
