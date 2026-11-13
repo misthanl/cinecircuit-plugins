@@ -2,6 +2,7 @@
 import { pluginErrorText } from "../_shared/request-feedback";
 import { computed, onMounted, ref } from "vue";
 import type { Component } from "vue";
+import { formatSize, subtitleFormat, subtitleLanguage } from "./subtitlePresentation";
 import SubtitleLocalList from "./SubtitleLocalList.vue";
 import SubtitleMediaSummary from "./SubtitleMediaSummary.vue";
 import SubtitleDeleteDialog from "./SubtitleDeleteDialog.vue";
@@ -523,21 +524,6 @@ function sourceTitle(value: SourceStatus) {
   if (value.state === "ready") return `${value.provider}：${count}`;
   const state = sourceState(value);
   return `${value.provider}${state ? `：${state}` : ""}${issue ? `${state ? "；" : "："}${issue}` : ""}`;
-}
-function formatSize(size = 0) {
-  if (size < 1024) return `${size} B`;
-  if (size < 1024 * 1024) return `${Math.max(1, Math.round(size / 1024))} KB`;
-  return `${(size / 1024 / 1024).toFixed(1)} MB`;
-}
-function subtitleFormat(name: string) {
-  return name.split(".").pop()?.toUpperCase() || "字幕";
-}
-function subtitleLanguage(name: string) {
-  const value = name.toLowerCase();
-  if (/zh[-_.]?(tw|hant)|cht/.test(value)) return "繁体中文";
-  if (/zh[-_.]?(cn|hans)|chs/.test(value)) return "简体中文";
-  if (/(^|[._-])en(g)?([._-]|$)/.test(value)) return "英语";
-  return "自动识别";
 }
 function chooseFile(event: Event) {
   file.value = (event.currentTarget as HTMLInputElement).files?.[0] || null;
