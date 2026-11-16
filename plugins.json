@@ -929,6 +929,235 @@
     },
     {
       "manifest": {
+        "id": "explore-menu",
+        "name": "探索菜单扩展",
+        "version": "1.0.0",
+        "description": "在探索中浏览腾讯视频、优酷、爱奇艺和芒果 TV 频道片库，各平台独立控制显示。",
+        "icon": "mdi-compass-outline",
+        "api_version": 2,
+        "entrypoint": "plugin:ExploreMenuPlugin",
+        "permissions": [
+          "media:discover"
+        ],
+        "capabilities": [
+          "explore_source",
+          "configuration_only"
+        ],
+        "events": [],
+        "schedule_seconds": 0,
+        "config_schema": {
+          "description_display": "hidden",
+          "layout": {
+            "columns": 2,
+            "row_gap": 14,
+            "column_gap": 16
+          },
+          "fields": [
+            {
+              "key": "tencent_visible",
+              "input_type": "switch",
+              "label": "腾讯视频",
+              "default": true
+            },
+            {
+              "key": "tencent_order",
+              "input_type": "number",
+              "label": "腾讯视频顺序",
+              "default": 1,
+              "validation": {
+                "min": 0,
+                "max": 999
+              }
+            },
+            {
+              "key": "youku_visible",
+              "input_type": "switch",
+              "label": "优酷",
+              "default": true
+            },
+            {
+              "key": "youku_order",
+              "input_type": "number",
+              "label": "优酷顺序",
+              "default": 2,
+              "validation": {
+                "min": 0,
+                "max": 999
+              }
+            },
+            {
+              "key": "iqiyi_visible",
+              "input_type": "switch",
+              "label": "爱奇艺",
+              "default": true
+            },
+            {
+              "key": "iqiyi_order",
+              "input_type": "number",
+              "label": "爱奇艺顺序",
+              "default": 3,
+              "validation": {
+                "min": 0,
+                "max": 999
+              }
+            },
+            {
+              "key": "mango_visible",
+              "input_type": "switch",
+              "label": "芒果 TV",
+              "default": true
+            },
+            {
+              "key": "mango_order",
+              "input_type": "number",
+              "label": "芒果 TV顺序",
+              "default": 4,
+              "validation": {
+                "min": 0,
+                "max": 999
+              }
+            }
+          ]
+        },
+        "frontend_module": "",
+        "navigation": {},
+        "jobs": [],
+        "explore_sources": [
+          {
+            "key": "tencent",
+            "label": "腾讯视频",
+            "visibility_config_key": "tencent_visible",
+            "order_config_key": "tencent_order",
+            "catalog_types": [
+              {
+                "value": "movie",
+                "label": "电影"
+              },
+              {
+                "value": "tv",
+                "label": "电视剧"
+              },
+              {
+                "value": "anime",
+                "label": "动漫"
+              },
+              {
+                "value": "kids",
+                "label": "少儿"
+              },
+              {
+                "value": "variety",
+                "label": "综艺"
+              },
+              {
+                "value": "documentary",
+                "label": "纪录片"
+              }
+            ]
+          },
+          {
+            "key": "youku",
+            "label": "优酷",
+            "visibility_config_key": "youku_visible",
+            "order_config_key": "youku_order",
+            "catalog_types": [
+              {
+                "value": "movie",
+                "label": "电影"
+              },
+              {
+                "value": "tv",
+                "label": "电视剧"
+              },
+              {
+                "value": "anime",
+                "label": "动漫"
+              },
+              {
+                "value": "kids",
+                "label": "少儿"
+              },
+              {
+                "value": "variety",
+                "label": "综艺"
+              },
+              {
+                "value": "documentary",
+                "label": "纪录片"
+              }
+            ]
+          },
+          {
+            "key": "iqiyi",
+            "label": "爱奇艺",
+            "visibility_config_key": "iqiyi_visible",
+            "order_config_key": "iqiyi_order",
+            "catalog_types": [
+              {
+                "value": "movie",
+                "label": "电影"
+              },
+              {
+                "value": "tv",
+                "label": "电视剧"
+              },
+              {
+                "value": "anime",
+                "label": "动漫"
+              },
+              {
+                "value": "kids",
+                "label": "少儿"
+              },
+              {
+                "value": "variety",
+                "label": "综艺"
+              },
+              {
+                "value": "documentary",
+                "label": "纪录片"
+              }
+            ]
+          },
+          {
+            "key": "mango",
+            "label": "芒果 TV",
+            "visibility_config_key": "mango_visible",
+            "order_config_key": "mango_order",
+            "catalog_types": [
+              {
+                "value": "movie",
+                "label": "电影"
+              },
+              {
+                "value": "tv",
+                "label": "电视剧"
+              },
+              {
+                "value": "anime",
+                "label": "动漫"
+              },
+              {
+                "value": "kids",
+                "label": "少儿"
+              },
+              {
+                "value": "variety",
+                "label": "综艺"
+              },
+              {
+                "value": "documentary",
+                "label": "纪录片"
+              }
+            ]
+          }
+        ]
+      },
+      "package_url": "packages/explore-menu-1.0.0-7759af6e6f1977ea.zip",
+      "sha256": "7759af6e6f1977ea02c2ab04739d697d050e1505004d36634a0f2be8357e3329"
+    },
+    {
+      "manifest": {
         "id": "iyuu-autoseed",
         "name": "IYUU 辅种",
         "version": "1.0.3",
