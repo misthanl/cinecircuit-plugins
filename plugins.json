@@ -246,7 +246,7 @@
       "manifest": {
         "id": "cast-profile-enricher",
         "name": "演职员资料完善",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "description": "补充影视人物的中文姓名、简介、角色信息与头像。",
         "icon": "mdi-account-star-outline",
         "api_version": 1,
@@ -391,13 +391,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.5-70506764c2379176.zip",
-      "sha256": "70506764c237917659fcc17cb98ce67e8343422cd8ab451e9c7bc61267ec2452",
-      "supersedes_sha256": [
-        "870bf9029247fa3d751191850f980ddd94212175b6b90a211ee7c5d81765d7dc",
-        "ae5e5fb1a0f1fc8d8966e9dc67789d830d94de306ec3cf6035bb6759a74b0bc9",
-        "b3095411b57db35e32a7cfcbfce77fd92017f748e37208228a902f902dddfb30"
-      ]
+      "package_url": "packages/cast-profile-enricher-1.0.6-a8d28e482193ef89.zip",
+      "sha256": "a8d28e482193ef89c82ee86916774ee446df2796aeb3350893d2a974bd50c574"
     },
     {
       "manifest": {
@@ -579,7 +574,7 @@
       "manifest": {
         "id": "cookiecloud",
         "name": "CookieCloud 站点同步",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "同步 CookieCloud 数据，自动验证并更新 PT 站点。",
         "icon": "mdi-cloud-sync-outline",
         "api_version": 2,
@@ -693,11 +688,8 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.3-37b04a9eee20d522.zip",
-      "sha256": "37b04a9eee20d52258fbcdd17fb66509bcb857acbfa7ea6d46c619973ce6ce63",
-      "supersedes_sha256": [
-        "48127641405e9265d0225d595aacc49d9e25983bf6790646aefdd68585d684d7"
-      ]
+      "package_url": "packages/cookiecloud-1.0.4-2a0b797fb16a7b7d.zip",
+      "sha256": "2a0b797fb16a7b7decf7dd6c8924bd5702abe5f43fe4adf61298b84be8e9f299"
     },
     {
       "manifest": {
@@ -1619,7 +1611,7 @@
       "manifest": {
         "id": "emby-cover-generator",
         "name": "媒体库视觉封面",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "为媒体库生成并上传静态或动态风格封面。",
         "icon": "mdi-image-multiple-outline",
         "api_version": 1,
@@ -2383,11 +2375,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/emby-cover-generator-1.0.4-c112bad56cbc6ccd.zip",
-      "sha256": "c112bad56cbc6ccdd4cf21a414a8ccbe38891a9eb71cf55d91e3b6f131707cf3",
-      "supersedes_sha256": [
-        "57280b1e12efebbd261013eaf6f4a84a8329010250480c0f3c16f90c94b02d0d"
-      ]
+      "package_url": "packages/emby-cover-generator-1.0.5-2c9480b74bde3f67.zip",
+      "sha256": "2c9480b74bde3f6781d8a0e2152ebb2b4248f5793d29dffb89f2684ca10e9fd7"
     },
     {
       "manifest": {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "../_shared/setting-switch.css";
 import { pluginErrorText, pluginErrorFallback, requestErrorNotified } from "../_shared/request-feedback";
 import { computed, ref } from "vue";
 import { coverImagePayload, waitForCoverPreview } from "./previewImage";
@@ -161,7 +162,6 @@ function update(key: string, value: unknown): void {
   emit("update:modelValue", { ...props.modelValue, [key]: value });
 }
 function inputValue(event: Event): string { return (event.target as HTMLInputElement).value; }
-function checkedValue(event: Event): boolean { return (event.target as HTMLInputElement).checked; }
 </script>
 
 <template>
@@ -209,7 +209,9 @@ function checkedValue(event: Event): boolean { return (event.target as HTMLInput
         <label><span>JPEG 质量（75–96）</span><input type="number" min="75" max="96" :value="modelValue.jpeg_quality ?? 92" :disabled="disabled" @input="update('jpeg_quality', Number(inputValue($event)))"></label>
         <label class="deferred-label" :class="{ 'label-active': focusedField === 'background_color' || Boolean(modelValue.background_color) }"><span>背景底色／装饰色</span><input type="text" :value="modelValue.background_color || ''" :placeholder="focusedField === 'background_color' ? '留空自动取色，如 #101828' : ''" :disabled="disabled" @focus="focusedField = 'background_color'" @blur="focusedField = ''" @input="update('background_color', inputValue($event))"></label>
         <label class="full deferred-label" :class="{ 'label-active': focusedField === 'title_config' || Boolean(modelValue.title_config) }"><span>媒体库标题配置 <small>可选，每行一个</small></span><textarea :value="String(modelValue.title_config || '')" :disabled="disabled" :placeholder="focusedField === 'title_config' ? '电影=电影|MOVIES\n剧集=剧集|TV SERIES' : ''" @focus="focusedField = 'title_config'" @blur="focusedField = ''" @input="update('title_config', inputValue($event))" /></label>
-        <div class="switches full plugin-config-grid app-form-layout"><label><input class="app-native-checkbox" type="checkbox" :checked="Boolean(modelValue.use_primary ?? true)" :disabled="disabled" @change="update('use_primary', checkedValue($event))"><span><b>优先使用海报图</b></span></label><label><input class="app-native-checkbox" type="checkbox" :checked="Boolean(modelValue.show_item_count)" :disabled="disabled" @change="update('show_item_count', checkedValue($event))"><span><b>显示媒体数量角标</b></span></label></div>
+        <div class="switches full plugin-config-grid app-form-layout">
+          <VSwitch class="plugin-setting-switch" hide-details inset label="优先使用海报图" :model-value="Boolean(modelValue.use_primary ?? true)" :disabled="disabled" @update:model-value="update('use_primary', Boolean($event))" />
+          <VSwitch class="plugin-setting-switch" hide-details inset label="显示媒体数量角标" :model-value="Boolean(modelValue.show_item_count)" :disabled="disabled" @update:model-value="update('show_item_count', Boolean($event))" /></div>
       </div>
     </section>
     <dialog ref="previewDialog" class="cover-preview-dialog" aria-label="封面高清预览" @click="backdropClick" @close="preview = null">
@@ -265,11 +267,6 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .form-grid textarea { height: auto; min-height: 112px; resize: vertical; }
 .full { grid-column: 1/-1; }
 .switches { display: grid; row-gap: var(--app-plugin-config-row-gap, 14px); column-gap: var(--app-plugin-config-column-gap, 16px); }
-.switches label { display: flex; align-items: center; gap: 10px; padding: 14px; border-radius: 10px; background: var(--app-surface-muted, #f5f7fa); cursor: pointer; }
-.switches input { accent-color: #5575e7; }
-.switches span { display: grid; gap: 4px; }
-.switches b { font-size: var(--app-font-size-label, 13px); font-weight: var(--app-font-weight-regular, 400); }
-.switches small { color: var(--app-text-secondary, #657087); font-size: 10px; }
 .cover-preview-dialog { position: fixed; inset: 0; width: min(1960px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 0; overflow: hidden; border: 1px solid #394354; border-radius: var(--app-dialog-radius, 16px); background: #10151d; color: #f4f6fc; box-shadow: 0 16px 80px #0009; }
 .cover-preview-dialog::backdrop { background: rgba(3, 7, 14, .86); }
 .cover-preview-shell { display: flex; flex-direction: column; max-height: calc(100dvh - 34px); }

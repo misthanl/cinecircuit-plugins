@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "../_shared/setting-switch.css";
 import { requestErrorNotified } from "../_shared/request-feedback";
 import { computed, onMounted, ref, type Component } from "vue";
 import { orderedFields, type ConfigField } from "../_shared/config-fields";
@@ -70,7 +71,7 @@ onMounted(async () => {
     <p v-if="revealError" class="cookiecloud-config-hint" role="alert">{{ revealError }}</p>
     <component v-if="shared" :is="schemaFieldsComponent" class="shared-connection-fields standard-config-fields plugin-config-grid app-form-layout" :model-value="modelValue" :fields="topFields" :disabled="disabled" compact @update:model-value="emit('update:modelValue', $event)" />
     <template v-else>
-    <VSwitch
+    <VSwitch class="plugin-setting-switch" inset
       :model-value="Boolean(modelValue.enabled)"
       :disabled="disabled"
       label="启用站点 Cookie 同步"
@@ -78,7 +79,7 @@ onMounted(async () => {
       hide-details
       @update:model-value="update('enabled', $event)"
     />
-    <VSwitch
+    <VSwitch class="plugin-setting-switch" inset
       :model-value="Boolean(modelValue.run_once)"
       :disabled="disabled"
       label="保存后立即运行一次"
@@ -115,7 +116,7 @@ onMounted(async () => {
       hide-details
       @update:model-value="update('cron', $event)"
     />
-    <VSwitch
+    <VSwitch class="plugin-setting-switch" inset
       :model-value="Boolean(modelValue.notification_enabled)"
       :disabled="disabled"
       label="发送通知"
@@ -124,6 +125,7 @@ onMounted(async () => {
       @update:model-value="update('notification_enabled', $event)"
     />
     </template>
+    <p class="cookiecloud-config-hint">浏览器扩展服务地址填写 http://127.0.0.1:8000/plugin-public/cookiecloud；上传只保存快照，站点检查由插件定时或手动触发。</p>
   </div>
 </template>
 
