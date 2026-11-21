@@ -605,8 +605,7 @@
           "sections": [
             {
               "key": "connection",
-              "title": "CookieCloud 设置",
-              "description": "浏览器扩展服务地址填写 http://127.0.0.1:8000/plugin-public/cookiecloud；上传只保存快照，站点检查由插件定时或手动触发。"
+              "title": "CookieCloud 设置"
             }
           ],
           "fields": [
@@ -688,8 +687,11 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.4-2a0b797fb16a7b7d.zip",
-      "sha256": "2a0b797fb16a7b7decf7dd6c8924bd5702abe5f43fe4adf61298b84be8e9f299"
+      "package_url": "packages/cookiecloud-1.0.4-cf75c4fb65a7e423.zip",
+      "sha256": "cf75c4fb65a7e423f5b1b62245d338ec98f6296d93dca446215e1f7f56f52e1d",
+      "supersedes_sha256": [
+        "2a0b797fb16a7b7decf7dd6c8924bd5702abe5f43fe4adf61298b84be8e9f299"
+      ]
     },
     {
       "manifest": {
