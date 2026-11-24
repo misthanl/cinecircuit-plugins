@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "../_shared/setting-switch.css";
 import { requestErrorNotified } from "../_shared/request-feedback";
 import { onMounted, ref } from "vue";
 
@@ -144,12 +145,12 @@ onMounted(load);
           <label class="brush-field"><span>保存目录</span><input :value="selected.save_path" @input="inputField('save_path', $event)"></label>
           <label class="brush-field"><span>分享率达到后处理</span><input type="number" :value="selected.delete_ratio" @input="inputField('delete_ratio', $event, true)"></label>
           <label class="brush-field"><span>做种小时达到后处理</span><input type="number" :value="selected.delete_seed_hours" @input="inputField('delete_seed_hours', $event, true)"></label>
-          <label class="brush-check"><input class="app-native-checkbox" type="checkbox" :checked="selected.enabled" @change="field('enabled', ($event.target as HTMLInputElement).checked)">启用任务</label>
+          <VSwitch class="plugin-setting-switch" hide-details inset label="启用任务" :model-value="selected.enabled" @update:model-value="field('enabled', Boolean($event))" />
           <label class="brush-field"><span>上传量达到后处理（GiB）</span><input type="number" min="0" :value="selected.delete_upload_gib || 0" @input="inputField('delete_upload_gib', $event, true)"></label>
           <label class="brush-field"><span>下载时长达到后处理（小时）</span><input type="number" min="0" :value="selected.delete_download_hours || 0" @input="inputField('delete_download_hours', $event, true)"></label>
           <label class="brush-field"><span>未活动时间达到后处理（小时）</span><input type="number" min="0" :value="selected.delete_inactive_hours || 0" @input="inputField('delete_inactive_hours', $event, true)"></label>
           <label class="brush-field"><span>平均上传速度低于时处理（KiB/s）</span><input type="number" min="0" :value="selected.delete_avg_upload_kib || 0" @input="inputField('delete_avg_upload_kib', $event, true)"></label>
-          <label class="brush-check"><input class="app-native-checkbox" type="checkbox" :checked="selected.delete_task" @change="field('delete_task', ($event.target as HTMLInputElement).checked)">条件满足时删种（否则暂停）</label>
+          <VSwitch class="plugin-setting-switch" hide-details inset label="条件满足时删种（否则暂停）" :model-value="selected.delete_task" @update:model-value="field('delete_task', Boolean($event))" />
           <div class="brush-actions brush-field full"><button class="ghost" :disabled="busy" @click="run('preview')">预览选种</button><button :disabled="busy" @click="run('run')">立即执行</button></div>
           <div v-if="preview.length" class="brush-preview"><div v-for="item in preview.slice(0, 10)" :key="item.title">{{ item.title }}</div></div>
           <p class="brush-field full">{{ message }}</p>

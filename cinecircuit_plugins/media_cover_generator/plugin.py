@@ -32,7 +32,15 @@ from .generation import ArtworkGenerationRun
 
 
 class LibraryArtworkPlugin(PluginBase):
-    disabled_read_actions = ("inventory", "targets", "libraries", "history", "history_image", "sample", "preview_status")
+    disabled_read_actions = (
+        "inventory",
+        "targets",
+        "libraries",
+        "history",
+        "history_image",
+        "sample",
+        "preview_status",
+    )
 
     FONT_FILENAME = "NotoSansCJKsc-Regular.otf"
     FONT_URL = (
@@ -47,7 +55,7 @@ class LibraryArtworkPlugin(PluginBase):
         entrypoint="plugin:LibraryArtworkPlugin",
         id="emby-cover-generator",
         name="媒体库视觉封面",
-        version="1.0.5",
+        version="1.0.6",
         description="为媒体库生成并上传静态或动态风格封面。",
         icon="mdi-image-multiple-outline",
         permissions=(
@@ -203,6 +211,13 @@ class LibraryArtworkPlugin(PluginBase):
                     "key": "use_primary",
                     "input_type": "switch",
                     "label": "优先使用海报图",
+                    "default": True,
+                    "section": "style",
+                },
+                {
+                    "key": "show_library_title",
+                    "input_type": "switch",
+                    "label": "显示媒体库标题",
                     "default": True,
                     "section": "style",
                 },
@@ -600,6 +615,7 @@ class LibraryArtworkPlugin(PluginBase):
     async def on_lifecycle(self, event, context, previous_version=""):
         if event in {"disable", "uninstall"}:
             from .runtime_state import state
+
             for identity, task in tuple(state.jobs.items()):
                 if task.done():
                     state.jobs.pop(identity, None)

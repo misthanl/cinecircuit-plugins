@@ -208,10 +208,12 @@ function inputValue(event: Event): string { return (event.target as HTMLInputEle
         <label v-if="hasBackground"><span>磨砂颗粒（0–10）</span><input type="number" min="0" max="10" :value="modelValue.background_grain ?? 3" :disabled="disabled" @input="update('background_grain',Number(inputValue($event)))"></label>
         <label><span>JPEG 质量（75–96）</span><input type="number" min="75" max="96" :value="modelValue.jpeg_quality ?? 92" :disabled="disabled" @input="update('jpeg_quality', Number(inputValue($event)))"></label>
         <label class="deferred-label" :class="{ 'label-active': focusedField === 'background_color' || Boolean(modelValue.background_color) }"><span>背景底色／装饰色</span><input type="text" :value="modelValue.background_color || ''" :placeholder="focusedField === 'background_color' ? '留空自动取色，如 #101828' : ''" :disabled="disabled" @focus="focusedField = 'background_color'" @blur="focusedField = ''" @input="update('background_color', inputValue($event))"></label>
-        <label class="full deferred-label" :class="{ 'label-active': focusedField === 'title_config' || Boolean(modelValue.title_config) }"><span>媒体库标题配置 <small>可选，每行一个</small></span><textarea :value="String(modelValue.title_config || '')" :disabled="disabled" :placeholder="focusedField === 'title_config' ? '电影=电影|MOVIES\n剧集=剧集|TV SERIES' : ''" @focus="focusedField = 'title_config'" @blur="focusedField = ''" @input="update('title_config', inputValue($event))" /></label>
+        <VSwitch class="plugin-setting-switch" color="primary" hide-details inset label="优先使用海报图" :model-value="Boolean(modelValue.use_primary ?? true)" :disabled="disabled" @update:model-value="update('use_primary', Boolean($event))" />
         <div class="switches full plugin-config-grid app-form-layout">
-          <VSwitch class="plugin-setting-switch" hide-details inset label="优先使用海报图" :model-value="Boolean(modelValue.use_primary ?? true)" :disabled="disabled" @update:model-value="update('use_primary', Boolean($event))" />
-          <VSwitch class="plugin-setting-switch" hide-details inset label="显示媒体数量角标" :model-value="Boolean(modelValue.show_item_count)" :disabled="disabled" @update:model-value="update('show_item_count', Boolean($event))" /></div>
+          <VSwitch class="plugin-setting-switch" color="primary" hide-details inset label="显示媒体库标题" :model-value="Boolean(modelValue.show_library_title ?? true)" :disabled="disabled" @update:model-value="update('show_library_title', Boolean($event))" />
+          <VSwitch class="plugin-setting-switch" color="primary" hide-details inset label="显示媒体数量角标" :model-value="Boolean(modelValue.show_item_count)" :disabled="disabled" @update:model-value="update('show_item_count', Boolean($event))" /></div>
+        <label class="full deferred-label" :class="{ 'label-active': focusedField === 'title_config' || Boolean(modelValue.title_config) }"><span>媒体库标题配置 <small>可选，每行一个</small></span><div class="textarea-frame"><textarea :value="String(modelValue.title_config || '')" :disabled="disabled" :placeholder="focusedField === 'title_config' ? '电影=电影|MOVIES\n剧集=剧集|TV SERIES' : ''" @focus="focusedField = 'title_config'" @blur="focusedField = ''" @input="update('title_config', inputValue($event))" /></div></label>
+
       </div>
     </section>
     <dialog ref="previewDialog" class="cover-preview-dialog" aria-label="封面高清预览" @click="backdropClick" @close="preview = null">
@@ -259,13 +261,18 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .form-grid > label:focus-within > span { color: var(--app-control-border-focus, #5575e7); }
 .form-grid > label:has(:disabled) { opacity: .55; }
 .form-grid label > span small { font-weight: 400; }
-.form-grid select, .form-grid input[type=number], .form-grid input[type=text], .form-grid textarea { box-sizing: border-box; width: 100%; min-width: 0; height: var(--app-active-control-height, 52px); min-height: var(--app-active-control-height, 52px); margin: 0; padding: 12px 16px; border: 1px solid var(--app-control-border, #d5dce8); border-radius: var(--app-control-radius, 12px); background: var(--control-surface, var(--app-surface, #fff)); color: var(--app-control-text, inherit); font: inherit; font-size: var(--app-font-size-control, 13px); line-height: 1.35; }
-.form-grid > label > :is(select,input,textarea):hover:not(:disabled) { border-color: var(--app-control-border-hover, #9ba9bd); }
-.form-grid > label > :is(select,input,textarea):focus { outline: none; border-color: var(--app-control-border-focus, #5575e7); box-shadow: inset 0 0 0 1px var(--app-control-border-focus, #5575e7), 0 0 0 2px var(--app-control-focus-ring, transparent); }
+.form-grid select, .form-grid input[type=number], .form-grid input[type=text], .form-grid textarea, .form-grid .textarea-frame { box-sizing: border-box; width: 100%; min-width: 0; height: var(--app-active-control-height, 52px); min-height: var(--app-active-control-height, 52px); margin: 0; padding: 12px 16px; border: 1px solid var(--app-control-border, #d5dce8); border-radius: var(--app-control-radius, 12px); background: var(--control-surface, var(--app-surface, #fff)); color: var(--app-control-text, inherit); font: inherit; font-size: var(--app-font-size-control, 13px); line-height: 1.35; }
+.form-grid > label > :is(select,input,textarea):hover:not(:disabled), .form-grid .textarea-frame:hover:not(:has(:disabled)) { border-color: var(--app-control-border-hover, #9ba9bd); }
+.form-grid > label > :is(select,input,textarea):focus, .form-grid .textarea-frame:focus-within { outline: none; border-color: var(--app-control-border-focus, #5575e7); box-shadow: inset 0 0 0 1px var(--app-control-border-focus, #5575e7), 0 0 0 2px var(--app-control-focus-ring, transparent); }
 .form-grid > label > small { padding-inline: 16px; line-height: 1.5; }
 .form-grid select { appearance: auto; cursor: pointer; }
-.form-grid textarea { height: auto; min-height: 112px; resize: vertical; }
+.form-grid .textarea-frame { height: auto; min-height: 112px; overflow: hidden; }
+.form-grid .textarea-frame > textarea { display: block; height: auto; min-height: 86px; padding: 0; border: 0; border-radius: 0; background: transparent; outline: none; resize: vertical; }
 .full { grid-column: 1/-1; }
+/* Host plugin grids reset switch padding; keep the standard row's inner gutter. */
+.form-grid :deep(.plugin-setting-switch.v-input) { padding-inline: 14px !important; }
+.form-grid :deep(.plugin-setting-switch .v-label) { color: var(--app-text) !important; }
+.form-grid > .switches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .switches { display: grid; row-gap: var(--app-plugin-config-row-gap, 14px); column-gap: var(--app-plugin-config-column-gap, 16px); }
 .cover-preview-dialog { position: fixed; inset: 0; width: min(1960px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 0; overflow: hidden; border: 1px solid #394354; border-radius: var(--app-dialog-radius, 16px); background: #10151d; color: #f4f6fc; box-shadow: 0 16px 80px #0009; }
 .cover-preview-dialog::backdrop { background: rgba(3, 7, 14, .86); }
@@ -281,6 +288,7 @@ button:disabled { opacity: .55; cursor: not-allowed; }
 .cover-preview-image.actual-size { display: block; }
 .cover-preview-image.actual-size img { width: auto; max-width: none; max-height: none; }
 @media (max-width: 760px) {
+  .form-grid > .switches { grid-template-columns: 1fr; }
   .style-selection { grid-template-columns: 1fr; gap: 20px; }
   .selected-preview { max-width: 320px; margin-inline: auto; }
   .full { grid-column: auto; }

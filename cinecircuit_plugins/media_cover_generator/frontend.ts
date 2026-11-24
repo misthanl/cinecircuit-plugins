@@ -11,7 +11,7 @@ export function install(sdk: CineCircuitPluginSdk): void {
   const { defineComponent, h } = sdk.vue;
   sdk.registerContribution?.({pluginId:ID,slot:'plugin.statistics',key:'cover-history',component:defineComponent({
     props:{context:{type:Object,required:true}},
-    setup(props){return ()=>h(HistoryView,{context:props.context as {close:()=>void},request:sdk.request,dialogComponent:sdk.ui.components.Dialog,cardComponent:sdk.ui.components.Card,buttonComponent:sdk.ui.components.Button});}
+    setup(props){return ()=>h(HistoryView,{context:props.context as {close:()=>void},request:sdk.request,dialogComponent:sdk.ui.components.Dialog,cardComponent:sdk.ui.components.Card,buttonComponent:sdk.ui.components.Button,baseDialogComponent:sdk.ui.components.BaseDialog,confirmDialogComponent:sdk.ui.components.ConfirmDialog,notify:sdk.ui.notify});}
   })});
   const StyleEditor = defineComponent({
     name: "LibraryArtworkStyleEditor",

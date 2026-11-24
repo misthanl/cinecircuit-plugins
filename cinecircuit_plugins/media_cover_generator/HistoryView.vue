@@ -3,11 +3,13 @@ import { pluginErrorText } from "../_shared/request-feedback";
 import { computed, onMounted, ref } from 'vue';
 import type { Component } from 'vue';
 type Row={id:string;name:string;server_id:string;server_name:string;library_id:string;created_at:string;status:string;style:string;format:string;resolution:string;bytes:number;animated:boolean};
-const props=defineProps<{context:{close:()=>void};request:(path:string,init?:RequestInit)=>Promise<any>;dialogComponent:Component;cardComponent:Component;buttonComponent:Component}>();
+const props=defineProps<{context:{close:()=>void};request:(path:string,init?:RequestInit)=>Promise<any>;dialogComponent:Component;cardComponent:Component;buttonComponent:Component;baseDialogComponent:Component;confirmDialogComponent:Component;notify:(message:{title:string;detail?:string;tone?:"success"|"info"|"warning"|"error"})=>void}>();
 const UiDialog=props.dialogComponent,UiCard=props.cardComponent,UiButton=props.buttonComponent;
+const UiBaseDialog=props.baseDialogComponent,UiConfirmDialog=props.confirmDialogComponent;
+const acting=ref(false);
 const rows=ref<Row[]>([]),limit=ref(50),counts=ref<Record<string,number>>({}),busy=ref(false),error=ref('');
 const server=ref(''),library=ref(''),kind=ref(''),status=ref(''),shown=ref(6),batch=ref(false),selected=ref<string[]>([]);
-const urls=ref<Record<string,string>>({}),preview=ref(''),previewTitle=ref(''),notice=ref('');
+const urls=ref<Record<string,string>>({}),preview=ref(''),previewTitle=ref('');
 const confirm=ref<'delete'|'apply'|''>(''),pending=ref<string[]>([]);
 let disposed=false,version=0,observer:IntersectionObserver|undefined;
 const fetching=new Set<string>();
@@ -33,14 +35,34 @@ function toggle(id:string,on:boolean){selected.value=on?[...new Set([...selected
 async function open(row:Row,download=false){error.value='';try{const blob=await imageBlob(row.id);if(disposed)return;const url=URL.createObjectURL(blob);if(download){const a=document.createElement('a');a.href=url;a.download=`${row.name}-${row.id}.${row.format==='jpeg'?'jpg':row.format==='apng'?'png':row.format}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}else{if(preview.value)URL.revokeObjectURL(preview.value);preview.value=url;previewTitle.value=row.name;}}catch(e){fail(e);}}
 function askDelete(ids:string[]){pending.value=[...ids];confirm.value='delete';}
 function askApply(id:string){pending.value=[id];confirm.value='apply';}
-async function execute(){if(busy.value)return;busy.value=true;error.value='';try{await props.request(endpoint(confirm.value==='delete'?'history_delete':'history_apply'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(confirm.value==='delete'?{ids:pending.value}:{id:pending.value[0]})});notice.value=confirm.value==='delete'?'历史封面已清理':'已重新应用封面';confirm.value='';}catch(e){fail(e);}finally{busy.value=false;}if(!confirm.value)await load();}
+function actionRequest(action:string,ids:string[]){
+ return {path:endpoint(action==='delete'?'history_delete':'history_apply'),init:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(action==='delete'?{ids}:{id:ids[0]})}};
+}
+function actionSuccess(action:string){return action==='delete'?'历史封面已清理':'封面已重新应用';}
+async function execute(){
+ if(acting.value||busy.value||!confirm.value||!pending.value.length)return;
+ acting.value=true;
+ const action=confirm.value,ids=[...pending.value];
+ try{
+  const request=actionRequest(action,ids);
+  await props.request(request.path,request.init);
+  if(disposed)return;
+  confirm.value='';
+  props.notify({title:actionSuccess(action),tone:'success'});
+ }catch(e){
+  const detail=pluginErrorText(e,'封面操作失败，请重试');
+  if(detail&&!disposed)props.notify({title:'封面操作失败',detail,tone:'error'});
+  return;
+ }finally{acting.value=false;}
+ if(!disposed)await load();
+}
 function date(s:string){return new Date(s).toLocaleString('zh-CN',{hour12:false});}
 onMounted(load);
 </script>
 <template>
- <UiDialog :model-value="true" :max-width="920" width="calc(100vw - 32px)" @update:model-value="context.close()">
+ <UiDialog :model-value="true" :max-width="920" width="calc(100vw - 32px)" :persistent="acting" @update:model-value="!$event&&!acting&&context.close()">
  <UiCard class="cover-history" @vue:unmounted="cleanup">
-  <header><h2>媒体库视觉封面 · 数据统计</h2><UiButton class="app-dialog-close" icon="mdi-close" variant="text" aria-label="关闭" @click="context.close()" /></header>
+  <header><h2>媒体库视觉封面 · 数据统计</h2><UiButton class="app-dialog-close" icon="mdi-close" variant="text" aria-label="关闭" :disabled="acting" @click="context.close()" /></header>
   <main @scroll="scroll">
    <div class="metrics"><div v-for="[key,label] in [['generated','已生成'],['uploaded','已上传'],['preview','仅预览'],['failed','生成失败']]" :key="key"><span>{{label}}</span><strong>{{counts[key]||0}}</strong></div></div>
    <div class="heading"><h3>历史封面</h3><span>最近 {{limit}} 张</span><UiButton variant="text" @click="batch=!batch;selected=[]">{{batch?'退出多选':'批量清理'}}</UiButton></div>
@@ -50,27 +72,31 @@ onMounted(load);
     <VSelect label="封面类型" :items="[all,{title:'静态',value:'static'},{title:'动态',value:'dynamic'}]" v-model="kind" variant="outlined" hide-details @update:model-value="filter" />
     <VSelect label="生成结果" :items="[all,{title:'已上传',value:'updated'},{title:'仅预览',value:'preview'}]" v-model="status" variant="outlined" hide-details @update:model-value="filter" />
    </div>
-   <p v-if="error" role="alert">{{error}} <UiButton variant="text" @click="load">重试</UiButton></p><p v-if="notice" role="status">{{notice}}</p>
+   <p v-if="error" role="alert">{{error}} <UiButton variant="text" @click="load">重试</UiButton></p>
    <div v-if="batch" class="batch"><UiButton variant="text" @click="selected=visible.map(x=>x.id)">全选已加载结果</UiButton><UiButton variant="text" @click="selected=[]">取消全选</UiButton><span>已选 {{selected.length}} 张</span><UiButton color="error" :disabled="!selected.length||busy" @click="askDelete(selected)">清理所选</UiButton></div>
-   <p v-if="busy" role="status">正在处理…</p>
+   <VProgressLinear v-if="busy" class="history-loading" indeterminate color="primary" height="2" aria-label="正在加载历史封面" />
    <p v-if="!busy&&!filtered.length" class="empty">暂无历史封面。开启“保留最近生成封面”后，新成品会保存在这里。</p>
    <div class="gallery">
     <article v-for="row in visible" :key="row.id" :class="{selected:selected.includes(row.id)}">
      <button class="thumbnail" :aria-label="'查看 '+row.name" @click="batch?toggle(row.id,!selected.includes(row.id)):open(row)"><img v-if="urls[row.id]" :src="urls[row.id]" :alt="row.name" loading="lazy"><span v-else>正在加载封面…</span><span v-if="row.animated" class="dynamic">动态 · 点击播放</span></button>
      <VCheckboxBtn v-if="batch" class="check" :class="{'is-selected':selected.includes(row.id)}" true-icon="mdi-check" color="primary" density="compact" :model-value="selected.includes(row.id)" :aria-label="'选择 '+row.name" @update:model-value="toggle(row.id,Boolean($event))" />
      <div class="details"><div class="title"><strong>{{row.name}}</strong><span>{{row.server_name}}</span><small>{{row.status==='updated'?'已上传':'仅预览'}}</small></div><time>{{date(row.created_at)}}</time><p>{{styles[row.style]||row.style}} · {{row.resolution}} · {{row.format.toUpperCase()}} · {{(row.bytes/1048576).toFixed(2)}} MB</p></div>
-     <div class="actions"><UiButton variant="text" size="small" @click="open(row)">查看大图</UiButton><UiButton variant="text" size="small" @click="open(row,true)">下载</UiButton><VMenu><template #activator="{props:menuProps}"><UiButton icon="mdi-dots-vertical" variant="text" size="small" aria-label="更多操作" :aria-expanded="menuProps['aria-expanded']" :aria-haspopup="menuProps['aria-haspopup']" @click="menuProps.onClick" /></template><VList><VListItem title="重新应用这张封面" @click="askApply(row.id)" /><VListItem title="删除历史封面" @click="askDelete([row.id])" /></VList></VMenu></div>
+     <div class="actions"><UiButton variant="text" size="small" @click="open(row)">查看大图</UiButton><UiButton variant="text" size="small" @click="open(row,true)">下载</UiButton><VMenu location="bottom end" :offset="4"><template #activator="{props:menuProps}"><UiButton v-bind="menuProps" icon="mdi-dots-vertical" variant="text" size="small" aria-label="更多操作" :disabled="acting" /></template><VList class="card-action-menu" density="compact" nav aria-label="封面操作"><VListItem title="重新应用封面" prepend-icon="mdi-refresh" @click="askApply(row.id)" /><VDivider class="my-1" /><VListItem title="删除历史封面" prepend-icon="mdi-trash-can-outline" base-color="error" @click="askDelete([row.id])" /></VList></VMenu></div>
     </article>
    </div>
    <div class="sentinel" @vue:mounted="observe($event.el)" @vue:updated="observe($event.el)">{{visible.length>=filtered.length?'已全部加载':'下滑加载更多'}} · {{visible.length}} / {{filtered.length}} 张</div>
   </main>
   <footer><span>统计自历史功能启用起，含可恢复的旧成品</span><UiButton prepend-icon="mdi-refresh" variant="text" :loading="busy" :disabled="busy" @click="load">刷新</UiButton></footer>
-  <UiDialog :model-value="Boolean(preview)" :max-width="1280" @update:model-value="closePreview"><UiCard class="cover-large"><UiButton variant="text" @click="closePreview">关闭</UiButton><img :src="preview" :alt="previewTitle" /></UiCard></UiDialog>
-  <UiDialog :model-value="Boolean(confirm)" :max-width="480" @update:model-value="!busy&&(confirm='')"><UiCard class="confirmation"><h3>{{confirm==='delete'?'清理 '+pending.length+' 张历史封面？':'重新应用这张封面？'}}</h3><p>{{confirm==='delete'?'仅删除本地历史文件和对应记录，不影响媒体服务器当前封面。此操作不可撤销。':'将替换该历史封面所属媒体库的当前封面。'}}</p><UiButton variant="text" :disabled="busy" @click="confirm=''">取消</UiButton><UiButton :color="confirm==='delete'?'error':'primary'" :disabled="busy" @click="execute">确认</UiButton></UiCard></UiDialog>
+  <UiBaseDialog kind="detail" :model-value="Boolean(preview)" :title="previewTitle+' · 历史封面'" :max-width="1280" plain-header mobile-inset :show-actions="false" content-class="cover-preview-content" @update:model-value="!$event&&closePreview()">
+   <img v-if="preview" class="cover-preview-image" :src="preview" :alt="previewTitle" />
+  </UiBaseDialog>
+  <UiConfirmDialog :open="Boolean(confirm)" :title="confirm==='delete'?'清理 '+pending.length+' 张历史封面？':'重新应用这张封面？'" :icon="confirm==='delete'?'mdi-trash-can-outline':'mdi-refresh'" :color="confirm==='delete'?'error':'primary'" :confirm-text="confirm==='delete'?'清理':'应用封面'" :loading="acting" :disabled="busy" @cancel="!acting&&(confirm='')" @confirm="execute">
+   <p>{{confirm==='delete'?'仅删除本地历史文件和对应记录，不影响媒体服务器当前封面。此操作不可撤销。':'将替换该历史封面所属媒体库的当前封面。'}}</p>
+  </UiConfirmDialog>
  </UiCard></UiDialog>
 </template>
 <style scoped>
-.cover-history{display:flex;flex-direction:column;max-height:90vh;color:var(--app-text,#202939);font-size:12px;background:var(--app-surface,#fff);font-weight:400}header,footer{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;gap:12px;border-bottom:1px solid #e2e7f0}header h2{margin:0;font-size:16px;font-weight:600}main{overflow:auto;padding:18px;min-height:0}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metrics>div{background:var(--app-surface-muted);border:1px solid var(--app-border-subtle);border-radius:11px;padding:12px 14px}.metrics span,time,.details p,footer span{color:#7a869d;font-size:10px;font-weight:400}.metrics strong{display:block;margin-top:5px;font-size:var(--app-font-size-metric,24px);line-height:1.15;font-weight:600}.heading{display:flex;align-items:center;gap:12px;margin:17px 0 12px}.heading h3{margin:0 auto 0 0;font-size:12px;font-weight:500}.filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.gallery article{position:relative;border:1px solid #dbe2ef;border-radius:11px;overflow:hidden}.gallery article.selected{outline:2px solid #2962ff}.thumbnail{width:100%;aspect-ratio:16/9;display:grid;place-items:center;background:var(--app-surface-subtle);position:relative;cursor:pointer}.thumbnail img{width:100%;height:100%;object-fit:contain}.dynamic{position:absolute;bottom:8px;left:9px;background:#23334bd9;color:white;border-radius:6px;padding:3px 6px;font-size:10px}.details{padding:9px 10px}.title{display:flex;gap:6px;align-items:center;margin-bottom:5px}.title strong{margin-right:auto;font-size:12px;font-weight:500}.title span,.title small{font-size:var(--app-font-size-helper,9px);font-weight:400}.title small{color:#189c65}.details p{margin:4px 0 0}.actions{display:flex;align-items:center;border-top:1px solid #edf0f6;padding:2px 5px}.actions>:last-child{margin-left:auto}.check{position:absolute;top:4px;left:6px;background:white;border-radius:6px}.batch{display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap}.sentinel,.empty{text-align:center;color:#8490a3;padding:18px}.confirmation{padding:20px}.confirmation p{margin:12px 0}.cover-large{padding:10px}.cover-large img{display:block;width:100%;max-height:78vh;object-fit:contain}footer{border-top:1px solid #e2e7f0;border-bottom:0;padding:10px 18px}[role=alert]{color:#c62828}@media(max-width:1100px){.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:850px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.gallery{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}main{padding:12px}header{padding:13px 14px}header h2{font-size:16px;font-weight:600}.title{flex-wrap:wrap}}
+.cover-history{display:flex;flex-direction:column;max-height:90vh;color:var(--app-text,#202939);font-size:12px;background:var(--app-surface,#fff);font-weight:400}header,footer{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;gap:12px;border-bottom:1px solid #e2e7f0}header h2{margin:0;font-size:16px;font-weight:600}main{overflow:auto;padding:18px;min-height:0}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metrics>div{background:var(--app-surface-muted);border:1px solid var(--app-border-subtle);border-radius:11px;padding:12px 14px}.metrics span,time,.details p,footer span{color:#7a869d;font-size:10px;font-weight:400}.metrics strong{display:block;margin-top:5px;font-size:var(--app-font-size-metric,24px);line-height:1.15;font-weight:600}.heading{display:flex;align-items:center;gap:12px;margin:17px 0 12px}.heading h3{margin:0 auto 0 0;font-size:12px;font-weight:500}.filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}.gallery{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.gallery article{position:relative;border:1px solid #dbe2ef;border-radius:11px;overflow:hidden}.gallery article.selected{outline:2px solid #2962ff}.thumbnail{width:100%;aspect-ratio:16/9;display:grid;place-items:center;background:var(--app-surface-subtle);position:relative;cursor:pointer}.thumbnail img{width:100%;height:100%;object-fit:contain}.dynamic{position:absolute;bottom:8px;left:9px;background:#23334bd9;color:white;border-radius:6px;padding:3px 6px;font-size:10px}.details{padding:9px 10px}.title{display:flex;gap:6px;align-items:center;margin-bottom:5px}.title strong{margin-right:auto;font-size:12px;font-weight:500}.title span,.title small{font-size:var(--app-font-size-helper,9px);font-weight:400}.title small{color:#189c65}.details p{margin:4px 0 0}.actions{display:flex;align-items:center;border-top:1px solid #edf0f6;padding:2px 5px}.actions>:last-child{margin-left:auto}.check{position:absolute;top:4px;left:6px;background:white;border-radius:6px}.batch{display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap}.sentinel,.empty{text-align:center;color:#8490a3;padding:18px}.cover-preview-image{display:block;width:100%;max-height:calc(90dvh - 120px);object-fit:contain}.history-loading{margin-bottom:12px}footer{border-top:1px solid #e2e7f0;border-bottom:0;padding:10px 18px}[role=alert]{color:#c62828}@media(max-width:1100px){.gallery{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:850px){.gallery{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.gallery{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}main{padding:12px}header{padding:13px 14px}header h2{font-size:16px;font-weight:600}.title{flex-wrap:wrap}}
 
 time{font-size:11px;font-weight:400;color:var(--app-text-secondary,#657087)}
 </style>

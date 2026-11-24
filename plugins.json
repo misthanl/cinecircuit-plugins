@@ -113,7 +113,7 @@
       "manifest": {
         "id": "brush-flow",
         "name": "站点刷流",
-        "version": "1.0.6",
+        "version": "1.0.7",
         "description": "按站点和规则自动选种、下载与删种。",
         "icon": "mdi-swap-vertical",
         "api_version": 2,
@@ -239,8 +239,8 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.6-b1b040060f839e28.zip",
-      "sha256": "b1b040060f839e285ebfa24aa7e1e88ffedc77d11ae2bf6ff619697cdf4cb749"
+      "package_url": "packages/brush-flow-1.0.7-222c39bdd402ca87.zip",
+      "sha256": "222c39bdd402ca87970fea21823c2ecc09784d21d30cee43d01b81d687b9ddf5"
     },
     {
       "manifest": {
@@ -1613,7 +1613,7 @@
       "manifest": {
         "id": "emby-cover-generator",
         "name": "媒体库视觉封面",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "description": "为媒体库生成并上传静态或动态风格封面。",
         "icon": "mdi-image-multiple-outline",
         "api_version": 1,
@@ -1851,6 +1851,13 @@
               "key": "use_primary",
               "input_type": "switch",
               "label": "优先使用海报图",
+              "default": true,
+              "section": "style"
+            },
+            {
+              "key": "show_library_title",
+              "input_type": "switch",
+              "label": "显示媒体库标题",
               "default": true,
               "section": "style"
             },
@@ -2377,8 +2384,8 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/emby-cover-generator-1.0.5-2c9480b74bde3f67.zip",
-      "sha256": "2c9480b74bde3f6781d8a0e2152ebb2b4248f5793d29dffb89f2684ca10e9fd7"
+      "package_url": "packages/emby-cover-generator-1.0.6-b8c20aa789e2057f.zip",
+      "sha256": "b8c20aa789e2057f58a2af9ca01be3cad34f62c24cd939bee82c71d800220fba"
     },
     {
       "manifest": {

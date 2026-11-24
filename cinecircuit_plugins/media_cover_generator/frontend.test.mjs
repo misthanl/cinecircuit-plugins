@@ -44,7 +44,7 @@ test('cover settings stay compact and desktop history keeps four columns', () =>
 
 test('poster preference defaults on but preserves explicit off', async () => {
   const wrapper=mount(styleEditor(),{props:{modelValue:{}}});
-  const preference=()=>wrapper.findAll('.switches label').find(x=>x.text().includes('优先使用海报图')).get('input');
+  const preference=()=>wrapper.findAll('label').find(x=>x.text().includes('优先使用海报图')).get('input');
   assert.equal(preference().element.checked,true);
   await preference().setValue(false);
   assert.equal(wrapper.emitted('update:modelValue').at(-1)[0].use_primary,false);
@@ -367,4 +367,75 @@ test('new templates and contextual matte controls preserve zero values and direc
   assert.equal(wrapper.emitted('update:modelValue').at(-1)[0].animation_direction,'alternate');
   assert.equal(wrapper.findAll('.sample img').length,1);
   wrapper.unmount();
+});
+
+
+test('cover switches follow background color, precede title config and preserve explicit hidden titles', async () => {
+  const wrapper=mount(styleEditor(),{props:{modelValue:{}}});
+  const group=wrapper.get('.switches');
+  assert.deepEqual(group.findAll('label').map(x=>x.text()),['显示媒体库标题','显示媒体数量角标']);
+  assert.match(group.element.previousElementSibling.textContent,/优先使用海报图/);
+  assert.match(group.element.previousElementSibling.previousElementSibling.textContent,/背景底色/);
+  assert.match(group.element.nextElementSibling.textContent,/媒体库标题配置/);
+  const toggle=()=>wrapper.get('.switches').findAll('input')[0];
+  assert.equal(toggle().element.checked,true);
+  await toggle().setValue(false);
+  assert.equal(wrapper.emitted('update:modelValue').at(-1)[0].show_library_title,false);
+  await wrapper.setProps({modelValue:{show_library_title:false,title_config:'Saved=Title|SUBTITLE'}});
+  assert.equal(toggle().element.checked,false);
+  assert.equal(wrapper.get('textarea').element.value,'Saved=Title|SUBTITLE');
+  wrapper.unmount();
+});
+
+
+function historyFixture(request,notify) {
+  const Shell=vue.defineComponent({props:['modelValue'],setup:(p,{slots})=>()=>p.modelValue===false?null:vue.h('section',slots.default?.())});
+  const Card=vue.defineComponent({setup:(_,{slots})=>()=>vue.h('div',slots.default?.())});
+  const Button=vue.defineComponent({props:['loading','disabled'],setup:(p,{slots,attrs})=>()=>vue.h('button',{...attrs,disabled:p.disabled||p.loading},slots.default?.())});
+  const Confirm=vue.defineComponent({name:'FixtureConfirm',props:['open','loading','title'],emits:['confirm','cancel'],setup:(p,{slots,emit})=>()=>p.open?vue.h('section',{class:'fixture-confirm'},[p.title,slots.default?.(),vue.h('button',{class:'confirm',disabled:p.loading,onClick:()=>emit('confirm')},'Confirm')]):null});
+  const Detail=vue.defineComponent({name:'FixtureDetail',props:['modelValue','title','kind'],emits:['update:modelValue'],setup:(p,{slots,emit})=>()=>p.modelValue?vue.h('section',{class:'fixture-detail'},[p.title,slots.default?.(),vue.h('button',{class:'close',onClick:()=>emit('update:modelValue',false)},'Close')]):null});
+  let contribution;
+  install({vue,request,ui:{notify,components:{Dialog:Shell,Card,Button,BaseDialog:Detail,ConfirmDialog:Confirm}},registerEditor(){},registerContribution:v=>contribution=v});
+  globalThis.IntersectionObserver=class{observe(){}disconnect(){}};
+  globalThis.URL.createObjectURL=()=> 'blob:cover-fixture';
+  globalThis.URL.revokeObjectURL=()=>{};
+  return mount(contribution.component,{props:{context:{close(){}}},global:{components:{
+    VMenu:{template:'<div><slot name="activator" :props="{}"/><slot/></div>'},
+    VList:{template:'<div><slot/></div>'},
+    VListItem:vue.defineComponent({props:['title'],setup:p=>()=>vue.h('button',p.title)}),
+    VDivider:{template:'<hr>'},VCheckboxBtn:{template:'<input type="checkbox">'},VProgressLinear:{template:'<progress/>'},
+  }}});
+}
+const historyRow={id:'one',name:'Movies',server_id:'server',server_name:'Emby',library_id:'library',created_at:'2026-11-24T01:00:00Z',status:'updated',style:'diagonal',format:'jpeg',resolution:'1920×1080',bytes:100,animated:false};
+function historyResponse(path){return path.includes('history_image')?{image_words:[],byte_length:0,mime:'image/jpeg'}:{items:[historyRow],limit:50,counts:{uploaded:1}};}
+
+test('history uses shared preview and confirmation, guards duplicate apply and notifies after success',async()=>{
+  let finish;let applied=0;const notices=[];
+  const wrapper=historyFixture(async path=>{if(path.endsWith('history_apply')){applied++;return new Promise(resolve=>finish=resolve);}return historyResponse(path);},v=>notices.push(v));
+  await flushPromises();
+  await wrapper.findAll('button').find(x=>x.text()==='查看大图').trigger('click');await flushPromises();
+  assert.equal(wrapper.getComponent({name:'FixtureDetail'}).props('kind'),'detail');
+  assert.match(wrapper.get('.fixture-detail').text(),/Movies/);
+  await wrapper.get('.fixture-detail .close').trigger('click');
+  await wrapper.findAll('button').find(x=>x.text()==='重新应用封面').trigger('click');
+  const confirm=wrapper.getComponent({name:'FixtureConfirm'});
+  confirm.vm.$emit('confirm');await flushPromises();
+  assert.equal(confirm.props('loading'),true);assert.equal(notices.length,0);
+  confirm.vm.$emit('confirm');await flushPromises();assert.equal(applied,1);
+  finish({});await flushPromises();
+  assert.deepEqual(notices,[{title:'封面已重新应用',tone:'success'}]);
+  assert.equal(wrapper.find('.fixture-confirm').exists(),false);
+  assert.equal(wrapper.text().includes('正在处理'),false);
+  assert.equal(wrapper.find('[role="status"]').exists(),false);
+  wrapper.unmount();
+});
+
+test('a failed apply keeps confirmation available for retry without duplicating a handled error',async()=>{
+ const notices=[];
+ const wrapper=historyFixture(async path=>{if(path.endsWith('history_apply'))throw Object.assign(new Error('Reported by host'),{notificationHandled:true});return historyResponse(path);},v=>notices.push(v));
+ await flushPromises();await wrapper.findAll('button').find(x=>x.text()==='重新应用封面').trigger('click');
+ wrapper.getComponent({name:'FixtureConfirm'}).vm.$emit('confirm');await flushPromises();
+ assert.equal(wrapper.getComponent({name:'FixtureConfirm'}).props('loading'),false);
+ assert.equal(wrapper.find('.fixture-confirm').exists(),true);assert.deepEqual(notices,[]);
+ wrapper.unmount();
 });
