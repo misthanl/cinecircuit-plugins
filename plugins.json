@@ -2385,7 +2385,10 @@
         "navigation": {}
       },
       "package_url": "packages/emby-cover-generator-1.0.6-b8c20aa789e2057f.zip",
-      "sha256": "b8c20aa789e2057f58a2af9ca01be3cad34f62c24cd939bee82c71d800220fba"
+      "sha256": "b8c20aa789e2057f58a2af9ca01be3cad34f62c24cd939bee82c71d800220fba",
+      "supersedes_sha256": [
+        "be90ae2cb7c1c2383492df2be46d5e598d706518923d3099c5713f92e68663f6"
+      ]
     },
     {
       "manifest": {
