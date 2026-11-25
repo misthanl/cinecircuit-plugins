@@ -178,3 +178,4 @@ def response(items, page, message, *, mode="live", data=None):
         "options": {"catalog_filters": data["filters"]} if "filters" in data else {},
         "source_status": {"mode": mode, "message": message},
     }
+

@@ -36,7 +36,7 @@ def merge_identical_frames(data):
     frames, tail = _frames(data)
     if len(frames) < 2:
         return data
-    kept = []
+    kept: list[bytearray] = []
     previous = None
     last_delay = None
     last_disposal = 3

@@ -66,27 +66,13 @@ class ArtworkGenerationRun:
 
         requested = list(dict.fromkeys(map(str, self.config.get("selected_servers") or [])))
         if not requested:
-            return {
-                "status": "skipped",
-                "reason": "no_servers_selected",
-                "server_ids": [],
-                "library_count": 0,
-                "generated_count": 0,
-                "items": [],
-            }
+            return self._skipped("no_servers_selected", [])
         await self._validate_servers(requested)
         selected_targets = self._selected_targets(requested)
         plans = await self._library_plans(requested, selected_targets)
         libraries = [library for _, chosen in plans for library in chosen]
         if not libraries:
-            return {
-                "status": "skipped",
-                "reason": "no_libraries",
-                "server_ids": requested,
-                "library_count": 0,
-                "generated_count": 0,
-                "items": [],
-            }
+            return self._skipped("no_libraries", requested)
         font_path = await self.plugin._ensure_cjk_font(self.context)
         self.plugin.renderer = CoverRenderer(font_path)
         try:
@@ -113,6 +99,17 @@ class ArtworkGenerationRun:
             return {**self._summary(libraries, generated), "server_ids": requested}
         finally:
             self.plugin.renderer = None
+
+    @staticmethod
+    def _skipped(reason: str, servers: list[str]) -> dict[str, Any]:
+        return {
+            "status": "skipped",
+            "reason": reason,
+            "server_ids": servers,
+            "library_count": 0,
+            "generated_count": 0,
+            "items": [],
+        }
 
     def _selected_libraries(self, response: dict[str, Any]) -> list[dict[str, Any]]:
         selected_ids = self.plugin._string_set(self.config.get("library_ids"))
@@ -376,7 +373,8 @@ class ArtworkGenerationRun:
             and str(item.get("type", "")).casefold() in {"emby", "jellyfin", "feiniu"}
         }
         feiniu = {
-            str(item["id"]) for item in configurations.get("items", [])
+            str(item["id"])
+            for item in configurations.get("items", [])
             if str(item.get("type", "")).casefold() == "feiniu"
         }
         if not self.dry_run and self.image_format == "gif" and feiniu.intersection(requested):
