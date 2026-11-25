@@ -65,6 +65,7 @@ def encode_frames(
     frame_count: int,
     seconds: int,
     image_format: str,
+    colors: int = 192,
 ) -> bytes:
     executable = ffmpeg_executable()
     if image_format not in {"apng", "webp", "gif"}:
@@ -88,7 +89,9 @@ def encode_frames(
         with tempfile.TemporaryDirectory(prefix="encode-", dir=root) as work:
             folder = Path(work)
             identical = _write_frames(folder, frames, width, height, frame_count)
-            command = _encoder_command(executable, folder, frame_count, seconds, image_format)
+            command = _encoder_command(
+                executable, folder, frame_count, seconds, image_format, colors
+            )
             output = folder / "encoded.bin"
             _run_encoder(
                 command
@@ -138,10 +141,10 @@ def _run_encoder(command, folder):
             raise RuntimeError("FFmpeg 编码失败，原有成品未改动")
 
 
-def _encoder_command(executable, folder, frame_count, seconds, image_format):
+def _encoder_command(executable, folder, frame_count, seconds, image_format, colors=192):
     common = _input_command(executable, folder, frame_count, seconds)
     if image_format == "gif":
-        command = _gif_command(common, folder)
+        command = _gif_command(common, folder, colors)
     elif image_format == "webp":
         command = common + [
             "-c:v",
@@ -171,7 +174,9 @@ def _encoder_command(executable, folder, frame_count, seconds, image_format):
 
 def _read_animation(output, width, height, identical):
     if not output.is_file() or output.stat().st_size > MAX_FILE_BYTES:
-        raise RuntimeError("动图超过宿主 20 MB 上传上限，请缩短时长或改用 WebP")
+        raise RuntimeError(
+            "动图超过宿主 20 MiB 上传上限，请降低分辨率、帧率或缩短时长（WebP 也受此限制）"
+        )
     # Verify complete animation before publishing or uploading anything.
     with Image.open(output) as image:
         # Encoders legitimately collapse identical input frames.
@@ -181,7 +186,12 @@ def _read_animation(output, width, height, identical):
             raise RuntimeError("编码结果不是完整动图")
         image.seek(getattr(image, "n_frames", 1) - 1)
         image.load()
-    return output.read_bytes()
+    data = output.read_bytes()
+    if data.startswith((b"GIF87a", b"GIF89a")):
+        from .gif_frames import merge_identical_frames
+
+        data = merge_identical_frames(data)
+    return data
 
 
 def _input_command(executable, folder, frame_count, seconds):
@@ -207,14 +217,14 @@ def _input_command(executable, folder, frame_count, seconds):
     return common
 
 
-def _gif_command(common, folder):
+def _gif_command(common, folder, colors=192):
     # Two passes avoid keeping an entire split stream buffered in RAM.
     palette = folder / "palette.png"
     _run_encoder(
         common
         + [
             "-vf",
-            "palettegen=max_colors=256",
+            f"palettegen=max_colors={256 if colors == 256 else 192}",
             "-frames:v",
             "1",
             "-threads",
@@ -227,7 +237,7 @@ def _gif_command(common, folder):
         "-i",
         str(palette),
         "-lavfi",
-        "paletteuse=dither=bayer:bayer_scale=3",
+        "paletteuse=dither=bayer:bayer_scale=3:diff_mode=rectangle",
         "-loop",
         "0",
         "-f",

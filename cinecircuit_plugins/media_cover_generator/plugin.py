@@ -32,7 +32,15 @@ from .generation import ArtworkGenerationRun
 
 
 class LibraryArtworkPlugin(PluginBase):
-    disabled_read_actions = ("inventory", "targets", "libraries", "history", "history_image", "sample", "preview_status")
+    disabled_read_actions = (
+        "inventory",
+        "targets",
+        "libraries",
+        "history",
+        "history_image",
+        "sample",
+        "preview_status",
+    )
 
     FONT_FILENAME = "NotoSansCJKsc-Regular.otf"
     FONT_URL = (
@@ -47,7 +55,7 @@ class LibraryArtworkPlugin(PluginBase):
         entrypoint="plugin:LibraryArtworkPlugin",
         id="emby-cover-generator",
         name="媒体库视觉封面",
-        version="1.0.4",
+        version="1.0.7",
         description="为媒体库生成并上传静态或动态风格封面。",
         icon="mdi-image-multiple-outline",
         permissions=(
@@ -207,6 +215,13 @@ class LibraryArtworkPlugin(PluginBase):
                     "section": "style",
                 },
                 {
+                    "key": "show_library_title",
+                    "input_type": "switch",
+                    "label": "显示媒体库标题",
+                    "default": True,
+                    "section": "style",
+                },
+                {
                     "key": "show_item_count",
                     "input_type": "switch",
                     "label": "显示媒体数量角标",
@@ -304,8 +319,8 @@ class LibraryArtworkPlugin(PluginBase):
                     "description_display": "always",
                     "input_type": "select",
                     "label": "动态格式",
-                    "default": "webp",
-                    "description": "1080p 建议使用 WebP；APNG 文件较大，超过宿主 20 MB 限制时需缩短时长。",
+                    "default": "gif",
+                    "description": "请根据媒体服务器类型选择。",
                     "section": "animation",
                     "options": [
                         {"value": "webp", "label": "WebP"},
@@ -314,12 +329,23 @@ class LibraryArtworkPlugin(PluginBase):
                     ],
                 },
                 {
+                    "key": "animation_colors",
+                    "input_type": "select",
+                    "label": "GIF 颜色数量",
+                    "default": "192",
+                    "section": "animation",
+                    "options": [
+                        {"value": "192", "label": "192 色"},
+                        {"value": "256", "label": "256 色"},
+                    ],
+                },
+                {
                     "key": "animation_duration",
                     "description_display": "always",
                     "input_type": "number",
                     "label": "动画时长（秒）",
                     "default": 6,
-                    "description": "1080p 建议 6 秒循环；更长动画可能超过 20 MB 上传限制。",
+                    "description": "默认 6 秒循环；高清 GIF 可能超过 20 MiB，请按实际结果调整。",
                     "validation": {"minimum": 2, "maximum": 60},
                     "section": "animation",
                 },
@@ -339,10 +365,11 @@ class LibraryArtworkPlugin(PluginBase):
                     "input_type": "select",
                     "label": "动画分辨率",
                     "description": "控制动态封面的输出尺寸；分辨率越高，画面越清晰，生成耗时和文件体积也越大。",
-                    "default": "1920x1080",
+                    "default": "400x225",
                     "section": "animation",
                     "options": [
                         {"value": "320x180", "label": "320 × 180"},
+                        {"value": "400x225", "label": "400 × 225（兼容推荐）"},
                         {"value": "480x270", "label": "480 × 270"},
                         {"value": "640x360", "label": "640 × 360"},
                         {"value": "1280x720", "label": "1280 × 720（720p）"},
@@ -600,6 +627,7 @@ class LibraryArtworkPlugin(PluginBase):
     async def on_lifecycle(self, event, context, previous_version=""):
         if event in {"disable", "uninstall"}:
             from .runtime_state import state
+
             for identity, task in tuple(state.jobs.items()):
                 if task.done():
                     state.jobs.pop(identity, None)
@@ -756,7 +784,7 @@ class LibraryArtworkPlugin(PluginBase):
                         )
                 except Exception as error:
                     context.logger.debug(
-                        "读取 Emby 图片失败：%s/%s - %s",
+                        "读取媒体服务器图片失败：%s/%s - %s",
                         item.get("id"),
                         image_type,
                         error,

@@ -12,6 +12,7 @@
 | [IYUU 辅种](cinecircuit_plugins/iyuu_autoseed/README.md) | 查找其他站点的同源种子，检查文件路径和体积后辅种 |
 | [演职员资料完善](cinecircuit_plugins/cast_profile_enricher/README.md) | 补全人物中文姓名、简介、角色与头像 |
 | [CookieCloud 站点同步](cinecircuit_plugins/cookiecloud/README.md) | 同步浏览器 Cookie，验证并更新站点 |
+| [探索菜单扩展](cinecircuit_plugins/explore_menu/README.md) | 浏览腾讯视频、优酷、爱奇艺及芒果 TV 片库，支持平台筛选与订阅 |
 | [豆瓣榜追更](cinecircuit_plugins/douban_rank/README.md) | 根据榜单与筛选条件添加影视订阅 |
 | [猫眼榜追更](cinecircuit_plugins/maoyan_rank/README.md) | 根据猫眼影视榜单添加订阅 |
 | [媒体库视觉工坊](cinecircuit_plugins/media_cover_generator/README.md) | 生成并上传媒体库静态或动态封面 |

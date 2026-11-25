@@ -633,7 +633,7 @@ onMounted(() => {
 
           <div
             :class="[
-              'subtitle-content-tabs',
+              'subtitle-content-tabs app-tabbar app-tabbar--stacked-mobile',
               { 'has-online-tools': activePanel === 'online' },
             ]"
           >

@@ -15,15 +15,19 @@ const { install } = await import("../../.build/cinecircuit_plugins/media_cover_g
 const { mount, flushPromises } = require("@vue/test-utils");
 installSelectStub(vue,require('@vue/test-utils').config);
 require('@vue/test-utils').config.global.stubs.VBtn=true;
-for (const name of ['VSwitch', 'VTextField']) {
+for (const name of ['VSwitch', 'VTextField', 'VTextarea']) {
   require('@vue/test-utils').config.global.components[name] = vue.defineComponent({
+    inheritAttrs: false,
     props: ['modelValue', 'label', 'disabled', 'type', 'hideDetails', 'density', 'variant'],
-    emits: ['update:modelValue'],
-    setup: (props, { emit }) => () => vue.h('label', [props.label, vue.h('input', {
+    emits: ['update:modelValue', 'update:focused'],
+    setup: (props, { emit, attrs }) => () => vue.h('label', { class: attrs.class }, [props.label, vue.h(name === 'VTextarea' ? 'textarea' : 'input', {
+      placeholder: attrs.placeholder,
       type: name === 'VSwitch' ? 'checkbox' : props.type,
       checked: name === 'VSwitch' ? props.modelValue : undefined,
       value: name === 'VSwitch' ? undefined : props.modelValue,
       disabled: props.disabled,
+      onFocus: () => emit('update:focused', true),
+      onBlur: () => emit('update:focused', false),
       onChange: event => emit('update:modelValue', name === 'VSwitch' ? event.target.checked : event.target.value),
     })]),
   });
@@ -44,7 +48,7 @@ test('cover settings stay compact and desktop history keeps four columns', () =>
 
 test('poster preference defaults on but preserves explicit off', async () => {
   const wrapper=mount(styleEditor(),{props:{modelValue:{}}});
-  const preference=()=>wrapper.findAll('.switches label').find(x=>x.text().includes('优先使用海报图')).get('input');
+  const preference=()=>wrapper.findAll('label').find(x=>x.text().includes('优先使用海报图')).get('input');
   assert.equal(preference().element.checked,true);
   await preference().setValue(false);
   assert.equal(wrapper.emitted('update:modelValue').at(-1)[0].use_primary,false);
@@ -88,25 +92,19 @@ test('optional style examples appear only while their fields are focused', async
   const field=title=>wrapper.findAll('.form-grid label').find(item=>item.text().startsWith(title));
   const background=field('背景底色').get('input');
   const titles=field('媒体库标题配置').get('textarea');
-  assert.equal(field('背景底色').classes().includes('label-active'),false);
-  assert.equal(field('媒体库标题配置').classes().includes('label-active'),false);
   assert.equal(background.attributes('placeholder') || '','');
   assert.equal(titles.attributes('placeholder') || '','');
   await background.trigger('focus');
-  assert.equal(field('背景底色').classes().includes('label-active'),true);
   assert.equal(background.attributes('placeholder'),'留空自动取色，如 #101828');
   await background.trigger('blur');
-  assert.equal(field('背景底色').classes().includes('label-active'),false);
   assert.equal(background.attributes('placeholder') || '','');
   await titles.trigger('focus');
-  assert.equal(field('媒体库标题配置').classes().includes('label-active'),true);
   assert.equal(titles.attributes('placeholder'),'电影=电影|MOVIES\n剧集=剧集|TV SERIES');
   await titles.trigger('blur');
-  assert.equal(field('媒体库标题配置').classes().includes('label-active'),false);
   assert.equal(titles.attributes('placeholder') || '','');
   await wrapper.setProps({modelValue:{cover_style_base:'diagonal',background_color:'#101828',title_config:'电影=电影|MOVIES'}});
-  assert.equal(field('背景底色').classes().includes('label-active'),true);
-  assert.equal(field('媒体库标题配置').classes().includes('label-active'),true);
+  assert.equal(background.element.value,'#101828');
+  assert.equal(titles.element.value,'电影=电影|MOVIES');
   assert.equal(wrapper.emitted('update:modelValue'),undefined);
   wrapper.unmount();
 });
@@ -367,4 +365,78 @@ test('new templates and contextual matte controls preserve zero values and direc
   assert.equal(wrapper.emitted('update:modelValue').at(-1)[0].animation_direction,'alternate');
   assert.equal(wrapper.findAll('.sample img').length,1);
   wrapper.unmount();
+});
+
+
+test('cover switches follow background color, precede title config and preserve explicit hidden titles', async () => {
+  const wrapper=mount(styleEditor(),{props:{modelValue:{}}});
+  const switches=()=>wrapper.findAll('.form-grid > .plugin-setting-switch');
+  assert.deepEqual(switches().map(x=>x.text()),['优先使用海报图','显示媒体库标题','显示媒体数量角标']);
+  assert.match(switches()[0].element.previousElementSibling.textContent,/背景底色/);
+  assert.match(switches()[2].element.nextElementSibling.textContent,/媒体库标题配置/);
+  const toggle=()=>switches()[1].get('input');
+  assert.equal(toggle().element.checked,true);
+  await toggle().setValue(false);
+  assert.equal(wrapper.emitted('update:modelValue').at(-1)[0].show_library_title,false);
+  await wrapper.setProps({modelValue:{show_library_title:false,title_config:'Saved=Title|SUBTITLE'}});
+  assert.equal(toggle().element.checked,false);
+  assert.equal(wrapper.get('textarea').element.value,'Saved=Title|SUBTITLE');
+  await wrapper.setProps({modelValue:{cover_style_base:'animated_diagonal',resolution:'custom'}});
+  assert.equal(wrapper.find('.switches').exists(),false);
+  assert.deepEqual(switches().map(x=>x.text()),['优先使用海报图','显示媒体库标题','显示媒体数量角标']);
+  assert.equal(wrapper.findAll('label').some(x=>/自定义宽度|自定义高度/.test(x.text())),false);
+  wrapper.unmount();
+});
+
+
+function historyFixture(request,notify) {
+  const Shell=vue.defineComponent({props:['modelValue'],setup:(p,{slots})=>()=>p.modelValue===false?null:vue.h('section',slots.default?.())});
+  const Card=vue.defineComponent({setup:(_,{slots})=>()=>vue.h('div',slots.default?.())});
+  const Button=vue.defineComponent({props:['loading','disabled'],setup:(p,{slots,attrs})=>()=>vue.h('button',{...attrs,disabled:p.disabled||p.loading},slots.default?.())});
+  const Confirm=vue.defineComponent({name:'FixtureConfirm',props:['open','loading','title'],emits:['confirm','cancel'],setup:(p,{slots,emit})=>()=>p.open?vue.h('section',{class:'fixture-confirm'},[p.title,slots.default?.(),vue.h('button',{class:'confirm',disabled:p.loading,onClick:()=>emit('confirm')},'Confirm')]):null});
+  const Detail=vue.defineComponent({name:'FixtureDetail',props:['modelValue','title','kind'],emits:['update:modelValue'],setup:(p,{slots,emit})=>()=>p.modelValue?vue.h('section',{class:'fixture-detail'},[p.title,slots.default?.(),vue.h('button',{class:'close',onClick:()=>emit('update:modelValue',false)},'Close')]):null});
+  let contribution;
+  install({vue,request,ui:{notify,components:{Dialog:Shell,Card,Button,BaseDialog:Detail,ConfirmDialog:Confirm}},registerEditor(){},registerContribution:v=>contribution=v});
+  globalThis.IntersectionObserver=class{observe(){}disconnect(){}};
+  globalThis.URL.createObjectURL=()=> 'blob:cover-fixture';
+  globalThis.URL.revokeObjectURL=()=>{};
+  return mount(contribution.component,{props:{context:{close(){}}},global:{components:{
+    VMenu:{template:'<div><slot name="activator" :props="{}"/><slot/></div>'},
+    VList:{template:'<div><slot/></div>'},
+    VListItem:vue.defineComponent({props:['title'],setup:p=>()=>vue.h('button',p.title)}),
+    VDivider:{template:'<hr>'},VCheckboxBtn:{template:'<input type="checkbox">'},VProgressLinear:{template:'<progress/>'},
+  }}});
+}
+const historyRow={id:'one',name:'Movies',server_id:'server',server_name:'Emby',library_id:'library',created_at:'2026-11-24T01:00:00Z',status:'updated',style:'diagonal',format:'jpeg',resolution:'1920×1080',bytes:100,animated:false};
+function historyResponse(path){return path.includes('history_image')?{image_words:[],byte_length:0,mime:'image/jpeg'}:{items:[historyRow],limit:50,counts:{uploaded:1}};}
+
+test('history uses shared preview and confirmation, guards duplicate apply and notifies after success',async()=>{
+  let finish;let applied=0;const notices=[];
+  const wrapper=historyFixture(async path=>{if(path.endsWith('history_apply')){applied++;return new Promise(resolve=>finish=resolve);}return historyResponse(path);},v=>notices.push(v));
+  await flushPromises();
+  await wrapper.findAll('button').find(x=>x.text()==='查看大图').trigger('click');await flushPromises();
+  assert.equal(wrapper.getComponent({name:'FixtureDetail'}).props('kind'),'detail');
+  assert.match(wrapper.get('.fixture-detail').text(),/Movies/);
+  await wrapper.get('.fixture-detail .close').trigger('click');
+  await wrapper.findAll('button').find(x=>x.text()==='重新应用封面').trigger('click');
+  const confirm=wrapper.getComponent({name:'FixtureConfirm'});
+  confirm.vm.$emit('confirm');await flushPromises();
+  assert.equal(confirm.props('loading'),true);assert.equal(notices.length,0);
+  confirm.vm.$emit('confirm');await flushPromises();assert.equal(applied,1);
+  finish({});await flushPromises();
+  assert.deepEqual(notices,[{title:'封面已重新应用',tone:'success'}]);
+  assert.equal(wrapper.find('.fixture-confirm').exists(),false);
+  assert.equal(wrapper.text().includes('正在处理'),false);
+  assert.equal(wrapper.find('[role="status"]').exists(),false);
+  wrapper.unmount();
+});
+
+test('a failed apply keeps confirmation available for retry without duplicating a handled error',async()=>{
+ const notices=[];
+ const wrapper=historyFixture(async path=>{if(path.endsWith('history_apply'))throw Object.assign(new Error('Reported by host'),{notificationHandled:true});return historyResponse(path);},v=>notices.push(v));
+ await flushPromises();await wrapper.findAll('button').find(x=>x.text()==='重新应用封面').trigger('click');
+ wrapper.getComponent({name:'FixtureConfirm'}).vm.$emit('confirm');await flushPromises();
+ assert.equal(wrapper.getComponent({name:'FixtureConfirm'}).props('loading'),false);
+ assert.equal(wrapper.find('.fixture-confirm').exists(),true);assert.deepEqual(notices,[]);
+ wrapper.unmount();
 });

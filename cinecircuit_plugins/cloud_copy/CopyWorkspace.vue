@@ -62,7 +62,7 @@ onMounted(async()=>{fitWorkspace();try{const options=await props.request<{items:
   <header><div><h2>跨网盘复制</h2></div><div class="workspace-actions"><UiButton variant="text" prepend-icon="mdi-history" @click="openRecords">复制记录</UiButton><UiButton prepend-icon="mdi-refresh" variant="text" :loading="loading" @click="load">刷新记录</UiButton></div></header>
   <p v-if="error" class="workspace-error" role="alert">{{error}}</p>
   <div class="copy-workbench app-surface-boundary">
-   <div class="mobile-copy-tabs" role="tablist" aria-label="复制位置"><button role="tab" :aria-selected="activePane==='source'" @click="activePane='source'">源文件<span v-if="source.selected.length">{{source.selected.length}}</span></button><button role="tab" :aria-selected="activePane==='target'" @click="activePane='target'">目标目录</button></div>
+   <div class="mobile-copy-tabs app-tabs" role="tablist" aria-label="复制位置"><button role="tab" :aria-selected="activePane==='source'" @click="activePane='source'">源文件<span v-if="source.selected.length">{{source.selected.length}}</span></button><button role="tab" :aria-selected="activePane==='target'" @click="activePane='target'">目标目录</button></div>
    <div class="copy-browsers"><FileBrowser :class="{'is-mobile-hidden':activePane!=='source'}" :request="request" :storages="sources" :disabled="busy" @change="source=$event" /><FileBrowser :class="{'is-mobile-hidden':activePane!=='target'}" :request="request" :storages="targets" :disabled="busy" target @change="target=$event" /></div>
    <div class="copy-controls">
     <div class="copy-option"><VSelect class="app-field app-control-compact" density="compact" v-model="policy" :items="policies" label="复制策略" aria-label="复制策略" variant="outlined" hide-details :disabled="busy" /></div>
@@ -95,7 +95,7 @@ onMounted(async()=>{fitWorkspace();try{const options=await props.request<{items:
 @media(max-width:700px){
  .copy-workspace>header>div:first-child{display:none}.copy-workspace>header{margin-bottom:10px;justify-content:flex-end}.workspace-actions{gap:0}
  .copy-browsers{grid-template-rows:minmax(0,1fr)}.copy-browsers>.is-mobile-hidden{display:none}.copy-browsers>:first-child{border:0}.copy-controls{display:none}
- .mobile-copy-tabs{display:flex;flex-shrink:0;border-bottom:1px solid var(--app-border);padding:0 12px;gap:20px}.mobile-copy-tabs button{position:relative;flex:1;padding:13px 4px;color:var(--app-text-secondary);font-size:14px;font-weight:500}.mobile-copy-tabs button[aria-selected=true]{color:var(--blue);box-shadow:inset 0 -2px var(--blue)}.mobile-copy-tabs span{margin-left:8px;font-size:12px}
+ .mobile-copy-tabs{display:flex;flex-shrink:0}.mobile-copy-tabs button{position:relative;flex:1;color:var(--app-text-secondary);font-size:14px;font-weight:500}.mobile-copy-tabs button[aria-selected=true]{color:var(--blue);}.mobile-copy-tabs span{margin-left:8px;font-size:12px}
  .mobile-copy-footer{display:block;flex-shrink:0;border-top:1px solid var(--app-border);padding:10px 12px}.mobile-copy-summary{display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:12px;color:var(--app-text-secondary)}.mobile-copy-summary>span{flex-shrink:0}.mobile-copy-summary button{display:flex;align-items:center;justify-content:flex-end;gap:3px;min-width:0;flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;text-align:right;color:var(--app-text)}.mobile-copy-actions{display:grid;grid-template-columns:1fr 1.3fr;gap:12px}.mobile-copy-actions .copy-submit{min-height:42px}
 }
 

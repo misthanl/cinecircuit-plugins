@@ -68,6 +68,7 @@ class CoverRenderOptions:
     blur_radius: int = 32
     background_color: str = ""
     show_count: bool = True
+    show_library_title: bool = True
     jpeg_quality: int = 92
     zh_font_preset: str = "wendao"
     en_font_preset: str = "emblemaone"
@@ -79,6 +80,7 @@ class CoverRenderOptions:
     background_light: int = 35
     background_grain: int = 3
     animation_direction: str = "up"
+    animation_colors: int = 192
 
     @classmethod
     def from_config(cls, config: dict[typing.Any, typing.Any]) -> "CoverRenderOptions":
@@ -114,6 +116,8 @@ class CoverRenderOptions:
             ),
             background_color=str(config.get("background_color") or "").strip(),
             show_count=bool(config.get("show_count", True)),
+            show_library_title=bool(config.get("show_library_title", True)),
+            animation_colors=256 if str(config.get("animation_colors")) == "256" else 192,
             jpeg_quality=min(96, max(75, int(config.get("jpeg_quality") or 92))),
             zh_font_preset=str(config.get("zh_font_preset") or "wendao"),
             en_font_preset=str(config.get("en_font_preset") or "emblemaone"),
@@ -201,14 +205,14 @@ class CoverRenderer(CoverFonts):
         subtitle: str,
         item_count: int,
         options: CoverRenderOptions,
-        image_format: str = "apng",
+        image_format: str = "gif",
         duration_seconds: int = 12,
         frames_per_second: int = 12,
     ) -> bytes:
         images = self._open_images(source_images)
         if not images:
             raise ValueError("没有可用于生成动态封面的媒体图片")
-        format_name = str(image_format or "apng").casefold()
+        format_name = str(image_format or "gif").casefold()
         if format_name not in {"apng", "gif", "webp"}:
             raise ValueError("动态封面仅支持 APNG、GIF 和 WebP")
 
@@ -230,6 +234,7 @@ class CoverRenderer(CoverFonts):
             frame_count=count,
             seconds=seconds,
             image_format=format_name,
+            colors=options.animation_colors,
         )
 
     def _animation_frames(self, images, options, accent, count, title, subtitle, item_count):
@@ -659,11 +664,24 @@ class CoverRenderer(CoverFonts):
         options: CoverRenderOptions,
         accent: tuple[int, int, int],
     ) -> None:
+        copy_layer = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+        if options.show_library_title:
+            self._draw_library_title(canvas, copy_layer, title, subtitle, options, accent)
+        if options.show_count:
+            self._draw_count_badge(
+                ImageDraw.Draw(copy_layer),
+                canvas.size,
+                int(canvas.width * 0.065),
+                item_count,
+                accent,
+            )
+        canvas.alpha_composite(copy_layer)
+
+    def _draw_library_title(self, canvas, copy_layer, title, subtitle, options, accent):
         width, height = canvas.size
         designed = options.style in DESIGNED_STYLES
         if not designed or options.style == "cinema":
             self._draw_background_overlay(canvas, centered=options.style == "cinema")
-        copy_layer = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
         draw = ImageDraw.Draw(copy_layer)
         margin: float = int(width * 0.065)
         scale = height / 1080
@@ -692,9 +710,6 @@ class CoverRenderer(CoverFonts):
             subtitle_size, copy_width, bar_width, bar_gap, subtitle_y, margin
         )
         self._draw_subtitle(copy_layer, subtitle, geometry, options, accent, shadow_color)
-        if options.show_count:
-            self._draw_count_badge(draw, canvas.size, int(width * 0.065), item_count, accent)
-        canvas.alpha_composite(copy_layer)
 
     def _copy_title_font(self, title, size, width_ratio, options):
         return self._fit_font(
@@ -942,7 +957,11 @@ class CoverRenderer(CoverFonts):
             candidates,
             key=lambda entry: entry[0] * (0.25 + (max(entry[1]) - min(entry[1])) / 255),
         )
-        return (min(200, max(18, color[0])), min(200, max(18, color[1])), min(200, max(18, color[2])))
+        return (
+            min(200, max(18, color[0])),
+            min(200, max(18, color[1])),
+            min(200, max(18, color[2])),
+        )
 
     @staticmethod
     def _brighten(color: tuple[int, int, int]) -> tuple[int, int, int]:

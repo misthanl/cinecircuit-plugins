@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "../_shared/setting-switch.css";
 import { pluginErrorText } from "../_shared/request-feedback";
 import { computed, onMounted, ref, type Component } from "vue";
 
@@ -61,7 +62,7 @@ onMounted(loadServers);
 
 <template>
   <div class="cast-editor plugin-config-grid app-form-layout">
-    <VSwitch label="启用定时生成" :model-value="Boolean(modelValue.enabled)" :disabled="disabled" color="primary" hide-details @update:model-value="update('enabled', $event)" />
+    <VSwitch class="plugin-setting-switch" inset label="启用定时生成" :model-value="Boolean(modelValue.enabled)" :disabled="disabled" color="primary" hide-details @update:model-value="update('enabled', $event)" />
     <component :is="cronFieldComponent" :model-value="modelValue.cron || ''" :field="cronField" :disabled="disabled" @update:model-value="update('cron', $event)" />
     <VSelect label="触发事件" :model-value="selectedEvent" :disabled="disabled" :items="[
       { value: 'organizer.completed', title: '整理完成' },
@@ -69,14 +70,14 @@ onMounted(loadServers);
       { value: 'metadata.scrape.completed', title: '刮削完成' },
     ]" clearable variant="outlined" hide-details @update:model-value="update('trigger_event', $event ?? null)" />
     <VTextField label="触发后延迟执行（秒）" type="number" min="0" max="3600" :model-value="modelValue.scrape_delay ?? 60" :disabled="disabled || !selectedEvent" variant="outlined" hide-details @update:model-value="update('scrape_delay', Number($event))" />
-    <VSwitch label="补充人物简介" :model-value="modelValue.update_biography !== false" :disabled="disabled" color="primary" hide-details @update:model-value="update('update_biography', $event)" />
+    <VSwitch class="plugin-setting-switch" inset label="补充人物简介" :model-value="modelValue.update_biography !== false" :disabled="disabled" color="primary" hide-details @update:model-value="update('update_biography', $event)" />
     <VSelect label="处理范围" :model-value="modelValue.condition || 'missing_any'" :disabled="disabled" :items="[
       { value: 'all', title: '全部人物' },
       { value: 'missing_any', title: '姓名或角色未中文化' },
       { value: 'missing_name', title: '姓名未中文化' },
       { value: 'missing_role', title: '角色未中文化' },
     ]" variant="outlined" hide-details @update:model-value="update('condition', $event)" />
-    <VSwitch label="移除无法完善的人物" :model-value="Boolean(modelValue.remove_unresolved)" :disabled="disabled" color="primary" hide-details @update:model-value="update('remove_unresolved', $event)" />
+    <VSwitch class="plugin-setting-switch" inset label="移除无法完善的人物" :model-value="Boolean(modelValue.remove_unresolved)" :disabled="disabled" color="primary" hide-details @update:model-value="update('remove_unresolved', $event)" />
     <VSelect class="server-select" label="媒体服务器" :items="serverItems" item-title="label" item-value="id" :model-value="selectedServers" multiple chips closable-chips clearable variant="outlined" hide-details="auto" :loading="loadingServers" :disabled="disabled" :error-messages="serverError || undefined" no-data-text="暂无可用媒体服务器" @update:model-value="update('selected_servers', $event || [])" />
   </div>
 </template>

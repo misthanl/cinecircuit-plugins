@@ -24,7 +24,7 @@ class CookieCloudPlugin(PluginBase):
         entrypoint="plugin:CookieCloudPlugin",
         id="cookiecloud",
         name="CookieCloud 站点同步",
-        version="1.0.3",
+        version="1.0.4",
         description="同步 CookieCloud 数据，自动验证并更新 PT 站点。",
         icon="mdi-cloud-sync-outline",
         api_version=2,
@@ -46,7 +46,6 @@ class CookieCloudPlugin(PluginBase):
                 {
                     "key": "connection",
                     "title": "CookieCloud 设置",
-                    "description": "浏览器扩展服务地址填写 http://127.0.0.1:8000/plugin-public/cookiecloud；上传只保存快照，站点检查由插件定时或手动触发。",
                 },
             ],
             "fields": [

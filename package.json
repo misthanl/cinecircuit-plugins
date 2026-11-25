@@ -11,7 +11,7 @@
     "test:host-integration": "node tests/run-host-integration.mjs",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "build:frontend": "node scripts/build-frontends.mjs",
-    "test:frontend": "node scripts/build-frontends.mjs && node --test cinecircuit_plugins/*/frontend.test.mjs",
+    "test:frontend": "node scripts/build-frontends.mjs && node --test cinecircuit_plugins/*/frontend.test.mjs tests/cover-history-image.test.mjs",
     "lint": "eslint cinecircuit_plugins",
     "quality:frontend": "pnpm run lint && pnpm run typecheck && pnpm run test:frontend"
   },

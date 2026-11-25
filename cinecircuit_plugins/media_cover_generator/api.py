@@ -22,6 +22,8 @@ class CoverApi:
             return result
         if request.action == "history_image" and request.method == "GET":
             thumb = request.query.get("thumbnail") == "1"
+            if "offset" in request.query:
+                return await asyncio.to_thread(history.read_chunk, request.query.get("id", ""), request.query["offset"], thumb)
             row, data = await asyncio.to_thread(history.read, request.query.get("id", ""), thumb)
             return packed(data, "image/jpeg" if thumb else MIMES[row["suffix"]])
         if request.action == "history_delete" and request.method == "POST":
@@ -36,7 +38,7 @@ class CoverApi:
             item
             for item in configurations.get("items", [])
             if item.get("enabled", True)
-            and str(item.get("type", "")).casefold() in {"emby", "jellyfin"}
+            and str(item.get("type", "")).casefold() in {"emby", "jellyfin", "feiniu"}
         ]
         requested = json.loads(request.query.get("servers", "[]"))
         if not isinstance(requested, list) or len(requested) > 100:
@@ -99,7 +101,7 @@ class CoverApi:
         if not any(
             x["id"] == row["server_id"]
             and x.get("enabled")
-            and x.get("type") in {"emby", "jellyfin"}
+            and x.get("type") in {"emby", "jellyfin", "feiniu"}
             for x in servers.get("items", [])
         ):
             raise ValueError("媒体服务器已停用或删除")

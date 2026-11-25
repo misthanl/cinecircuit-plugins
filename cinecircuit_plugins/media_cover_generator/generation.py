@@ -39,7 +39,7 @@ class ArtworkGenerationRun:
         self.image_sources = plugin._image_sources(self.config.get("image_sources"))
         self.options = CoverRenderOptions.from_config(self.config)
         self.image_format = (
-            str(self.config.get("animation_format") or "webp").casefold()
+            str(self.config.get("animation_format") or "gif").casefold()
             if self.animated
             else "jpeg"
         )
@@ -53,12 +53,12 @@ class ArtworkGenerationRun:
     def _animated_options(self) -> CoverRenderOptions:
         from dataclasses import replace
 
-        animation_size = str(self.config.get("animation_resolution") or "1920x1080")
+        animation_size = str(self.config.get("animation_resolution") or "400x225")
         width_text, _, height_text = animation_size.partition("x")
         return replace(
             self.options,
-            width=min(1920, max(320, int(width_text or 1920))),
-            height=min(1080, max(180, int(height_text or 1080))),
+            width=min(1920, max(320, int(width_text or 400))),
+            height=min(1080, max(180, int(height_text or 225))),
         )
 
     async def run(self) -> dict[str, Any]:
@@ -94,7 +94,9 @@ class ArtworkGenerationRun:
                 self.server_id = identity
                 for library in chosen:
                     await self._process_library(library)
-            generated = [item for item in self.results if item.get("status") in {"preview", "updated"}]
+            generated = [
+                item for item in self.results if item.get("status") in {"preview", "updated"}
+            ]
             if (
                 self.errors
                 and not generated
@@ -371,11 +373,17 @@ class ArtworkGenerationRun:
             str(item["id"])
             for item in configurations.get("items", [])
             if item.get("enabled", True)
-            and str(item.get("type", "")).casefold() in {"emby", "jellyfin"}
+            and str(item.get("type", "")).casefold() in {"emby", "jellyfin", "feiniu"}
         }
+        feiniu = {
+            str(item["id"]) for item in configurations.get("items", [])
+            if str(item.get("type", "")).casefold() == "feiniu"
+        }
+        if not self.dry_run and self.image_format == "gif" and feiniu.intersection(requested):
+            raise ValueError("飞牛影视不支持 GIF 封面，请改用 WEBP 或 PNG 格式")
         if any(identity not in supported for identity in requested):
             raise ValueError(
-                "所选服务器已关闭、删除或类型不受支持，请重新选择已启用的 Emby 或 Jellyfin 服务器"
+                "所选服务器已关闭、删除或类型不受支持，请重新选择已启用的 Emby、Jellyfin 或飞牛影视服务器"
             )
 
     async def _publish_cover(self, cover, result, item_key, library_id, library_name):

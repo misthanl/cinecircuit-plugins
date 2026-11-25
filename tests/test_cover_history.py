@@ -15,6 +15,30 @@ def image(color='red'):
 def add(store,server='one',library='1',color='red',config=None):
     store.add(image(color),{'library_id':library,'name':'电影','format':'jpeg','status':'updated'},server,config or {})
 
+
+def test_large_history_image_reads_in_bounded_lossless_messages(store):
+    import array
+    import json
+    import sys
+
+    data = image() + b'\xff' * (6 * 1024 * 1024)
+    store.add(data, {'library_id': '1', 'name': 'large', 'format': 'jpeg'}, 'one', {})
+    identity = store.listing({})['items'][0]['id']
+    chunks, offset = [], 0
+    while offset < len(data):
+        chunk = store.read_chunk(identity, str(offset))
+        assert len(json.dumps(chunk).encode()) < 16 * 1024 * 1024
+        assert chunk['offset'] == offset and chunk['total_bytes'] == len(data)
+        words = array.array('I', chunk['image_words'])
+        if sys.byteorder != 'little':
+            words.byteswap()
+        chunks.append(words.tobytes()[:chunk['byte_length']])
+        offset += chunk['byte_length']
+    assert b''.join(chunks) == data
+    for invalid in ('bad', '-1', str(len(data))):
+        with pytest.raises(ValueError):
+            store.read_chunk(identity, invalid)
+
 def test_immutable_retention_and_server_scope(store):
     add(store,color='red');first=store.listing({})['items'][0]
     add(store,color='blue');assert store.read(first['id'])[1]==image('red')

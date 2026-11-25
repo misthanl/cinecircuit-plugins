@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "../_shared/setting-switch.css";
 import { pluginErrorText, pluginErrorFallback, requestErrorNotified } from "../_shared/request-feedback";
 import { computed, ref } from "vue";
 import { coverImagePayload, waitForCoverPreview } from "./previewImage";
@@ -160,8 +161,6 @@ function backdropClick(event: MouseEvent): void {
 function update(key: string, value: unknown): void {
   emit("update:modelValue", { ...props.modelValue, [key]: value });
 }
-function inputValue(event: Event): string { return (event.target as HTMLInputElement).value; }
-function checkedValue(event: Event): boolean { return (event.target as HTMLInputElement).checked; }
 </script>
 
 <template>
@@ -193,23 +192,26 @@ function checkedValue(event: Event): boolean { return (event.target as HTMLInput
       <div class="form-grid plugin-config-grid app-form-layout">
         <div><VSelect label="媒体排序" :model-value="modelValue.sort_by || 'Random'" :disabled="disabled" @update:model-value="update('sort_by', $event)" :items="[{'value':'Random','title':'随机选择'},{'value':'DateCreated','title':'按入库时间'},{'value':'PremiereDate','title':'按首映时间'}]" variant="outlined" density="comfortable" hide-details /></div>
         <div v-if="currentMode === 'static'"><VSelect label="输出分辨率" :model-value="modelValue.resolution || '1080p'" :disabled="disabled" @update:model-value="update('resolution', $event)" :items="[{'value':'480p','title':'854 × 480'},{'value':'720p','title':'1280 × 720'},{'value':'1080p','title':'1920 × 1080'},{'value':'custom','title':'自定义'}]" variant="outlined" density="comfortable" hide-details /></div>
-        <label v-if="modelValue.resolution === 'custom'"><span>自定义宽度</span><input type="number" min="320" max="7680" :value="modelValue.custom_width || 1920" :disabled="disabled" @input="update('custom_width', Number(inputValue($event)))"></label>
-        <label v-if="modelValue.resolution === 'custom'"><span>自定义高度</span><input type="number" min="180" max="4320" :value="modelValue.custom_height || 1080" :disabled="disabled" @input="update('custom_height', Number(inputValue($event)))"></label>
+        <VTextField v-if="currentMode === 'static' && modelValue.resolution === 'custom'" label="自定义宽度" type="number" min="320" max="7680" :model-value="modelValue.custom_width || 1920" :disabled="disabled" @update:model-value="update('custom_width', Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField v-if="currentMode === 'static' && modelValue.resolution === 'custom'" label="自定义高度" type="number" min="180" max="4320" :model-value="modelValue.custom_height || 1080" :disabled="disabled" @update:model-value="update('custom_height', Number($event))" variant="outlined" density="comfortable" hide-details />
         <div><VSelect label="主标题字体" :model-value="modelValue.zh_font_preset || 'wendao'" :disabled="disabled" @update:model-value="update('zh_font_preset', $event)" :items="zhFonts.map(([value,title]) => ({value,title}))" variant="outlined" density="comfortable" hide-details /></div>
         <div><VSelect label="副标题字体" :model-value="modelValue.en_font_preset || 'emblemaone'" :disabled="disabled" @update:model-value="update('en_font_preset', $event)" :items="enFonts.map(([value,title]) => ({value,title}))" variant="outlined" density="comfortable" hide-details /></div>
         <div><VSelect label="文字质感" :model-value="modelValue.text_finish || 'shadow'" :disabled="disabled" @update:model-value="update('text_finish',$event)" :items="[{'value':'clean','title':'海报白字'},{'value':'shadow','title':'柔影立体'},{'value':'silver','title':'银色质感'}]" variant="outlined" density="comfortable" hide-details /></div>
         <div v-if="hasBackground"><VSelect label="留白背景" :model-value="backgroundMode" :disabled="disabled" @update:model-value="update('background_mode',$event)" :items="[{'value':'solid','title':'纯色底'},{'value':'blurred','title':'柔焦取色'},{'value':'gradient','title':'柔和渐变'}]" variant="outlined" density="comfortable" hide-details /></div>
-        <label><span>中文字号</span><input type="number" min="20" max="400" :value="modelValue.zh_font_size || 170" :disabled="disabled" @input="update('zh_font_size', Number(inputValue($event)))"></label>
-        <label><span>英文字号</span><input type="number" min="12" max="240" :value="modelValue.en_font_size || 75" :disabled="disabled" @input="update('en_font_size', Number(inputValue($event)))"></label>
-        <label><span>每张封面最多使用图片</span><input type="number" min="1" max="12" :value="modelValue.source_limit ?? 8" :disabled="disabled" @input="update('source_limit', Number(inputValue($event)))"></label>
-        <label v-if="hasBackground && backgroundMode === 'blurred'"><span>背景模糊强度</span><input type="number" min="0" max="80" :value="modelValue.blur_radius ?? 32" :disabled="disabled" @input="update('blur_radius', Number(inputValue($event)))"></label>
-        <label v-if="hasBackground && backgroundMode === 'blurred'"><span>底色占比（%）</span><input type="number" min="0" max="100" :value="modelValue.background_mix ?? 80" :disabled="disabled" @input="update('background_mix',Number(inputValue($event)))"></label>
-        <label v-if="hasBackground && backgroundMode !== 'solid'"><span>横向提亮（%）</span><input type="number" min="0" max="100" :value="modelValue.background_light ?? 35" :disabled="disabled" @input="update('background_light',Number(inputValue($event)))"></label>
-        <label v-if="hasBackground"><span>磨砂颗粒（0–10）</span><input type="number" min="0" max="10" :value="modelValue.background_grain ?? 3" :disabled="disabled" @input="update('background_grain',Number(inputValue($event)))"></label>
-        <label><span>JPEG 质量（75–96）</span><input type="number" min="75" max="96" :value="modelValue.jpeg_quality ?? 92" :disabled="disabled" @input="update('jpeg_quality', Number(inputValue($event)))"></label>
-        <label class="deferred-label" :class="{ 'label-active': focusedField === 'background_color' || Boolean(modelValue.background_color) }"><span>背景底色／装饰色</span><input type="text" :value="modelValue.background_color || ''" :placeholder="focusedField === 'background_color' ? '留空自动取色，如 #101828' : ''" :disabled="disabled" @focus="focusedField = 'background_color'" @blur="focusedField = ''" @input="update('background_color', inputValue($event))"></label>
-        <label class="full deferred-label" :class="{ 'label-active': focusedField === 'title_config' || Boolean(modelValue.title_config) }"><span>媒体库标题配置 <small>可选，每行一个</small></span><textarea :value="String(modelValue.title_config || '')" :disabled="disabled" :placeholder="focusedField === 'title_config' ? '电影=电影|MOVIES\n剧集=剧集|TV SERIES' : ''" @focus="focusedField = 'title_config'" @blur="focusedField = ''" @input="update('title_config', inputValue($event))" /></label>
-        <div class="switches full plugin-config-grid app-form-layout"><label><input class="app-native-checkbox" type="checkbox" :checked="Boolean(modelValue.use_primary ?? true)" :disabled="disabled" @change="update('use_primary', checkedValue($event))"><span><b>优先使用海报图</b></span></label><label><input class="app-native-checkbox" type="checkbox" :checked="Boolean(modelValue.show_item_count)" :disabled="disabled" @change="update('show_item_count', checkedValue($event))"><span><b>显示媒体数量角标</b></span></label></div>
+        <VTextField label="中文字号" type="number" min="20" max="400" :model-value="modelValue.zh_font_size || 170" :disabled="disabled" @update:model-value="update('zh_font_size', Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField label="英文字号" type="number" min="12" max="240" :model-value="modelValue.en_font_size || 75" :disabled="disabled" @update:model-value="update('en_font_size', Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField label="每张封面最多使用图片" type="number" min="1" max="12" :model-value="modelValue.source_limit ?? 8" :disabled="disabled" @update:model-value="update('source_limit', Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField v-if="hasBackground && backgroundMode === 'blurred'" label="背景模糊强度" type="number" min="0" max="80" :model-value="modelValue.blur_radius ?? 32" :disabled="disabled" @update:model-value="update('blur_radius', Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField v-if="hasBackground && backgroundMode === 'blurred'" label="底色占比（%）" type="number" min="0" max="100" :model-value="modelValue.background_mix ?? 80" :disabled="disabled" @update:model-value="update('background_mix',Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField v-if="hasBackground && backgroundMode !== 'solid'" label="横向提亮（%）" type="number" min="0" max="100" :model-value="modelValue.background_light ?? 35" :disabled="disabled" @update:model-value="update('background_light',Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField v-if="hasBackground" label="磨砂颗粒（0–10）" type="number" min="0" max="10" :model-value="modelValue.background_grain ?? 3" :disabled="disabled" @update:model-value="update('background_grain',Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField label="JPEG 质量（75–96）" type="number" min="75" max="96" :model-value="modelValue.jpeg_quality ?? 92" :disabled="disabled" @update:model-value="update('jpeg_quality', Number($event))" variant="outlined" density="comfortable" hide-details />
+        <VTextField label="背景底色／装饰色" :model-value="modelValue.background_color || ''" :placeholder="focusedField === 'background_color' ? '留空自动取色，如 #101828' : ''" :disabled="disabled" @update:focused="focusedField = $event ? 'background_color' : ''" @update:model-value="update('background_color', $event)" variant="outlined" density="comfortable" hide-details />
+        <VSwitch class="plugin-setting-switch" color="primary" hide-details inset label="优先使用海报图" :model-value="Boolean(modelValue.use_primary ?? true)" :disabled="disabled" @update:model-value="update('use_primary', Boolean($event))" />
+          <VSwitch class="plugin-setting-switch" color="primary" hide-details inset label="显示媒体库标题" :model-value="Boolean(modelValue.show_library_title ?? true)" :disabled="disabled" @update:model-value="update('show_library_title', Boolean($event))" />
+          <VSwitch class="plugin-setting-switch" color="primary" hide-details inset label="显示媒体数量角标" :model-value="Boolean(modelValue.show_item_count)" :disabled="disabled" @update:model-value="update('show_item_count', Boolean($event))" />
+        <VTextarea class="full title-config-field" no-resize label="媒体库标题配置（可选，每行一个）" :model-value="String(modelValue.title_config || '')" :disabled="disabled" :placeholder="focusedField === 'title_config' ? '电影=电影|MOVIES\n剧集=剧集|TV SERIES' : ''" @update:focused="focusedField = $event ? 'title_config' : ''" @update:model-value="update('title_config', $event)" variant="outlined" density="comfortable" rows="4" hide-details />
+
       </div>
     </section>
     <dialog ref="previewDialog" class="cover-preview-dialog" aria-label="封面高清预览" @click="backdropClick" @close="preview = null">
@@ -244,32 +246,18 @@ function checkedValue(event: Event): boolean { return (event.target as HTMLInput
 .sample-enlarge { bottom: 12px; }
 .preview-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:10px; }
 .preview-actions button { padding:8px 12px; border:1px solid var(--app-border,#d5dce8); border-radius:var(--app-radius-action, 8px); background:var(--app-surface,#fff); color:inherit; font:inherit; font-size:13px; cursor:pointer; }
-.preview-actions small,.form-grid label > small { color:var(--app-text-secondary,#657087); font-size:12px; }
+.preview-actions small { color:var(--app-text-secondary,#657087); font-size:12px; }
 .preview-error { color:#c23934; font-size:10px; }
 button:focus-visible { outline: 3px solid #5575e7; outline-offset: -3px; }
 button:disabled { opacity: .55; cursor: not-allowed; }
 .form-grid { display: grid; row-gap: var(--app-plugin-config-row-gap, 14px); column-gap: var(--app-plugin-config-column-gap, 16px); }
-.form-grid label { display: grid; gap: 8px; }
-.form-grid > label { position: relative; min-width: 0; align-content: start; }
-.form-grid > label > span { position: absolute; top: -8px; left: 12px; z-index: 1; max-width: calc(100% - 32px); padding: 0 4px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; background: var(--control-surface, var(--app-surface, #fff)); color: var(--app-control-muted, #8894a8); font-size: var(--app-font-size-label, 12px); font-weight: 400; line-height: 16px; pointer-events: none; }
-.form-grid > label.deferred-label > span { transition: top .15s ease, left .15s ease, padding .15s ease, font-size .15s ease, background-color .15s ease; }
-.form-grid > label.deferred-label:not(.label-active) > span { top: 18px; left: 16px; padding: 0; background: transparent; font-size: var(--app-font-size-control, 13px); }
-.form-grid > label:focus-within > span { color: var(--app-control-border-focus, #5575e7); }
-.form-grid > label:has(:disabled) { opacity: .55; }
-.form-grid label > span small { font-weight: 400; }
-.form-grid select, .form-grid input[type=number], .form-grid input[type=text], .form-grid textarea { box-sizing: border-box; width: 100%; min-width: 0; height: var(--app-active-control-height, 52px); min-height: var(--app-active-control-height, 52px); margin: 0; padding: 12px 16px; border: 1px solid var(--app-control-border, #d5dce8); border-radius: var(--app-control-radius, 12px); background: var(--control-surface, var(--app-surface, #fff)); color: var(--app-control-text, inherit); font: inherit; font-size: var(--app-font-size-control, 13px); line-height: 1.35; }
-.form-grid > label > :is(select,input,textarea):hover:not(:disabled) { border-color: var(--app-control-border-hover, #9ba9bd); }
-.form-grid > label > :is(select,input,textarea):focus { outline: none; border-color: var(--app-control-border-focus, #5575e7); box-shadow: inset 0 0 0 1px var(--app-control-border-focus, #5575e7), 0 0 0 2px var(--app-control-focus-ring, transparent); }
-.form-grid > label > small { padding-inline: 16px; line-height: 1.5; }
-.form-grid select { appearance: auto; cursor: pointer; }
-.form-grid textarea { height: auto; min-height: 112px; resize: vertical; }
 .full { grid-column: 1/-1; }
-.switches { display: grid; row-gap: var(--app-plugin-config-row-gap, 14px); column-gap: var(--app-plugin-config-column-gap, 16px); }
-.switches label { display: flex; align-items: center; gap: 10px; padding: 14px; border-radius: 10px; background: var(--app-surface-muted, #f5f7fa); cursor: pointer; }
-.switches input { accent-color: #5575e7; }
-.switches span { display: grid; gap: 4px; }
-.switches b { font-size: var(--app-font-size-label, 13px); font-weight: var(--app-font-weight-regular, 400); }
-.switches small { color: var(--app-text-secondary, #657087); font-size: 10px; }
+/* Keep the native scrollbar inside the outline, clear of its rounded corners. */
+.title-config-field :deep(.v-field__field) { padding-block: 10px; padding-inline-end: 10px; }
+.title-config-field :deep(textarea.v-field__input) { height: auto; padding-block: 0 !important; mask-image: none; -webkit-mask-image: none; }
+/* Host plugin grids reset switch padding; keep the standard row's inner gutter. */
+.form-grid :deep(.plugin-setting-switch.v-input) { padding-inline: 14px !important; }
+.form-grid :deep(.plugin-setting-switch .v-label) { color: var(--app-text) !important; }
 .cover-preview-dialog { position: fixed; inset: 0; width: min(1960px, calc(100vw - 32px)); max-width: none; max-height: calc(100dvh - 32px); margin: auto; padding: 0; overflow: hidden; border: 1px solid #394354; border-radius: var(--app-dialog-radius, 16px); background: #10151d; color: #f4f6fc; box-shadow: 0 16px 80px #0009; }
 .cover-preview-dialog::backdrop { background: rgba(3, 7, 14, .86); }
 .cover-preview-shell { display: flex; flex-direction: column; max-height: calc(100dvh - 34px); }

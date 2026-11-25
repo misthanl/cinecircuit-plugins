@@ -25,8 +25,8 @@ def test_default_resolution_and_explicit_values():
     plugin = LibraryArtworkPlugin()
     fields = {f['key']: f for f in plugin.manifest.to_dict()['config_schema']['fields']}
     assert fields['resolution']['default'] == '1080p'
-    assert fields['animation_resolution']['default'] == '1920x1080'
-    assert fields['animation_format']['default'] == 'webp'
+    assert fields['animation_resolution']['default'] == '400x225'
+    assert fields['animation_format']['default'] == 'gif'
     assert [item['value'] for item in fields['animation_format']['options']] == ['webp','apng','gif']
     assert fields['animation_duration']['default'] == 6
     assert fields['use_primary']['default'] is True
@@ -37,7 +37,7 @@ def test_default_resolution_and_explicit_values():
     assert ArtworkGenerationRun(plugin,SimpleNamespace(config={'use_primary':False,'image_sources':['Backdrop','Primary']})).image_sources[0]=='Backdrop'
     for style in ('single', 'animated_diagonal'):
         run = ArtworkGenerationRun(plugin, SimpleNamespace(config={'cover_style_base': style}))
-        assert (run.options.width, run.options.height) == (1920, 1080)
+        assert (run.options.width, run.options.height) == ((1920, 1080) if style == 'single' else (400, 225))
     run = ArtworkGenerationRun(plugin, SimpleNamespace(config={'cover_style_base':'animated_diagonal','animation_resolution':'320x180'}))
     assert (run.options.width, run.options.height) == (320,180)
 
@@ -162,3 +162,42 @@ def test_preview_job_survives_module_reload(monkeypatch):
         assert preview.preview_status(identity)['width']==1920
         jobs.clear()
     asyncio.run(check())
+
+
+def test_gif_merges_holds_and_preserves_timing(storage, monkeypatch):
+    from pathlib import Path
+    executable = shutil.which('ffmpeg')
+    if not executable:
+        pytest.skip('FFmpeg integration dependency is not installed')
+    monkeypatch.setattr(encoding, 'FFMPEG_EXECUTABLE', Path(executable))
+    frames = (Image.new('RGB', (400, 225), 'red' if i < 12 else 'blue') for i in range(24))
+    data = encoding.encode_frames(frames, width=400, height=225, frame_count=24, seconds=2, image_format='gif')
+    with Image.open(io.BytesIO(data)) as image:
+        assert image.n_frames == 2
+        durations = []
+        for index in range(image.n_frames):
+            image.seek(index)
+            durations.append(image.info['duration'])
+            assert image.convert('RGB').getpixel((200,100)) == ((255,0,0) if index == 0 else (0,0,255))
+        assert durations == [1000, 1000]
+        assert image.info.get('loop') == 0
+
+
+def test_explicit_hd_format_and_palette_are_preserved():
+    plugin = LibraryArtworkPlugin()
+    for size in ['1280x720', '1920x1080']:
+        run = ArtworkGenerationRun(plugin, SimpleNamespace(config={
+            'cover_style_base':'animated_diagonal', 'animation_resolution':size,
+            'animation_format':'webp', 'animation_colors':256}))
+        assert (run.options.width,run.options.height) == tuple(map(int,size.split('x')))
+        assert run.image_format == 'webp' and run.options.animation_colors == 256
+
+
+@pytest.mark.parametrize("colors", [None, "192", "256"])
+def test_palette_setting_passes_host_save_validation(colors):
+    from app.extensions.schema import ExtensionConfigSchema
+    schema = ExtensionConfigSchema(LibraryArtworkPlugin().manifest.configuration_fields())
+    config = schema.normalize({} if colors is None else {"animation_colors": colors})
+    assert config["animation_colors"] == (colors or "192")
+    run = ArtworkGenerationRun(LibraryArtworkPlugin(), SimpleNamespace(config=config))
+    assert run.options.animation_colors == int(colors or "192")

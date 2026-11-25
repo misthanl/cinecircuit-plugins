@@ -208,6 +208,26 @@ class CoverHistory:
             row["status"] = "updated"
             db.execute("update covers set payload=? where id=?", (json.dumps(row), identity))
 
+    def read_chunk(self, identity, offset, thumbnail=False):
+        self.path(identity, "jpg")
+        try:
+            start = int(offset)
+        except (ValueError, TypeError):
+            raise ValueError("历史封面读取位置无效") from None
+        with self.lock, self.db() as db:
+            found = db.execute("select payload from covers where id=?", (identity,)).fetchone()
+            if not found:
+                raise ValueError("历史封面已清理，请刷新列表")
+            row = json.loads(found[0])
+            path = self.path(identity, "thumb.jpg" if thumbnail else row["suffix"])
+            with path.open("rb") as stream:
+                total = path.stat().st_size
+                if not 0 <= start < total or total > 20 * 1024 * 1024:
+                    raise ValueError("历史封面读取位置或文件大小无效")
+                stream.seek(start)
+                result = packed(stream.read(1024 * 1024), "image/jpeg" if thumbnail else MIMES[row["suffix"]])
+            return {**result, "offset": start, "total_bytes": total}
+
 
 def packed(data, mime):
     words = array.array("I")

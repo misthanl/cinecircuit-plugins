@@ -1,0 +1,19 @@
+.plugin-setting-switch.v-input {
+  align-items: center;
+  min-width: 0;
+  min-height: var(--app-control-height, 56px);
+  padding: 0 14px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-surface);
+}
+.plugin-setting-switch .v-selection-control {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  gap: 12px;
+}
+.plugin-setting-switch .v-selection-control .v-label {
+  flex: 1;
+  color: var(--app-text);
+  opacity: 1;
+}

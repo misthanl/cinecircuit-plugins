@@ -113,7 +113,7 @@
       "manifest": {
         "id": "brush-flow",
         "name": "站点刷流",
-        "version": "1.0.6",
+        "version": "1.0.7",
         "description": "按站点和规则自动选种、下载与删种。",
         "icon": "mdi-swap-vertical",
         "api_version": 2,
@@ -239,14 +239,14 @@
           }
         ]
       },
-      "package_url": "packages/brush-flow-1.0.6-b1b040060f839e28.zip",
-      "sha256": "b1b040060f839e285ebfa24aa7e1e88ffedc77d11ae2bf6ff619697cdf4cb749"
+      "package_url": "packages/brush-flow-1.0.7-222c39bdd402ca87.zip",
+      "sha256": "222c39bdd402ca87970fea21823c2ecc09784d21d30cee43d01b81d687b9ddf5"
     },
     {
       "manifest": {
         "id": "cast-profile-enricher",
         "name": "演职员资料完善",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "description": "补充影视人物的中文姓名、简介、角色信息与头像。",
         "icon": "mdi-account-star-outline",
         "api_version": 1,
@@ -391,19 +391,14 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/cast-profile-enricher-1.0.5-70506764c2379176.zip",
-      "sha256": "70506764c237917659fcc17cb98ce67e8343422cd8ab451e9c7bc61267ec2452",
-      "supersedes_sha256": [
-        "870bf9029247fa3d751191850f980ddd94212175b6b90a211ee7c5d81765d7dc",
-        "ae5e5fb1a0f1fc8d8966e9dc67789d830d94de306ec3cf6035bb6759a74b0bc9",
-        "b3095411b57db35e32a7cfcbfce77fd92017f748e37208228a902f902dddfb30"
-      ]
+      "package_url": "packages/cast-profile-enricher-1.0.6-a8d28e482193ef89.zip",
+      "sha256": "a8d28e482193ef89c82ee86916774ee446df2796aeb3350893d2a974bd50c574"
     },
     {
       "manifest": {
         "id": "cloud-copy",
         "name": "跨网盘复制",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "通过统一存储能力复制文件，支持秒传、校验后秒传及可选服务器中转。保留源文件。",
         "icon": "mdi-content-copy",
         "api_version": 2,
@@ -569,17 +564,14 @@
           }
         ]
       },
-      "package_url": "packages/cloud-copy-1.0.4-97941f6731213e55.zip",
-      "sha256": "97941f6731213e5558653a4820a6a1e19b592dbe89cedd2b7c373208722c4672",
-      "supersedes_sha256": [
-        "28555aa7689f1db184cf89d1f31cacc330b1f455e1ff9afc94873db72160e274"
-      ]
+      "package_url": "packages/cloud-copy-1.0.5-f702f43095670f8b.zip",
+      "sha256": "f702f43095670f8b393cf1134e7915fdc60b9215d1869760bf2ce976b99fe14c"
     },
     {
       "manifest": {
         "id": "cookiecloud",
         "name": "CookieCloud 站点同步",
-        "version": "1.0.3",
+        "version": "1.0.4",
         "description": "同步 CookieCloud 数据，自动验证并更新 PT 站点。",
         "icon": "mdi-cloud-sync-outline",
         "api_version": 2,
@@ -610,8 +602,7 @@
           "sections": [
             {
               "key": "connection",
-              "title": "CookieCloud 设置",
-              "description": "浏览器扩展服务地址填写 http://127.0.0.1:8000/plugin-public/cookiecloud；上传只保存快照，站点检查由插件定时或手动触发。"
+              "title": "CookieCloud 设置"
             }
           ],
           "fields": [
@@ -693,10 +684,10 @@
         "navigation": {},
         "jobs": []
       },
-      "package_url": "packages/cookiecloud-1.0.3-37b04a9eee20d522.zip",
-      "sha256": "37b04a9eee20d52258fbcdd17fb66509bcb857acbfa7ea6d46c619973ce6ce63",
+      "package_url": "packages/cookiecloud-1.0.4-cf75c4fb65a7e423.zip",
+      "sha256": "cf75c4fb65a7e423f5b1b62245d338ec98f6296d93dca446215e1f7f56f52e1d",
       "supersedes_sha256": [
-        "48127641405e9265d0225d595aacc49d9e25983bf6790646aefdd68585d684d7"
+        "2a0b797fb16a7b7decf7dd6c8924bd5702abe5f43fe4adf61298b84be8e9f299"
       ]
     },
     {
@@ -926,6 +917,235 @@
         "7bf3f6dbba3bb6942c5981c6898946e2d873f4bd0f7d873b15a8ffad1abfb30f",
         "d11746bf26b2c939ee4f6afe027a14315da82302ef5af2b8dece6dd2e0743f7e"
       ]
+    },
+    {
+      "manifest": {
+        "id": "explore-menu",
+        "name": "探索菜单扩展",
+        "version": "1.0.0",
+        "description": "在探索中浏览腾讯视频、优酷、爱奇艺和芒果 TV 频道片库，各平台独立控制显示。",
+        "icon": "mdi-compass-outline",
+        "api_version": 2,
+        "entrypoint": "plugin:ExploreMenuPlugin",
+        "permissions": [
+          "media:discover"
+        ],
+        "capabilities": [
+          "explore_source",
+          "configuration_only"
+        ],
+        "events": [],
+        "schedule_seconds": 0,
+        "config_schema": {
+          "description_display": "hidden",
+          "layout": {
+            "columns": 2,
+            "row_gap": 14,
+            "column_gap": 16
+          },
+          "fields": [
+            {
+              "key": "tencent_visible",
+              "input_type": "switch",
+              "label": "腾讯视频",
+              "default": true
+            },
+            {
+              "key": "tencent_order",
+              "input_type": "number",
+              "label": "腾讯视频顺序",
+              "default": 1,
+              "validation": {
+                "min": 0,
+                "max": 999
+              }
+            },
+            {
+              "key": "youku_visible",
+              "input_type": "switch",
+              "label": "优酷",
+              "default": true
+            },
+            {
+              "key": "youku_order",
+              "input_type": "number",
+              "label": "优酷顺序",
+              "default": 2,
+              "validation": {
+                "min": 0,
+                "max": 999
+              }
+            },
+            {
+              "key": "iqiyi_visible",
+              "input_type": "switch",
+              "label": "爱奇艺",
+              "default": true
+            },
+            {
+              "key": "iqiyi_order",
+              "input_type": "number",
+              "label": "爱奇艺顺序",
+              "default": 3,
+              "validation": {
+                "min": 0,
+                "max": 999
+              }
+            },
+            {
+              "key": "mango_visible",
+              "input_type": "switch",
+              "label": "芒果 TV",
+              "default": true
+            },
+            {
+              "key": "mango_order",
+              "input_type": "number",
+              "label": "芒果 TV顺序",
+              "default": 4,
+              "validation": {
+                "min": 0,
+                "max": 999
+              }
+            }
+          ]
+        },
+        "frontend_module": "",
+        "navigation": {},
+        "jobs": [],
+        "explore_sources": [
+          {
+            "key": "tencent",
+            "label": "腾讯视频",
+            "visibility_config_key": "tencent_visible",
+            "order_config_key": "tencent_order",
+            "catalog_types": [
+              {
+                "value": "movie",
+                "label": "电影"
+              },
+              {
+                "value": "tv",
+                "label": "电视剧"
+              },
+              {
+                "value": "anime",
+                "label": "动漫"
+              },
+              {
+                "value": "kids",
+                "label": "少儿"
+              },
+              {
+                "value": "variety",
+                "label": "综艺"
+              },
+              {
+                "value": "documentary",
+                "label": "纪录片"
+              }
+            ]
+          },
+          {
+            "key": "youku",
+            "label": "优酷",
+            "visibility_config_key": "youku_visible",
+            "order_config_key": "youku_order",
+            "catalog_types": [
+              {
+                "value": "movie",
+                "label": "电影"
+              },
+              {
+                "value": "tv",
+                "label": "电视剧"
+              },
+              {
+                "value": "anime",
+                "label": "动漫"
+              },
+              {
+                "value": "kids",
+                "label": "少儿"
+              },
+              {
+                "value": "variety",
+                "label": "综艺"
+              },
+              {
+                "value": "documentary",
+                "label": "纪录片"
+              }
+            ]
+          },
+          {
+            "key": "iqiyi",
+            "label": "爱奇艺",
+            "visibility_config_key": "iqiyi_visible",
+            "order_config_key": "iqiyi_order",
+            "catalog_types": [
+              {
+                "value": "movie",
+                "label": "电影"
+              },
+              {
+                "value": "tv",
+                "label": "电视剧"
+              },
+              {
+                "value": "anime",
+                "label": "动漫"
+              },
+              {
+                "value": "kids",
+                "label": "少儿"
+              },
+              {
+                "value": "variety",
+                "label": "综艺"
+              },
+              {
+                "value": "documentary",
+                "label": "纪录片"
+              }
+            ]
+          },
+          {
+            "key": "mango",
+            "label": "芒果 TV",
+            "visibility_config_key": "mango_visible",
+            "order_config_key": "mango_order",
+            "catalog_types": [
+              {
+                "value": "movie",
+                "label": "电影"
+              },
+              {
+                "value": "tv",
+                "label": "电视剧"
+              },
+              {
+                "value": "anime",
+                "label": "动漫"
+              },
+              {
+                "value": "kids",
+                "label": "少儿"
+              },
+              {
+                "value": "variety",
+                "label": "综艺"
+              },
+              {
+                "value": "documentary",
+                "label": "纪录片"
+              }
+            ]
+          }
+        ]
+      },
+      "package_url": "packages/explore-menu-1.0.0-7759af6e6f1977ea.zip",
+      "sha256": "7759af6e6f1977ea02c2ab04739d697d050e1505004d36634a0f2be8357e3329"
     },
     {
       "manifest": {
@@ -1390,7 +1610,7 @@
       "manifest": {
         "id": "emby-cover-generator",
         "name": "媒体库视觉封面",
-        "version": "1.0.4",
+        "version": "1.0.7",
         "description": "为媒体库生成并上传静态或动态风格封面。",
         "icon": "mdi-image-multiple-outline",
         "api_version": 1,
@@ -1632,6 +1852,13 @@
               "section": "style"
             },
             {
+              "key": "show_library_title",
+              "input_type": "switch",
+              "label": "显示媒体库标题",
+              "default": true,
+              "section": "style"
+            },
+            {
               "key": "show_item_count",
               "input_type": "switch",
               "label": "显示媒体数量角标",
@@ -1798,8 +2025,8 @@
               "description_display": "always",
               "input_type": "select",
               "label": "动态格式",
-              "default": "webp",
-              "description": "1080p 建议使用 WebP；APNG 文件较大，超过宿主 20 MB 限制时需缩短时长。",
+              "default": "gif",
+              "description": "请根据媒体服务器类型选择。",
               "section": "animation",
               "options": [
                 {
@@ -1817,12 +2044,29 @@
               ]
             },
             {
+              "key": "animation_colors",
+              "input_type": "select",
+              "label": "GIF 颜色数量",
+              "default": "192",
+              "section": "animation",
+              "options": [
+                {
+                  "value": "192",
+                  "label": "192 色"
+                },
+                {
+                  "value": "256",
+                  "label": "256 色"
+                }
+              ]
+            },
+            {
               "key": "animation_duration",
               "description_display": "always",
               "input_type": "number",
               "label": "动画时长（秒）",
               "default": 6,
-              "description": "1080p 建议 6 秒循环；更长动画可能超过 20 MB 上传限制。",
+              "description": "默认 6 秒循环；高清 GIF 可能超过 20 MiB，请按实际结果调整。",
               "validation": {
                 "minimum": 2,
                 "maximum": 60
@@ -1848,12 +2092,16 @@
               "input_type": "select",
               "label": "动画分辨率",
               "description": "控制动态封面的输出尺寸；分辨率越高，画面越清晰，生成耗时和文件体积也越大。",
-              "default": "1920x1080",
+              "default": "400x225",
               "section": "animation",
               "options": [
                 {
                   "value": "320x180",
                   "label": "320 × 180"
+                },
+                {
+                  "value": "400x225",
+                  "label": "400 × 225（兼容推荐）"
                 },
                 {
                   "value": "480x270",
@@ -2154,10 +2402,10 @@
         "frontend_module": "frontend.js",
         "navigation": {}
       },
-      "package_url": "packages/emby-cover-generator-1.0.4-c112bad56cbc6ccd.zip",
-      "sha256": "c112bad56cbc6ccdd4cf21a414a8ccbe38891a9eb71cf55d91e3b6f131707cf3",
+      "package_url": "packages/emby-cover-generator-1.0.7-ff6e74dcddc9a906.zip",
+      "sha256": "ff6e74dcddc9a906ac46ce03361c5b2611e261ea2b7f968274fea5caf52e3c97",
       "supersedes_sha256": [
-        "57280b1e12efebbd261013eaf6f4a84a8329010250480c0f3c16f90c94b02d0d"
+        "fb4d44dfb8c5c423405151cd5716c5b46e681bd6557f21bf43360635dc5bb8bb"
       ]
     },
     {
@@ -2732,7 +2980,7 @@
       "manifest": {
         "id": "subtitle-manager",
         "name": "字幕管理助手",
-        "version": "1.0.8",
+        "version": "1.0.9",
         "description": "在线搜索、自动匹配并管理媒体外挂字幕。",
         "icon": "mdi-subtitles-outline",
         "api_version": 1,
@@ -3101,8 +3349,8 @@
           "visibility_config_key": "show_sidebar_nav"
         }
       },
-      "package_url": "packages/subtitle-manager-1.0.8-9f62921b060854ba.zip",
-      "sha256": "9f62921b060854ba71e2996137316875a23c3a7eb568d9de6daa350cc0fc3735"
+      "package_url": "packages/subtitle-manager-1.0.9-14c8f1801826701f.zip",
+      "sha256": "14c8f1801826701f72e08e51cf7d0336f023f8c4d75f9f0636ad2b6940b9d9b0"
     },
     {
       "manifest": {

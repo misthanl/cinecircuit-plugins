@@ -49,6 +49,7 @@ export interface CineCircuitPluginSdk {
     resolveComponent: typeof resolveComponent;
   };
   ui: {
+    notify(message: { title: string; detail?: string; tone?: "success" | "info" | "warning" | "error" }): void;
     components: Record<string, Component> & {
       Image?: Component;
       Alert: Component;
@@ -56,6 +57,8 @@ export interface CineCircuitPluginSdk {
       Card: Component;
       Chip: Component;
       Dialog: Component;
+      BaseDialog: Component;
+      ConfirmDialog: Component;
       CronField: Component;
       SchemaFields?: Component;
     };

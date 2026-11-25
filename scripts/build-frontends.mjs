@@ -14,7 +14,7 @@ const runtimeGlobal = "__CINECIRCUIT_PLUGIN_VUE_RUNTIME__";
 const runtimeExports = [
   "Fragment", "computed", "createBlock", "createCommentVNode", "createElementBlock",
   "createElementVNode", "createTextVNode", "createVNode", "defineComponent", "h", "isRef",
-  "normalizeClass", "normalizeStyle", "onMounted", "onUnmounted", "openBlock", "reactive", "ref",
+  "mergeProps", "normalizeClass", "normalizeStyle", "onMounted", "onUnmounted", "openBlock", "reactive", "ref",
   "renderList", "resolveComponent", "resolveDynamicComponent", "toDisplayString", "unref", "withCtx", "withModifiers",
 ];
 const execFileAsync = promisify(execFile);
